@@ -6,16 +6,26 @@ class StorageService {
   final FlutterSecureStorage _secureStorage;
   final SharedPreferences _fallback;
 
+  static const _sensitiveKeys = {'api_token'};
+
   StorageService(this._secureStorage, this._fallback);
 
   Future<void> write({required String key, required String? value}) async {
     if (kDebugMode) print('StorageService: Writing $key -> $value');
 
-    // Always write to SharedPreferences fallback
-    if (value != null) {
-      await _fallback.setString(key, value);
+    // Only write to SharedPreferences fallback if it's not a sensitive key
+    if (!_sensitiveKeys.contains(key)) {
+      if (value != null) {
+        await _fallback.setString(key, value);
+      } else {
+        await _fallback.remove(key);
+      }
     } else {
-      await _fallback.remove(key);
+      // If we are deleting a sensitive key, ensure it's removed from fallback too
+      // just in case it was leaked previously
+      if (value == null) {
+        await _fallback.remove(key);
+      }
     }
 
     try {
@@ -48,6 +58,11 @@ class StorageService {
     }
 
     if (secureValue != null) return secureValue;
+
+    // Do not read sensitive keys from the plaintext fallback
+    if (_sensitiveKeys.contains(key)) {
+      return null;
+    }
 
     final fallbackValue = _fallback.getString(key);
     if (kDebugMode && fallbackValue != null) {
