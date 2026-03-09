@@ -1,0 +1,105 @@
+# Test connessione
+query Me {
+  currentWorkspaceMember {
+    id
+    name
+  }
+}
+
+# Lista contatti con search opzionale e paginazione
+query GetPeople($filter: PersonFilterInput, $first: Int, $after: String) {
+  people(filter: $filter, first: $first, after: $after, orderBy: { createdAt: DescNullsLast }) {
+    edges {
+      node {
+        id
+        name { firstName lastName }
+        emails { primaryEmail }
+        phones { primaryPhoneNumber }
+        avatarUrl
+        company { id name }
+        createdAt
+        updatedAt
+      }
+      cursor
+    }
+    pageInfo { hasNextPage endCursor }
+  }
+}
+
+# Dettaglio contatto
+query GetPersonById($id: UUID!) {
+  people(filter: { id: { eq: $id } }) {
+    edges {
+      node {
+        id
+        name { firstName lastName }
+        emails { primaryEmail additionalEmails }
+        phones { primaryPhoneNumber additionalPhones }
+        avatarUrl
+        city
+        jobTitle
+        company { id name domainName { primaryLinkUrl } }
+        createdAt
+        updatedAt
+      }
+    }
+  }
+}
+
+# Crea contatto
+mutation CreatePerson($input: PersonCreateInput!) {
+  createPerson(data: $input) {
+    id
+    name
+    emails { primaryEmail }
+  }
+}
+
+# Lista aziende
+query GetCompanies($filter: CompanyFilterInput, $first: Int) {
+  companies(filter: $filter, first: $first, orderBy: { createdAt: DescNullsLast }) {
+    edges {
+      node {
+        id
+        name
+        createdAt
+      }
+    }
+  }
+}
+
+# Note per contatto
+query GetNotesByPerson($personId: UUID!) {
+  notes(filter: { noteTargets: { some: { personId: { eq: $personId } } } },
+        orderBy: { createdAt: DescNullsLast }) {
+    edges {
+      node { id body createdAt updatedAt }
+    }
+  }
+}
+
+# Crea nota
+mutation CreateNote($input: NoteCreateInput!) {
+  createNote(data: $input) { id body createdAt }
+}
+
+# Lista task
+query GetTasks($filter: TaskFilterInput) {
+  tasks(filter: $filter, orderBy: { createdAt: DescNullsLast }) {
+    edges {
+      node {
+        id title bodyV2 { blocknote { text } } status dueAt createdAt
+      }
+    }
+  }
+}
+
+# Crea task
+mutation CreateTask($input: TaskCreateInput!) {
+  createTask(data: $input) { id title status dueAt createdAt }
+}
+
+# Completa task
+mutation UpdateTask($id: UUID!, $input: TaskUpdateInput!) {
+  updateTask(id: $id, data: $input) { id status }
+}

@@ -1,0 +1,57 @@
+# docker-compose.yml — Twenty CRM local dev
+version: '3.8'
+
+services:
+  twenty:
+    image: twentycrm/twenty:latest
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - SERVER_URL=http://localhost:3000
+      - FRONT_BASE_URL=http://localhost:3000
+      - PG_DATABASE_URL=postgres://twenty:twenty@postgres:5432/default
+      - POSTGRES_URL=postgres://twenty:twenty@postgres:5432/default
+      - REDIS_URL=redis://redis:6379
+      - STORAGE_TYPE=local
+      - APP_SECRET=pocketcrm_dev_secret_change_in_prod
+      - ACCESS_TOKEN_SECRET=pocketcrm_access_secret
+      - LOGIN_TOKEN_SECRET=pocketcrm_login_secret
+      - REFRESH_TOKEN_SECRET=pocketcrm_refresh_secret
+      - FILE_TOKEN_SECRET=pocketcrm_file_secret
+      - ENABLE_DB_MIGRATIONS=true
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    restart: unless-stopped
+    volumes:
+      - twenty_storage:/app/packages/twenty-server/.local-storage
+
+  postgres:
+    image: twentycrm/twenty-postgres:latest
+    environment:
+      - POSTGRES_USER=twenty
+      - POSTGRES_PASSWORD=twenty
+      - POSTGRES_DB=default
+    ports:
+      - "5432:5432"
+    volumes:
+      - twenty_postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U twenty -d default" ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+
+volumes:
+  twenty_postgres:
+  twenty_storage:
