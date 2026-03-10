@@ -80,17 +80,41 @@ class MockCRMRepository extends _i1.Mock implements _i6.CRMRepository {
           as _i7.Future<String>);
 
   @override
-  _i7.Future<List<_i2.Contact>> getContacts({
+  _i7.Future<({List<_i2.Contact> contacts, String? endCursor, bool hasNextPage})> getContacts({
     String? search,
-    int? page = 1,
-    int? pageSize = 20,
+    int pageSize = 20,
+    String? after,
   }) =>
       (super.noSuchMethod(
             Invocation.method(#getContacts, [], {
               #search: search,
-              #page: page,
               #pageSize: pageSize,
+              #after: after,
             }),
+            returnValue: _i7.Future<({List<_i2.Contact> contacts, String? endCursor, bool hasNextPage})>.value(
+              (contacts: <_i2.Contact>[], endCursor: null, hasNextPage: false),
+            ),
+            returnValueForMissingStub: _i7.Future<({List<_i2.Contact> contacts, String? endCursor, bool hasNextPage})>.value(
+              (contacts: <_i2.Contact>[], endCursor: null, hasNextPage: false),
+            ),
+          )
+          as _i7.Future<({List<_i2.Contact> contacts, String? endCursor, bool hasNextPage})>);
+
+  @override
+  _i7.Future<List<_i2.Contact>> getContactsByCompany(String? companyId) =>
+      (super.noSuchMethod(
+            Invocation.method(#getContactsByCompany, [companyId]),
+            returnValue: _i7.Future<List<_i2.Contact>>.value(<_i2.Contact>[]),
+            returnValueForMissingStub: _i7.Future<List<_i2.Contact>>.value(
+              <_i2.Contact>[],
+            ),
+          )
+          as _i7.Future<List<_i2.Contact>>);
+
+  @override
+  _i7.Future<List<_i2.Contact>> getContactsByTask(String? taskId) =>
+      (super.noSuchMethod(
+            Invocation.method(#getContactsByTask, [taskId]),
             returnValue: _i7.Future<List<_i2.Contact>>.value(<_i2.Contact>[]),
             returnValueForMissingStub: _i7.Future<List<_i2.Contact>>.value(
               <_i2.Contact>[],
@@ -241,14 +265,27 @@ class MockCRMRepository extends _i1.Mock implements _i6.CRMRepository {
           as _i7.Future<List<_i4.Note>>);
 
   @override
+  _i7.Future<List<_i4.Note>> getNotesByCompany(String? companyId) =>
+      (super.noSuchMethod(
+            Invocation.method(#getNotesByCompany, [companyId]),
+            returnValue: _i7.Future<List<_i4.Note>>.value(<_i4.Note>[]),
+            returnValueForMissingStub: _i7.Future<List<_i4.Note>>.value(
+              <_i4.Note>[],
+            ),
+          )
+          as _i7.Future<List<_i4.Note>>);
+
+  @override
   _i7.Future<_i4.Note> createNote({
     required String? contactId,
     required String? body,
+    DateTime? dueAt,
   }) =>
       (super.noSuchMethod(
             Invocation.method(#createNote, [], {
               #contactId: contactId,
               #body: body,
+              #dueAt: dueAt,
             }),
             returnValue: _i7.Future<_i4.Note>.value(
               _FakeNote_2(
@@ -256,6 +293,7 @@ class MockCRMRepository extends _i1.Mock implements _i6.CRMRepository {
                 Invocation.method(#createNote, [], {
                   #contactId: contactId,
                   #body: body,
+                  #dueAt: dueAt,
                 }),
               ),
             ),
@@ -265,7 +303,39 @@ class MockCRMRepository extends _i1.Mock implements _i6.CRMRepository {
                 Invocation.method(#createNote, [], {
                   #contactId: contactId,
                   #body: body,
+                  #dueAt: dueAt,
                 }),
+              ),
+            ),
+          )
+          as _i7.Future<_i4.Note>);
+
+  @override
+  _i7.Future<_i4.Note> updateNote(
+    String? id, {
+    required String? body,
+    DateTime? dueAt,
+  }) =>
+      (super.noSuchMethod(
+            Invocation.method(#updateNote, [id], {#body: body, #dueAt: dueAt}),
+            returnValue: _i7.Future<_i4.Note>.value(
+              _FakeNote_2(
+                this,
+                Invocation.method(
+                  #updateNote,
+                  [id],
+                  {#body: body, #dueAt: dueAt},
+                ),
+              ),
+            ),
+            returnValueForMissingStub: _i7.Future<_i4.Note>.value(
+              _FakeNote_2(
+                this,
+                Invocation.method(
+                  #updateNote,
+                  [id],
+                  {#body: body, #dueAt: dueAt},
+                ),
               ),
             ),
           )
@@ -322,14 +392,57 @@ class MockCRMRepository extends _i1.Mock implements _i6.CRMRepository {
           as _i7.Future<_i5.Task>);
 
   @override
-  _i7.Future<_i5.Task> completeTask(String? id) =>
+  _i7.Future<_i5.Task> updateTask(
+    String? id, {
+    String? title,
+    String? body,
+    DateTime? dueAt,
+    bool? clearDueDate = false,
+    bool? completed,
+  }) =>
       (super.noSuchMethod(
-            Invocation.method(#completeTask, [id]),
+            Invocation.method(
+              #updateTask,
+              [id],
+              {
+                #title: title,
+                #body: body,
+                #dueAt: dueAt,
+                #clearDueDate: clearDueDate,
+                #completed: completed,
+              },
+            ),
             returnValue: _i7.Future<_i5.Task>.value(
-              _FakeTask_3(this, Invocation.method(#completeTask, [id])),
+              _FakeTask_3(
+                this,
+                Invocation.method(
+                  #updateTask,
+                  [id],
+                  {
+                    #title: title,
+                    #body: body,
+                    #dueAt: dueAt,
+                    #clearDueDate: clearDueDate,
+                    #completed: completed,
+                  },
+                ),
+              ),
             ),
             returnValueForMissingStub: _i7.Future<_i5.Task>.value(
-              _FakeTask_3(this, Invocation.method(#completeTask, [id])),
+              _FakeTask_3(
+                this,
+                Invocation.method(
+                  #updateTask,
+                  [id],
+                  {
+                    #title: title,
+                    #body: body,
+                    #dueAt: dueAt,
+                    #clearDueDate: clearDueDate,
+                    #completed: completed,
+                  },
+                ),
+              ),
             ),
           )
           as _i7.Future<_i5.Task>);

@@ -25,6 +25,7 @@ mixin _$Note {
   String get body => throw _privateConstructorUsedError;
   String? get contactId => throw _privateConstructorUsedError;
   String? get companyId => throw _privateConstructorUsedError;
+  DateTime? get dueAt => throw _privateConstructorUsedError;
   DateTime? get createdAt => throw _privateConstructorUsedError;
 
   /// Serializes this Note to a JSON map.
@@ -46,6 +47,7 @@ abstract class $NoteCopyWith<$Res> {
     String body,
     String? contactId,
     String? companyId,
+    DateTime? dueAt,
     DateTime? createdAt,
   });
 }
@@ -69,6 +71,7 @@ class _$NoteCopyWithImpl<$Res, $Val extends Note>
     Object? body = null,
     Object? contactId = freezed,
     Object? companyId = freezed,
+    Object? dueAt = freezed,
     Object? createdAt = freezed,
   }) {
     return _then(
@@ -89,6 +92,10 @@ class _$NoteCopyWithImpl<$Res, $Val extends Note>
                 ? _value.companyId
                 : companyId // ignore: cast_nullable_to_non_nullable
                       as String?,
+            dueAt: freezed == dueAt
+                ? _value.dueAt
+                : dueAt // ignore: cast_nullable_to_non_nullable
+                      as DateTime?,
             createdAt: freezed == createdAt
                 ? _value.createdAt
                 : createdAt // ignore: cast_nullable_to_non_nullable
@@ -112,6 +119,7 @@ abstract class _$$NoteImplCopyWith<$Res> implements $NoteCopyWith<$Res> {
     String body,
     String? contactId,
     String? companyId,
+    DateTime? dueAt,
     DateTime? createdAt,
   });
 }
@@ -132,6 +140,7 @@ class __$$NoteImplCopyWithImpl<$Res>
     Object? body = null,
     Object? contactId = freezed,
     Object? companyId = freezed,
+    Object? dueAt = freezed,
     Object? createdAt = freezed,
   }) {
     return _then(
@@ -152,6 +161,10 @@ class __$$NoteImplCopyWithImpl<$Res>
             ? _value.companyId
             : companyId // ignore: cast_nullable_to_non_nullable
                   as String?,
+        dueAt: freezed == dueAt
+            ? _value.dueAt
+            : dueAt // ignore: cast_nullable_to_non_nullable
+                  as DateTime?,
         createdAt: freezed == createdAt
             ? _value.createdAt
             : createdAt // ignore: cast_nullable_to_non_nullable
@@ -169,6 +182,7 @@ class _$NoteImpl implements _Note {
     required this.body,
     this.contactId,
     this.companyId,
+    this.dueAt,
     this.createdAt,
   });
 
@@ -184,11 +198,13 @@ class _$NoteImpl implements _Note {
   @override
   final String? companyId;
   @override
+  final DateTime? dueAt;
+  @override
   final DateTime? createdAt;
 
   @override
   String toString() {
-    return 'Note(id: $id, body: $body, contactId: $contactId, companyId: $companyId, createdAt: $createdAt)';
+    return 'Note(id: $id, body: $body, contactId: $contactId, companyId: $companyId, dueAt: $dueAt, createdAt: $createdAt)';
   }
 
   @override
@@ -202,14 +218,22 @@ class _$NoteImpl implements _Note {
                 other.contactId == contactId) &&
             (identical(other.companyId, companyId) ||
                 other.companyId == companyId) &&
+            (identical(other.dueAt, dueAt) || other.dueAt == dueAt) &&
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, id, body, contactId, companyId, createdAt);
+  int get hashCode => Object.hash(
+    runtimeType,
+    id,
+    body,
+    contactId,
+    companyId,
+    dueAt,
+    createdAt,
+  );
 
   /// Create a copy of Note
   /// with the given fields replaced by the non-null parameter values.
@@ -231,6 +255,7 @@ abstract class _Note implements Note {
     required final String body,
     final String? contactId,
     final String? companyId,
+    final DateTime? dueAt,
     final DateTime? createdAt,
   }) = _$NoteImpl;
 
@@ -244,6 +269,8 @@ abstract class _Note implements Note {
   String? get contactId;
   @override
   String? get companyId;
+  @override
+  DateTime? get dueAt;
   @override
   DateTime? get createdAt;
 

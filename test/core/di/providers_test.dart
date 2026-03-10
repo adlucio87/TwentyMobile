@@ -42,7 +42,8 @@ void main() {
       final updatedContacts = [...initialContacts, newContact];
 
       // 2. Mock repository behavior
-      when(mockCRMRepository.getContacts()).thenAnswer((_) async => initialContacts);
+      when(mockCRMRepository.getContacts()).thenAnswer((_) async => 
+          (contacts: initialContacts, endCursor: null, hasNextPage: false));
 
       when(mockCRMRepository.createContact(
         firstName: 'Jane',
@@ -58,7 +59,8 @@ void main() {
       await container.read(contactsProvider.future);
 
       // Change getContacts to return updatedContacts for the refresh
-      when(mockCRMRepository.getContacts()).thenAnswer((_) async => updatedContacts);
+      when(mockCRMRepository.getContacts()).thenAnswer((_) async =>
+          (contacts: updatedContacts, endCursor: null, hasNextPage: false));
 
       await contactsNotifier.addContact(
         firstName: 'Jane',
@@ -85,7 +87,8 @@ void main() {
         Contact(id: '1', firstName: 'John', lastName: 'Doe', email: null, phone: null),
       ];
 
-      when(mockCRMRepository.getContacts()).thenAnswer((_) async => initialContacts);
+      when(mockCRMRepository.getContacts()).thenAnswer((_) async =>
+          (contacts: initialContacts, endCursor: null, hasNextPage: false));
 
       when(mockCRMRepository.createContact(
         firstName: 'Error',

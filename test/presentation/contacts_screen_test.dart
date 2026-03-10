@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
-import 'package:mockito/annotations.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+
 import 'package:pocketcrm/core/di/providers.dart';
 import 'package:pocketcrm/core/utils/storage_service.dart';
 import 'package:pocketcrm/domain/models/contact.dart';
@@ -32,8 +31,6 @@ void main() {
     });
 
     Widget createWidgetUnderTest() {
-      // SharedPreferences is required by the original providers
-      SharedPreferences.setMockInitialValues({});
 
       return ProviderScope(
         overrides: [
@@ -62,7 +59,8 @@ void main() {
 
       // 2. Mock repository behavior
       // First call for initial load
-      when(mockCRMRepository.getContacts()).thenAnswer((_) async => initialContacts);
+      when(mockCRMRepository.getContacts()).thenAnswer((_) async =>
+          (contacts: initialContacts, endCursor: null, hasNextPage: false));
 
       when(mockCRMRepository.createContact(
         firstName: 'Jane',
@@ -80,7 +78,8 @@ void main() {
       expect(find.text('Jane Smith'), findsNothing);
 
       // Change getContacts to return updatedContacts for the refresh after adding
-      when(mockCRMRepository.getContacts()).thenAnswer((_) async => updatedContacts);
+      when(mockCRMRepository.getContacts()).thenAnswer((_) async =>
+          (contacts: updatedContacts, endCursor: null, hasNextPage: false));
 
       // 5. Open Add Contact dialog
       await tester.tap(find.byIcon(Icons.add));
@@ -123,7 +122,8 @@ void main() {
       ];
 
       // 2. Mock repository behavior for initial load
-      when(mockCRMRepository.getContacts()).thenAnswer((_) async => initialContacts);
+      when(mockCRMRepository.getContacts()).thenAnswer((_) async =>
+          (contacts: initialContacts, endCursor: null, hasNextPage: false));
 
       // 3. Pump the widget
       await tester.pumpWidget(createWidgetUnderTest());
@@ -134,7 +134,8 @@ void main() {
       expect(find.text('Refreshed Contact'), findsNothing);
 
       // 5. Change getContacts to return new data for refresh
-      when(mockCRMRepository.getContacts()).thenAnswer((_) async => refreshedContacts);
+      when(mockCRMRepository.getContacts()).thenAnswer((_) async =>
+          (contacts: refreshedContacts, endCursor: null, hasNextPage: false));
 
       // 6. Perform pull to refresh
       await tester.drag(find.byType(ListView), const Offset(0, 300));

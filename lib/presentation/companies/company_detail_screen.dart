@@ -1,58 +1,37 @@
-//
-import 'dart:io' show Platform;
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:pocketcrm/core/di/providers.dart';
-import 'package:pocketcrm/domain/models/contact.dart';
+import 'package:pocketcrm/domain/models/company.dart';
 import 'package:pocketcrm/domain/models/note.dart';
 import 'package:pocketcrm/shared/widgets/block_note_renderer.dart';
-import 'package:flutter_contacts/flutter_contacts.dart' as fc;
-import 'package:pocketcrm/presentation/contacts/edit_contact_sheet.dart';
+import 'package:pocketcrm/presentation/shared/linked_contacts_widget.dart';
 import 'package:pocketcrm/presentation/notes/edit_note_sheet.dart';
 import 'package:pocketcrm/presentation/shared/skeleton_loading.dart';
 import 'package:pocketcrm/presentation/shared/snackbar_helper.dart';
 
-class ContactDetailScreen extends ConsumerStatefulWidget {
+class CompanyDetailScreen extends ConsumerStatefulWidget {
   final String id;
-  const ContactDetailScreen({super.key, required this.id});
+  const CompanyDetailScreen({super.key, required this.id});
 
   @override
-  ConsumerState<ContactDetailScreen> createState() => _ContactDetailScreenState();
+  ConsumerState<CompanyDetailScreen> createState() => _CompanyDetailScreenState();
 }
 
-class _ContactDetailScreenState extends ConsumerState<ContactDetailScreen> {
+class _CompanyDetailScreenState extends ConsumerState<CompanyDetailScreen> {
   @override
   Widget build(BuildContext context) {
-    final detailAsync = ref.watch(contactDetailProvider(widget.id));
+    final detailAsync = ref.watch(companyDetailProvider(widget.id));
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Dettaglio Contatto'),
-        actions: [
-          detailAsync.whenOrNull(
-            data: (contact) => IconButton(
-              icon: const Icon(Icons.edit),
-              tooltip: 'Modifica contatto',
-              onPressed: () {
-                showModalBottomSheet(
-                  context: context,
-                  isScrollControlled: true,
-                  builder: (_) => EditContactSheet(contact: contact),
-                );
-              },
-            ),
-          ) ?? const SizedBox.shrink(),
-        ],
-      ),
+      appBar: AppBar(title: const Text('Dettaglio Azienda')),
       floatingActionButton: detailAsync.whenOrNull(
-        data: (contact) => FloatingActionButton.extended(
+        data: (company) => FloatingActionButton.extended(
           onPressed: () {
             showModalBottomSheet(
               context: context,
               isScrollControlled: true,
-              builder: (_) => _AddNoteSheet(contactId: contact.id),
+              builder: (_) => _AddCompanyNoteSheet(companyId: company.id),
             );
           },
           icon: const Icon(Icons.add),
@@ -60,14 +39,14 @@ class _ContactDetailScreenState extends ConsumerState<ContactDetailScreen> {
         ),
       ),
       body: detailAsync.when(
-        data: (contact) => _buildDetail(context, contact),
+        data: (company) => _buildDetail(context, company),
         loading: () => const DetailSkeleton(),
         error: (err, stack) => Center(child: Text('Errore: $err')),
       ),
     );
   }
 
-  Widget _buildDetail(BuildContext context, Contact contact) {
+  Widget _buildDetail(BuildContext context, Company company) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -75,106 +54,66 @@ class _ContactDetailScreenState extends ConsumerState<ContactDetailScreen> {
         children: [
           CircleAvatar(
             radius: 50,
-            backgroundImage: contact.avatarUrl != null
-                ? NetworkImage(contact.avatarUrl!)
+            backgroundImage: company.logoUrl != null
+                ? NetworkImage(company.logoUrl!)
                 : null,
-            child: contact.avatarUrl == null
-                ? Text(
-                    contact.firstName.isNotEmpty ? contact.firstName[0] : '?',
-                    style: const TextStyle(fontSize: 40),
-                  )
+            child: company.logoUrl == null
+                ? const Icon(Icons.business, size: 40)
                 : null,
           ),
           const SizedBox(height: 16),
           Text(
-            '${contact.firstName} ${contact.lastName}',
+            company.name,
             style: Theme.of(context).textTheme.headlineMedium,
+            textAlign: TextAlign.center,
           ),
-          if (contact.companyName != null)
-            Text(
-              contact.companyName!,
-              style: Theme.of(context).textTheme.titleMedium,
+          if (company.domainName != null) ...[
+            const SizedBox(height: 4),
+            InkWell(
+              onTap: () async {
+                final url = Uri.parse('https://${company.domainName}');
+                if (await canLaunchUrl(url)) {
+                  await launchUrl(url, mode: LaunchMode.externalApplication);
+                }
+              },
+              child: Text(
+                company.domainName!,
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      color: Colors.blue,
+                      decoration: TextDecoration.underline,
+                    ),
+              ),
             ),
+          ],
           const SizedBox(height: 32),
           Card(
             margin: EdgeInsets.zero,
             child: Column(
               children: [
-                ListTile(
-                  leading: const Icon(Icons.email),
-                  title: Text(
-                    contact.email ?? 'Nessuna email',
-                    style: TextStyle(
-                      color: contact.email != null ? Colors.blue : null,
-                      decoration: contact.email != null ? TextDecoration.underline : null,
-                    ),
+                if (company.industry != null)
+                  ListTile(
+                    leading: const Icon(Icons.category),
+                    title: Text(company.industry!),
+                    subtitle: const Text('Settore'),
                   ),
-                  onTap: contact.email != null
-                      ? () async {
-                          final uri = Uri.parse('mailto:${contact.email}');
-                          if (await canLaunchUrl(uri)) {
-                            await launchUrl(uri);
-                          } else {
-                            if (context.mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('Impossibile aprire il client email')),
-                              );
-                            }
-                          }
-                        }
-                      : null,
-                ),
-                ListTile(
-                  leading: const Icon(Icons.phone),
-                  title: Text(
-                    contact.phone ?? 'Nessun telefono',
-                    style: TextStyle(
-                      color: contact.phone != null ? Colors.blue : null,
-                      decoration: contact.phone != null ? TextDecoration.underline : null,
-                    ),
+                if (company.employeesCount != null)
+                  ListTile(
+                    leading: const Icon(Icons.people),
+                    title: Text('${company.employeesCount}'),
+                    subtitle: const Text('Dipendenti'),
                   ),
-                  onTap: contact.phone != null
-                      ? () async {
-                          if (kIsWeb || (!Platform.isIOS && !Platform.isAndroid)) {
-                            if (context.mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('Le chiamate sono supportate solo su dispositivi mobili')),
-                              );
-                            }
-                            return;
-                          }
-                          final uri = Uri.parse('tel:${contact.phone}');
-                          if (await canLaunchUrl(uri)) {
-                            await launchUrl(uri);
-                          } else {
-                            if (context.mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('Impossibile avviare la chiamata')),
-                              );
-                            }
-                          }
-                        }
-                      : null,
-                ),
+                if (company.industry == null && company.employeesCount == null)
+                  const ListTile(
+                    leading: Icon(Icons.info_outline),
+                    title: Text('Nessun dettaglio aggiuntivo'),
+                  ),
               ],
             ),
           ),
-          const SizedBox(height: 16),
-          ElevatedButton.icon(
-            onPressed: () async {
-              if (await fc.FlutterContacts.permissions.request(fc.PermissionType.write) == fc.PermissionStatus.granted) {
-                final emails = contact.email != null ? [fc.Email(address: contact.email!)] : <fc.Email>[];
-                final phones = contact.phone != null ? [fc.Phone(number: contact.phone!)] : <fc.Phone>[];
-                final newContact = fc.Contact(
-                  name: fc.Name(first: contact.firstName, last: contact.lastName),
-                  emails: emails,
-                  phones: phones,
-                );
-                await fc.FlutterContacts.native.showCreator(contact: newContact);
-              }
-            },
-            icon: const Icon(Icons.save_alt),
-            label: const Text('Salva in Rubrica'),
+          const SizedBox(height: 24),
+          LinkedContactsWidget(
+            entityId: company.id,
+            type: LinkedContactType.company,
           ),
           const SizedBox(height: 24),
           const Text(
@@ -182,20 +121,20 @@ class _ContactDetailScreenState extends ConsumerState<ContactDetailScreen> {
             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
           ),
           const SizedBox(height: 8),
-          _NotesList(contactId: contact.id),
+          _CompanyNotesList(companyId: company.id),
         ],
       ),
     );
   }
 }
 
-class _NotesList extends ConsumerWidget {
-  final String contactId;
-  const _NotesList({required this.contactId});
+class _CompanyNotesList extends ConsumerWidget {
+  final String companyId;
+  const _CompanyNotesList({required this.companyId});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final notesAsync = ref.watch(contactNotesProvider(contactId));
+    final notesAsync = ref.watch(companyNotesProvider(companyId));
 
     return notesAsync.when(
       data: (notes) {
@@ -211,7 +150,7 @@ class _NotesList extends ConsumerWidget {
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           itemCount: notes.length,
-          itemBuilder: (context, index) => _NoteCard(note: notes[index], contactId: contactId),
+          itemBuilder: (context, index) => _NoteCard(note: notes[index], companyId: companyId),
         );
       },
       loading: () => const ListSkeleton(shrinkWrap: true),
@@ -220,10 +159,11 @@ class _NotesList extends ConsumerWidget {
   }
 }
 
+// Reuse the same _NoteCard logic as ContactDetailScreen for consistency
 class _NoteCard extends StatelessWidget {
   final Note note;
-  final String? contactId;
-  const _NoteCard({required this.note, this.contactId});
+  final String? companyId;
+  const _NoteCard({required this.note, this.companyId});
 
   @override
   Widget build(BuildContext context) {
@@ -237,7 +177,6 @@ class _NoteCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Preview compatta — altezza limitata
               LimitedBox(
                 maxHeight: 120,
                 child: IgnorePointer(
@@ -280,7 +219,6 @@ class _NoteCard extends StatelessWidget {
         expand: false,
         builder: (ctx, scrollController) => Column(
           children: [
-            // Handle bar
             Center(
               child: Container(
                 margin: const EdgeInsets.only(top: 12, bottom: 8),
@@ -292,7 +230,6 @@ class _NoteCard extends StatelessWidget {
                 ),
               ),
             ),
-            // Header con data e chiudi
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Row(
@@ -315,7 +252,7 @@ class _NoteCard extends StatelessWidget {
                         isScrollControlled: true,
                         builder: (_) => EditNoteSheet(
                           note: note,
-                          contactId: contactId,
+                          companyId: companyId,
                         ),
                       );
                     },
@@ -328,7 +265,6 @@ class _NoteCard extends StatelessWidget {
               ),
             ),
             const Divider(height: 1),
-            // Contenuto completo
             Expanded(
               child: SingleChildScrollView(
                 controller: scrollController,
@@ -344,17 +280,17 @@ class _NoteCard extends StatelessWidget {
 }
 
 // ──────────────────────────────────────────────────────────────────────────────
-// Add Note bottom sheet
+// Add Note bottom sheet for Company
 // ──────────────────────────────────────────────────────────────────────────────
-class _AddNoteSheet extends ConsumerStatefulWidget {
-  final String contactId;
-  const _AddNoteSheet({required this.contactId});
+class _AddCompanyNoteSheet extends ConsumerStatefulWidget {
+  final String companyId;
+  const _AddCompanyNoteSheet({required this.companyId});
 
   @override
-  ConsumerState<_AddNoteSheet> createState() => _AddNoteSheetState();
+  ConsumerState<_AddCompanyNoteSheet> createState() => _AddCompanyNoteSheetState();
 }
 
-class _AddNoteSheetState extends ConsumerState<_AddNoteSheet> {
+class _AddCompanyNoteSheetState extends ConsumerState<_AddCompanyNoteSheet> {
   final _bodyController = TextEditingController();
   bool _isLoading = false;
 
@@ -369,8 +305,8 @@ class _AddNoteSheetState extends ConsumerState<_AddNoteSheet> {
     if (text.isEmpty) return;
     setState(() => _isLoading = true);
     try {
-      await ref.read(contactNotesProvider(widget.contactId).notifier).addNote(
-            widget.contactId,
+      await ref.read(companyNotesProvider(widget.companyId).notifier).addNote(
+            widget.companyId,
             text,
           );
       if (mounted) {

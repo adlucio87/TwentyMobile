@@ -1,5 +1,5 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:pocketcrm/core/utils/storage_service.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:pocketcrm/data/connectors/twenty_connector.dart';
@@ -13,7 +13,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'providers.g.dart';
 
 @Riverpod(keepAlive: true)
-SharedPreferences sharedPreferences(SharedPreferencesRef ref) {
+Box<String> hiveStorageBox(HiveStorageBoxRef ref) {
   throw UnimplementedError(); // Overridden in main.dart
 }
 
@@ -22,8 +22,8 @@ StorageService storageService(StorageServiceRef ref) {
   const secure = FlutterSecureStorage(
     aOptions: AndroidOptions(encryptedSharedPreferences: true),
   );
-  final fallback = ref.watch(sharedPreferencesProvider);
-  return StorageService(secure, fallback);
+  final box = ref.watch(hiveStorageBoxProvider);
+  return StorageService(secure, box);
 }
 
 @Riverpod(keepAlive: true)
@@ -46,40 +46,130 @@ Future<CRMRepository> crmRepository(CrmRepositoryRef ref) async {
   return TwentyConnector(client: client);
 }
 
-@riverpod
+@Riverpod(keepAlive: true)
 class Contacts extends _$Contacts {
+  String? _endCursor;
+  bool _hasNextPage = false;
+  bool _isLoadingMore = false;
+  String? _currentSearch;
+
   @override
   FutureOr<List<Contact>> build() async {
+    _endCursor = null;
+    _hasNextPage = false;
+    _currentSearch = null;
     final repo = await ref.watch(crmRepositoryProvider.future);
-    return repo.getContacts();
+    final result = await repo.getContacts();
+    _endCursor = result.endCursor;
+    _hasNextPage = result.hasNextPage;
+    return result.contacts;
   }
 
   Future<void> search(String query) async {
+    _endCursor = null;
+    _hasNextPage = false;
+    _currentSearch = query.isEmpty ? null : query;
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
-      final repo = await ref.watch(crmRepositoryProvider.future);
-      return repo.getContacts(search: query);
+      final repo = await ref.read(crmRepositoryProvider.future);
+      final result = await repo.getContacts(search: _currentSearch);
+      _endCursor = result.endCursor;
+      _hasNextPage = result.hasNextPage;
+      return result.contacts;
     });
   }
 
-  Future<void> addContact({
+  bool get hasNextPage => _hasNextPage;
+  bool get isLoadingMore => _isLoadingMore;
+
+  Future<void> loadMore() async {
+    if (_isLoadingMore || !_hasNextPage || _endCursor == null) return;
+    final current = state.value;
+    if (current == null) return;
+
+    _isLoadingMore = true;
+    try {
+      final repo = await ref.read(crmRepositoryProvider.future);
+      final result = await repo.getContacts(
+        search: _currentSearch,
+        after: _endCursor,
+      );
+      _endCursor = result.endCursor;
+      _hasNextPage = result.hasNextPage;
+      state = AsyncValue.data([...current, ...result.contacts]);
+    } finally {
+      _isLoadingMore = false;
+    }
+  }
+
+  Future<Contact> addContact({
     required String firstName,
     required String lastName,
     String? email,
     String? phone,
   }) async {
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
-      final repo = await ref.read(crmRepositoryProvider.future);
-      await repo.createContact(
-        firstName: firstName,
-        lastName: lastName,
-        email: email,
-        phone: phone,
-      );
-      // Refresh the contacts list
-      return repo.getContacts();
-    });
+    final repo = await ref.read(crmRepositoryProvider.future);
+    final newContact = await repo.createContact(
+      firstName: firstName,
+      lastName: lastName,
+      email: email,
+      phone: phone,
+    );
+    
+    // Aggiorniamo ottimisticamente lo stato inserendo il nuovo contatto in cima 
+    // alla lista attuale. In questo modo l'UI si aggiorna all'istante!
+    final currentState = state.value;
+    if (currentState != null) {
+      state = AsyncValue.data([newContact, ...currentState]);
+    } else {
+      // Se era vuoto o in errore, forziamo il reload dal backend
+      ref.invalidateSelf();
+    }
+    
+    return newContact;
+  }
+
+  Future<Contact> updateContact(
+    String id, {
+    String? firstName,
+    String? lastName,
+    String? email,
+    String? phone,
+  }) async {
+    final repo = await ref.read(crmRepositoryProvider.future);
+    final updatedContact = await repo.updateContact(
+      id,
+      firstName: firstName,
+      lastName: lastName,
+      email: email,
+      phone: phone,
+    );
+    
+    // Optimistic update: replace the old contact with the updated one
+    final currentState = state.value;
+    if (currentState != null) {
+      final index = currentState.indexWhere((c) => c.id == id);
+      if (index != -1) {
+        final newList = [...currentState];
+        // We preserve some fields like avatarUrl and company that the update 
+        // mutation might not return fully, by merging with the old contact.
+        // Wait, updatePerson returns the updated fields. Let's merge.
+        final oldContact = newList[index];
+        newList[index] = oldContact.copyWith(
+          firstName: updatedContact.firstName.isNotEmpty ? updatedContact.firstName : oldContact.firstName,
+          lastName: updatedContact.lastName.isNotEmpty ? updatedContact.lastName : oldContact.lastName,
+          email: updatedContact.email ?? oldContact.email,
+          phone: updatedContact.phone ?? oldContact.phone,
+        );
+        state = AsyncValue.data(newList);
+      }
+    }
+    
+    // Also invalidate the contactDetailProvider for this specific contact
+    // so the detail screen gets the fresh data next time it's accessed or currently viewed.
+    ref.invalidate(contactDetailProvider(id));
+    
+    return updatedContact;
   }
 }
 
@@ -99,9 +189,116 @@ class ContactNotes extends _$ContactNotes {
     final repo = await ref.watch(crmRepositoryProvider.future);
     return repo.getNotesByContact(id);
   }
+
+  Future<Note> updateNote(String noteId, String body, {DateTime? dueAt}) async {
+    final repo = await ref.read(crmRepositoryProvider.future);
+    final updatedNote = await repo.updateNote(noteId, body: body, dueAt: dueAt);
+
+    final currentState = state.value;
+    if (currentState != null) {
+      final index = currentState.indexWhere((n) => n.id == noteId);
+      if (index != -1) {
+        final newList = [...currentState];
+        newList[index] = updatedNote;
+        state = AsyncValue.data(newList);
+      }
+    }
+
+    return updatedNote;
+  }
+
+  Future<Note> addNote(String contactId, String body, {DateTime? dueAt}) async {
+    final repo = await ref.read(crmRepositoryProvider.future);
+    final newNote = await repo.createNote(
+      contactId: contactId,
+      body: body,
+      dueAt: dueAt,
+    );
+
+    final currentState = state.value;
+    if (currentState != null) {
+      state = AsyncValue.data([newNote, ...currentState]);
+    } else {
+      ref.invalidateSelf();
+    }
+
+    return newNote;
+  }
+}
+
+
+@riverpod
+class CompanyDetail extends _$CompanyDetail {
+  @override
+  FutureOr<Company> build(String id) async {
+    final repo = await ref.watch(crmRepositoryProvider.future);
+    return repo.getCompanyById(id);
+  }
 }
 
 @riverpod
+class CompanyNotes extends _$CompanyNotes {
+  @override
+  FutureOr<List<Note>> build(String id) async {
+    final repo = await ref.watch(crmRepositoryProvider.future);
+    return repo.getNotesByCompany(id);
+  }
+
+  Future<Note> updateNote(String noteId, String body, {DateTime? dueAt}) async {
+    final repo = await ref.read(crmRepositoryProvider.future);
+    final updatedNote = await repo.updateNote(noteId, body: body, dueAt: dueAt);
+
+    final currentState = state.value;
+    if (currentState != null) {
+      final index = currentState.indexWhere((n) => n.id == noteId);
+      if (index != -1) {
+        final newList = [...currentState];
+        newList[index] = updatedNote;
+        state = AsyncValue.data(newList);
+      }
+    }
+
+    return updatedNote;
+  }
+
+  Future<Note> addNote(String companyId, String body, {DateTime? dueAt}) async {
+    final repo = await ref.read(crmRepositoryProvider.future);
+    final newNote = await repo.createNote(
+      contactId: '', // Usually handled differently for companies, but matching signature
+      body: body,
+      dueAt: dueAt,
+    );
+
+    final currentState = state.value;
+    if (currentState != null) {
+      state = AsyncValue.data([newNote, ...currentState]);
+    } else {
+      ref.invalidateSelf();
+    }
+
+    return newNote;
+  }
+}
+
+@riverpod
+class CompanyContacts extends _$CompanyContacts {
+  @override
+  FutureOr<List<Contact>> build(String id) async {
+    final repo = await ref.watch(crmRepositoryProvider.future);
+    return repo.getContactsByCompany(id);
+  }
+}
+
+@riverpod
+class TaskContacts extends _$TaskContacts {
+  @override
+  FutureOr<List<Contact>> build(String id) async {
+    final repo = await ref.watch(crmRepositoryProvider.future);
+    return repo.getContactsByTask(id);
+  }
+}
+
+@Riverpod(keepAlive: true)
 class Companies extends _$Companies {
   @override
   FutureOr<List<Company>> build() async {
@@ -119,42 +316,72 @@ class Companies extends _$Companies {
 }
 
 @riverpod
+class TaskFilter extends _$TaskFilter {
+  @override
+  bool build() => false; // false = TODO, true = DONE
+
+  void toggle() => state = !state;
+}
+
+@riverpod
 class Tasks extends _$Tasks {
   @override
   FutureOr<List<Task>> build() async {
+    final filter = ref.watch(taskFilterProvider);
     final repo = await ref.watch(crmRepositoryProvider.future);
-    return repo.getTasks();
+    return repo.getTasks(completed: filter);
   }
 
-  Future<void> filterCompleted(bool completed) async {
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
-      final repo = await ref.watch(crmRepositoryProvider.future);
-      return repo.getTasks(completed: completed);
-    });
+
+  Future<Task> addTask(String title, {DateTime? dueAt, String? contactId}) async {
+    final repo = await ref.read(crmRepositoryProvider.future);
+    final newTask = await repo.createTask(
+      title: title,
+      dueAt: dueAt,
+      contactId: contactId,
+    );
+    
+    // Aggiorniamo ottimisticamente lo stato inserendo il nuovo task in cima 
+    final currentState = state.value;
+    if (currentState != null) {
+      state = AsyncValue.data([newTask, ...currentState]);
+    } else {
+      ref.invalidateSelf();
+    }
+    
+    return newTask;
   }
 
-  Future<void> toggleTask(String id, bool currentlyCompleted) async {
-    state = await AsyncValue.guard(() async {
-      final repo = await ref.read(crmRepositoryProvider.future);
-      if (currentlyCompleted) {
-        // Twenty non ha un "uncomplete" semplice nel repository interface ora,
-        // ma possiamo mappare status a TODO/DONE.
-        // Per ora implementiamo solo completeTask come da repo.
-        await repo.completeTask(id);
-      } else {
-        await repo.completeTask(id);
+  Future<Task> updateTask(String id, {String? title, String? body, DateTime? dueAt, bool clearDueDate = false, bool? completed}) async {
+    final repo = await ref.read(crmRepositoryProvider.future);
+    final updatedTask = await repo.updateTask(
+      id,
+      title: title,
+      body: body,
+      dueAt: dueAt,
+      clearDueDate: clearDueDate,
+      completed: completed,
+    );
+
+    final currentState = state.value;
+    if (currentState != null) {
+      final index = currentState.indexWhere((t) => t.id == id);
+      if (index != -1) {
+        final currentFilter = ref.read(taskFilterProvider);
+        if (completed != null && completed != currentFilter) {
+          // Se lo stato di completamento è cambiato ed è diverso dal filtro attivo,
+          // rimuovi il task dalla lista attiva.
+          final newList = [...currentState];
+          newList.removeAt(index);
+          state = AsyncValue.data(newList);
+        } else {
+          final newList = [...currentState];
+          newList[index] = updatedTask;
+          state = AsyncValue.data(newList);
+        }
       }
-      return repo.getTasks();
-    });
-  }
+    }
 
-  Future<void> addTask(String title, {DateTime? dueAt, String? contactId}) async {
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
-      final repo = await ref.read(crmRepositoryProvider.future);
-      await repo.createTask(title: title, dueAt: dueAt, contactId: contactId);
-      return repo.getTasks();
-    });
+    return updatedTask;
   }
 }

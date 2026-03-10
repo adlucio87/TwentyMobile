@@ -1,15 +1,15 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 class StorageService {
   final FlutterSecureStorage _secureStorage;
-  final SharedPreferences _fallback;
+  final Box<String> _box;
   final Map<String, String> _cache = {};
 
   static const _sensitiveKeys = <String>{};
 
-  StorageService(this._secureStorage, this._fallback);
+  StorageService(this._secureStorage, this._box);
 
   Future<void> write({required String key, required String? value}) async {
     if (value != null) {
@@ -24,18 +24,18 @@ class StorageService {
         kDebugMode && defaultTargetPlatform == TargetPlatform.macOS;
     final bool blockPlaintext = _sensitiveKeys.contains(key) && !isMacOSDebug;
 
-    // Only write to SharedPreferences fallback if it's not a sensitive key (except for macOS debug workaround)
+    // Scrivi su Hive come fallback (a meno che la chiave non sia sensibile)
     if (!blockPlaintext) {
       if (value != null) {
-        await _fallback.setString(key, value);
+        await _box.put(key, value);
+        if (kDebugMode) print('StorageService: $key written to Hive');
       } else {
-        await _fallback.remove(key);
+        await _box.delete(key);
+        if (kDebugMode) print('StorageService: $key removed from Hive');
       }
     } else {
-      // If we are deleting a sensitive key, ensure it's removed from fallback too
-      // just in case it was leaked previously
       if (value == null) {
-        await _fallback.remove(key);
+        await _box.delete(key);
       }
     }
 
@@ -84,21 +84,21 @@ class StorageService {
         kDebugMode && defaultTargetPlatform == TargetPlatform.macOS;
     final bool blockPlaintext = _sensitiveKeys.contains(key) && !isMacOSDebug;
 
-    // Do not read sensitive keys from the plaintext fallback (except for macOS debug workaround)
     if (blockPlaintext) {
       return null;
     }
 
-    final fallbackValue = _fallback.getString(key);
-    if (kDebugMode && fallbackValue != null) {
-      print('StorageService: $key read from SharedPreferences fallback');
+    // Leggi da Hive come fallback
+    final hiveValue = _box.get(key);
+    if (kDebugMode && hiveValue != null) {
+      print('StorageService: $key read from Hive fallback');
     }
 
-    if (fallbackValue != null) {
-      _cache[key] = fallbackValue;
+    if (hiveValue != null) {
+      _cache[key] = hiveValue;
     }
 
-    return fallbackValue;
+    return hiveValue;
   }
 
   Future<void> delete({required String key}) async {
@@ -106,7 +106,7 @@ class StorageService {
     try {
       await _secureStorage.delete(key: key);
     } catch (e) {}
-    await _fallback.remove(key);
+    await _box.delete(key);
   }
 
   Future<void> deleteAll() async {
@@ -114,6 +114,6 @@ class StorageService {
     try {
       await _secureStorage.deleteAll();
     } catch (e) {}
-    await _fallback.clear();
+    await _box.clear();
   }
 }

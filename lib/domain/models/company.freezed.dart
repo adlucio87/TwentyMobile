@@ -23,6 +23,7 @@ Company _$CompanyFromJson(Map<String, dynamic> json) {
 mixin _$Company {
   String get id => throw _privateConstructorUsedError;
   String get name => throw _privateConstructorUsedError;
+  String? get domainName => throw _privateConstructorUsedError;
   String? get industry => throw _privateConstructorUsedError;
   String? get website => throw _privateConstructorUsedError;
   String? get logoUrl => throw _privateConstructorUsedError;
@@ -46,6 +47,7 @@ abstract class $CompanyCopyWith<$Res> {
   $Res call({
     String id,
     String name,
+    String? domainName,
     String? industry,
     String? website,
     String? logoUrl,
@@ -71,6 +73,7 @@ class _$CompanyCopyWithImpl<$Res, $Val extends Company>
   $Res call({
     Object? id = null,
     Object? name = null,
+    Object? domainName = freezed,
     Object? industry = freezed,
     Object? website = freezed,
     Object? logoUrl = freezed,
@@ -87,6 +90,10 @@ class _$CompanyCopyWithImpl<$Res, $Val extends Company>
                 ? _value.name
                 : name // ignore: cast_nullable_to_non_nullable
                       as String,
+            domainName: freezed == domainName
+                ? _value.domainName
+                : domainName // ignore: cast_nullable_to_non_nullable
+                      as String?,
             industry: freezed == industry
                 ? _value.industry
                 : industry // ignore: cast_nullable_to_non_nullable
@@ -124,6 +131,7 @@ abstract class _$$CompanyImplCopyWith<$Res> implements $CompanyCopyWith<$Res> {
   $Res call({
     String id,
     String name,
+    String? domainName,
     String? industry,
     String? website,
     String? logoUrl,
@@ -148,6 +156,7 @@ class __$$CompanyImplCopyWithImpl<$Res>
   $Res call({
     Object? id = null,
     Object? name = null,
+    Object? domainName = freezed,
     Object? industry = freezed,
     Object? website = freezed,
     Object? logoUrl = freezed,
@@ -164,6 +173,10 @@ class __$$CompanyImplCopyWithImpl<$Res>
             ? _value.name
             : name // ignore: cast_nullable_to_non_nullable
                   as String,
+        domainName: freezed == domainName
+            ? _value.domainName
+            : domainName // ignore: cast_nullable_to_non_nullable
+                  as String?,
         industry: freezed == industry
             ? _value.industry
             : industry // ignore: cast_nullable_to_non_nullable
@@ -195,6 +208,7 @@ class _$CompanyImpl implements _Company {
   _$CompanyImpl({
     required this.id,
     required this.name,
+    this.domainName,
     this.industry,
     this.website,
     this.logoUrl,
@@ -210,6 +224,8 @@ class _$CompanyImpl implements _Company {
   @override
   final String name;
   @override
+  final String? domainName;
+  @override
   final String? industry;
   @override
   final String? website;
@@ -222,7 +238,7 @@ class _$CompanyImpl implements _Company {
 
   @override
   String toString() {
-    return 'Company(id: $id, name: $name, industry: $industry, website: $website, logoUrl: $logoUrl, employeesCount: $employeesCount, createdAt: $createdAt)';
+    return 'Company(id: $id, name: $name, domainName: $domainName, industry: $industry, website: $website, logoUrl: $logoUrl, employeesCount: $employeesCount, createdAt: $createdAt)';
   }
 
   @override
@@ -232,6 +248,8 @@ class _$CompanyImpl implements _Company {
             other is _$CompanyImpl &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.name, name) || other.name == name) &&
+            (identical(other.domainName, domainName) ||
+                other.domainName == domainName) &&
             (identical(other.industry, industry) ||
                 other.industry == industry) &&
             (identical(other.website, website) || other.website == website) &&
@@ -248,6 +266,7 @@ class _$CompanyImpl implements _Company {
     runtimeType,
     id,
     name,
+    domainName,
     industry,
     website,
     logoUrl,
@@ -273,6 +292,7 @@ abstract class _Company implements Company {
   factory _Company({
     required final String id,
     required final String name,
+    final String? domainName,
     final String? industry,
     final String? website,
     final String? logoUrl,
@@ -286,6 +306,8 @@ abstract class _Company implements Company {
   String get id;
   @override
   String get name;
+  @override
+  String? get domainName;
   @override
   String? get industry;
   @override

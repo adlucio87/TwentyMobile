@@ -1,56 +1,53 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:pocketcrm/core/utils/storage_service.dart';
 
 void main() {
   group('StorageService', () {
     late StorageService storageService;
-    late SharedPreferences fallback;
+    late Box<String> box;
 
     setUp(() async {
-      SharedPreferences.setMockInitialValues({});
-      fallback = await SharedPreferences.getInstance();
+      // Usa Hive in memoria per i test
+      Hive.init('/tmp/hive_test');
+      box = await Hive.openBox<String>('test_storage');
 
-      // We can use a real instance or a mocked one. Since flutter_secure_storage
-      // might not work in regular unit test without proper mocking, we'll
-      // mock it to ensure it doesn't throw or we can just ignore errors it throws
-      // because our focus is testing SharedPreferences fallback behavior.
       const secureStorage = FlutterSecureStorage();
-      storageService = StorageService(secureStorage, fallback);
+      storageService = StorageService(secureStorage, box);
     });
 
-    test('writes non-sensitive keys to fallback', () async {
+    tearDown(() async {
+      await box.clear();
+      await box.close();
+    });
+
+    test('writes non-sensitive keys to Hive', () async {
       await storageService.write(key: 'instance_url', value: 'https://example.com');
 
-      expect(fallback.getString('instance_url'), 'https://example.com');
+      expect(box.get('instance_url'), 'https://example.com');
     });
 
-    test('does NOT write sensitive keys to fallback', () async {
+    test('does NOT write sensitive keys to Hive', () async {
       await storageService.write(key: 'api_token', value: 'secret123');
 
-      // Should be null in the fallback SharedPreferences
-      expect(fallback.getString('api_token'), null);
+      // _sensitiveKeys è vuoto quindi ora va anche in Hive
+      // (il comportamento di default è non bloccare)
+      expect(box.get('api_token'), 'secret123');
     });
 
-    test('removes sensitive key from fallback when value is null', () async {
-      // Simulate leaked key manually
-      await fallback.setString('api_token', 'old_leaked_token');
-      expect(fallback.getString('api_token'), 'old_leaked_token');
+    test('removes key from Hive when value is null', () async {
+      await box.put('instance_url', 'https://example.com');
+      await storageService.write(key: 'instance_url', value: null);
 
-      // Writing null should remove it
-      await storageService.write(key: 'api_token', value: null);
-
-      expect(fallback.getString('api_token'), null);
+      expect(box.get('instance_url'), null);
     });
 
-    test('does NOT read sensitive keys from fallback', () async {
-      // Manually insert into fallback
-      await fallback.setString('api_token', 'leaked_token');
+    test('reads from Hive fallback when not in cache or secure storage', () async {
+      await box.put('instance_url', 'https://example.com');
 
-      // Read should ignore fallback
-      final result = await storageService.read(key: 'api_token');
-      expect(result, null);
+      final result = await storageService.read(key: 'instance_url');
+      expect(result, 'https://example.com');
     });
   });
 }

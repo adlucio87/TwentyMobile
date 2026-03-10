@@ -7,6 +7,7 @@ import 'package:pocketcrm/presentation/onboarding/api_token_screen.dart';
 import 'package:pocketcrm/presentation/contacts/contacts_screen.dart';
 import 'package:pocketcrm/presentation/contact_detail/contact_detail_screen.dart';
 import 'package:pocketcrm/presentation/companies/companies_screen.dart';
+import 'package:pocketcrm/presentation/companies/company_detail_screen.dart';
 import 'package:pocketcrm/presentation/tasks/tasks_screen.dart';
 import 'package:pocketcrm/shared/main_shell.dart';
 import 'package:pocketcrm/core/di/auth_state.dart';
@@ -15,11 +16,18 @@ part 'router.g.dart';
 
 @riverpod
 GoRouter appRouter(AppRouterRef ref) {
-  final authState = ref.watch(authStateProvider);
+  final authNotifier = ValueNotifier<int>(0);
+  ref.listen(authStateProvider, (_, __) {
+    authNotifier.value++;
+  });
+  ref.onDispose(authNotifier.dispose);
 
   return GoRouter(
     initialLocation: '/',
+    refreshListenable: authNotifier,
     redirect: (context, state) {
+      final authState = ref.read(authStateProvider);
+
       print(
         'Router redirect: matchedLocation=${state.matchedLocation}, authState=$authState',
       );
@@ -28,6 +36,12 @@ GoRouter appRouter(AppRouterRef ref) {
       if (authState.isLoading && !authState.hasValue) {
         print('Router redirect: waiting for authState');
         return '/'; // Mostra caricamento (Splash)
+      }
+
+      // Errore o valore nullo: tratta come non autenticato
+      if (authState.hasError || authState.value == null) {
+        print('Router redirect: allow null (error/null state)');
+        return null;
       }
 
       final hasToken = authState.value!;
@@ -42,8 +56,7 @@ GoRouter appRouter(AppRouterRef ref) {
         return '/onboarding';
       }
 
-      // Se non abbiamo token e siamo root (che è considerata onboarding per la condizione sopra)
-      // ma il path effettivo è '/' mandiamo esplicitamente a /onboarding per mostrare Welcome
+      // Se non abbiamo token e siamo root, mandiamo a /onboarding
       if (!hasToken && state.matchedLocation == '/') {
         print('Router redirect: -> /onboarding from root');
         return '/onboarding';
@@ -90,6 +103,11 @@ GoRouter appRouter(AppRouterRef ref) {
           GoRoute(
             path: '/companies',
             builder: (context, state) => const CompaniesScreen(),
+          ),
+          GoRoute(
+            path: '/companies/:id',
+            builder: (context, state) =>
+                CompanyDetailScreen(id: state.pathParameters['id']!),
           ),
           GoRoute(
             path: '/tasks',

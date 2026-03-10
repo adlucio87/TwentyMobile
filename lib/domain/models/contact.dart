@@ -34,12 +34,22 @@ class Contact with _$Contact {
         ? rawAvatar
         : null;
 
+    final phones = json['phones'];
+    String? parsedPhone;
+    if (phones != null) {
+      final callingCode = phones['primaryPhoneCallingCode'] ?? '';
+      final number = phones['primaryPhoneNumber'] ?? '';
+      if (callingCode.isNotEmpty || number.isNotEmpty) {
+        parsedPhone = '$callingCode$number';
+      }
+    }
+
     return Contact(
       id: json['id'],
       firstName: json['name']?['firstName'] ?? '',
       lastName: json['name']?['lastName'] ?? '',
       email: json['emails']?['primaryEmail'],
-      phone: json['phones']?['primaryPhoneNumber'],
+      phone: parsedPhone,
       avatarUrl: avatarUrl,
       companyName: companyName,
       companyId: companyData?['id'],

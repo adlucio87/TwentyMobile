@@ -1,16 +1,28 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:pocketcrm/core/router/router.dart';
 import 'package:pocketcrm/core/theme/theme.dart';
 import 'package:pocketcrm/core/di/providers.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:path_provider/path_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  final prefs = await SharedPreferences.getInstance();
+
+  // Inizializza Hive nella directory dei dati applicazione (persistente)
+  final appDocDir = await getApplicationSupportDirectory();
+  if (kDebugMode) print('Hive storage path: ${appDocDir.path}');
+  Hive.init(appDocDir.path);
+
+  final box = await Hive.openBox<String>('app_storage');
+  if (kDebugMode) {
+    print('Hive box keys at startup: ${box.keys.toList()}');
+  }
+
   runApp(
     ProviderScope(
-      overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
+      overrides: [hiveStorageBoxProvider.overrideWithValue(box)],
       child: const PocketCRMApp(),
     ),
   );

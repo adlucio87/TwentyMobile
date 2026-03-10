@@ -5,6 +5,9 @@ import 'package:go_router/go_router.dart';
 import 'package:pocketcrm/core/di/providers.dart';
 import 'package:pocketcrm/core/di/auth_state.dart';
 import 'package:flutter_contacts/flutter_contacts.dart' as fc;
+import 'package:pocketcrm/presentation/shared/skeleton_loading.dart';
+import 'package:pocketcrm/presentation/shared/snackbar_helper.dart';
+import 'package:pocketcrm/presentation/shared/empty_state_widget.dart';
 
 class ContactsScreen extends ConsumerStatefulWidget {
   const ContactsScreen({super.key});
@@ -15,11 +18,27 @@ class ContactsScreen extends ConsumerStatefulWidget {
 
 class _ContactsScreenState extends ConsumerState<ContactsScreen> {
   Timer? _debounce;
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_onScroll);
+  }
 
   @override
   void dispose() {
     _debounce?.cancel();
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
     super.dispose();
+  }
+
+  void _onScroll() {
+    final pos = _scrollController.position;
+    if (pos.pixels >= pos.maxScrollExtent - 200) {
+      ref.read(contactsProvider.notifier).loadMore();
+    }
   }
 
   void _onSearchChanged(String query) {
@@ -72,15 +91,45 @@ class _ContactsScreenState extends ConsumerState<ContactsScreen> {
       body: contactsAsync.when(
         data: (contacts) {
           if (contacts.isEmpty) {
-            return const Center(child: Text('Nessun contatto trovato.'));
+            return RefreshIndicator(
+              onRefresh: () async => ref.refresh(contactsProvider.future),
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                child: SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.7,
+                  child: const EmptyStateWidget(
+                    icon: Icons.people_outline,
+                    title: 'Nessun contatto',
+                    message: 'Nessun risultato corrisponde alla tua ricerca.',
+                  ),
+                ),
+              ),
+            );
           }
+          final notifier = ref.read(contactsProvider.notifier);
           return RefreshIndicator(
-            onRefresh: () async => ref.refresh(contactsProvider.future),
+            onRefresh: () async {
+              ref.invalidate(contactsProvider);
+              await ref.read(contactsProvider.future);
+            },
             child: ListView.separated(
+              controller: _scrollController,
               physics: const AlwaysScrollableScrollPhysics(),
-              itemCount: contacts.length,
-              separatorBuilder: (context, index) => const Divider(height: 1),
+              itemCount: contacts.length + 1, // +1 for footer
+              separatorBuilder: (context, index) =>
+                  index < contacts.length - 1 ? const Divider(height: 1) : const SizedBox.shrink(),
               itemBuilder: (context, index) {
+                // Footer: spinner or end-of-list indicator
+                if (index == contacts.length) {
+                  if (notifier.hasNextPage) {
+                    return const Padding(
+                      padding: EdgeInsets.all(16),
+                      child: Center(child: CircularProgressIndicator()),
+                    );
+                  } else {
+                    return const SizedBox.shrink();
+                  }
+                }
                 final contact = contacts[index];
                 return ListTile(
                   contentPadding: const EdgeInsets.symmetric(
@@ -124,7 +173,7 @@ class _ContactsScreenState extends ConsumerState<ContactsScreen> {
             ),
           );
         },
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => const ListSkeleton(),
         error: (err, stack) => Center(child: Text('Errore: $err')),
       ),
       floatingActionButton: FloatingActionButton(
@@ -160,6 +209,20 @@ class _AddContactSheetState extends ConsumerState<_AddContactSheet> {
   final _phoneController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
 
+  bool _isLoading = false;
+  String? _errorMessage;
+
+  bool _isValidEmail(String email) {
+    if (email.isEmpty) return true; // Optional
+    return RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email);
+  }
+
+  bool _isValidPhone(String phone) {
+    if (phone.isEmpty) return true; // Optional
+    // Basic validation: allows + and digits, min 5 chars, max 15
+    return RegExp(r'^\+?[0-9\s\-\(\)]{5,15}$').hasMatch(phone);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -186,7 +249,7 @@ class _AddContactSheetState extends ConsumerState<_AddContactSheet> {
                   IconButton(
                     icon: const Icon(Icons.import_contacts),
                     tooltip: 'Importa da rubrica',
-                    onPressed: () async {
+                    onPressed: _isLoading ? null : () async {
                       if (await fc.FlutterContacts.permissions.request(
                             fc.PermissionType.read,
                           ) ==
@@ -229,18 +292,22 @@ class _AddContactSheetState extends ConsumerState<_AddContactSheet> {
                 controller: _firstNameController,
                 decoration: const InputDecoration(labelText: 'Nome'),
                 validator: (v) => v?.isEmpty == true ? 'Obbligatorio' : null,
+                enabled: !_isLoading,
               ),
               const SizedBox(height: 16),
               TextFormField(
                 controller: _lastNameController,
                 decoration: const InputDecoration(labelText: 'Cognome'),
-                validator: (v) => v?.isEmpty == true ? 'Obbligatorio' : null,
+                validator: (v) => v?.trim().isEmpty == true ? 'Obbligatorio' : null,
+                enabled: !_isLoading,
               ),
               const SizedBox(height: 16),
               TextFormField(
                 controller: _emailController,
                 decoration: const InputDecoration(labelText: 'Email'),
                 keyboardType: TextInputType.emailAddress,
+                validator: (v) => !_isValidEmail(v ?? '') ? 'Formato email non valido' : null,
+                enabled: !_isLoading,
               ),
               const SizedBox(height: 16),
               TextFormField(
@@ -249,52 +316,92 @@ class _AddContactSheetState extends ConsumerState<_AddContactSheet> {
                   labelText: 'Telefono (Mobile)',
                 ),
                 keyboardType: TextInputType.phone,
+                validator: (v) => !_isValidPhone(v ?? '') ? 'Formato numero non valido' : null,
+                enabled: !_isLoading,
               ),
+              if (_errorMessage != null) ...[
+                const SizedBox(height: 16),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.red.shade50,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.red.shade200),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(Icons.error_outline, color: Colors.red.shade700, size: 20),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          _errorMessage!,
+                          style: TextStyle(color: Colors.red.shade700, fontSize: 13),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
               const SizedBox(height: 32),
               ElevatedButton(
-                onPressed: () async {
-                  if (_formKey.currentState!.validate()) {
-                    final navigator = Navigator.of(context);
-                    final scaffoldMessenger = ScaffoldMessenger.of(context);
-
-                    // Show a loading indicator while saving
-                    showDialog(
-                      context: context,
-                      barrierDismissible: false,
-                      builder: (context) =>
-                          const Center(child: CircularProgressIndicator()),
-                    );
-
-                    try {
-                      await ref
-                          .read(contactsProvider.notifier)
-                          .addContact(
-                            firstName: _firstNameController.text,
-                            lastName: _lastNameController.text,
-                            email: _emailController.text.isNotEmpty
-                                ? _emailController.text
-                                : null,
-                            phone: _phoneController.text.isNotEmpty
-                                ? _phoneController.text
-                                : null,
-                          );
-                      if (mounted) {
-                        navigator.pop(); // Pop loading dialog
-                        navigator.pop(); // Pop add contact sheet
-                      }
-                    } catch (e) {
-                      if (mounted) {
-                        navigator.pop(); // Pop loading dialog
-                        scaffoldMessenger.showSnackBar(
-                          SnackBar(
-                            content: Text('Errore durante il salvataggio: $e'),
-                          ),
-                        );
-                      }
-                    }
-                  }
-                },
-                child: const Text('Salva'),
+                onPressed: _isLoading
+                    ? null
+                    : () async {
+                        setState(() {
+                          _errorMessage = null;
+                        });
+                        if (_formKey.currentState!.validate()) {
+                          setState(() {
+                            _isLoading = true;
+                          });
+                          
+                          final navigator = Navigator.of(context);
+                          
+                          try {
+                            await ref
+                                .read(contactsProvider.notifier)
+                                .addContact(
+                                  firstName: _firstNameController.text.trim(),
+                                  lastName: _lastNameController.text.trim(),
+                                  email: _emailController.text.trim().isNotEmpty
+                                      ? _emailController.text.trim()
+                                      : null,
+                                  phone: _phoneController.text.trim().isNotEmpty
+                                      ? _phoneController.text.trim()
+                                      : null,
+                                );
+                            
+                            if (mounted) {
+                              navigator.pop(); // Pop solo se successo
+                              SnackbarHelper.showSuccess(context, 'Contatto creato con successo');
+                            }
+                          } catch (e) {
+                            if (mounted) {
+                              // Extract a readable message if it's a GraphQL error
+                              String errorMsg = e.toString();
+                              if (errorMsg.contains('INVALID_PHONE_NUMBER')) {
+                                errorMsg = 'Il numero di telefono (${_phoneController.text}) non è valido o il prefisso internazionale è errato.';
+                              } else if (errorMsg.contains('Provided phone number is invalid')) {
+                                errorMsg = 'Numero di telefono rifiutato dal server.';
+                              } else if (errorMsg.contains('Exception:')) {
+                                errorMsg = errorMsg.replaceAll('Exception:', '').trim();
+                              }
+                              
+                              setState(() {
+                                _isLoading = false;
+                                _errorMessage = errorMsg;
+                              });
+                            }
+                          }
+                        }
+                      },
+                child: _isLoading 
+                    ? const SizedBox(
+                        height: 20, 
+                        width: 20, 
+                        child: CircularProgressIndicator(strokeWidth: 2)
+                      )
+                    : const Text('Salva Contatto'),
               ),
               const SizedBox(height: 32),
             ],

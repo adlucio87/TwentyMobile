@@ -1,21 +1,21 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:pocketcrm/core/di/providers.dart';
 import 'package:flutter/widgets.dart';
 
 void main() {
   test('Benchmark CRM Repository', () async {
     WidgetsFlutterBinding.ensureInitialized();
-    SharedPreferences.setMockInitialValues({
-      'instance_url': 'https://example.com',
-      'api_token': 'test_token',
-    });
 
-    final prefs = await SharedPreferences.getInstance();
+    Hive.init('/tmp/hive_benchmark_crm_repo');
+    final box = await Hive.openBox<String>('crm_repo_bench');
+    await box.put('instance_url', 'https://example.com');
+    await box.put('api_token', 'test_token');
+
     final container = ProviderContainer(
       overrides: [
-        sharedPreferencesProvider.overrideWithValue(prefs),
+        hiveStorageBoxProvider.overrideWithValue(box),
       ],
     );
 
@@ -27,5 +27,8 @@ void main() {
     }
     stopwatch.stop();
     print('100 reads took ${stopwatch.elapsedMilliseconds} ms');
+
+    await box.close();
+    container.dispose();
   });
 }

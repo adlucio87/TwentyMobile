@@ -8,7 +8,7 @@ class AuthState extends _$AuthState {
   @override
   Future<bool> build() async {
     print('AuthState: build started');
-    final storage = ref.watch(storageServiceProvider);
+    final storage = ref.read(storageServiceProvider);
     final token = await storage.read(key: 'api_token');
     final url = await storage.read(key: 'instance_url');
     print('AuthState: read token -> ${token != null}, url -> ${url != null}');

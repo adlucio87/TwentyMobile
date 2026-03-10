@@ -102,37 +102,15 @@ class _ApiTokenScreenState extends ConsumerState<ApiTokenScreen> {
 
       final token = _controller.text.trim();
 
-      // Usa direttamente il connettore senza provider completo per evitare caching
-      // Per simularlo possiamo usare una logica custom o watchare temporaneamente.
-      // E' preferibile invocare la Repo bypassando la cache per il test:
-      // Wait, let's just create a new HTTP client or test it directly.
-      // Nel requirement si chiedeva repo.testConnection(baseUrl, apiToken).
-      // Creiamo un'istanza repo temporanea?
-      // La repo nel provider si inizializza da storage. Salviamo prima su storage.
+      // Salva il token e aggiorna authState → il router si occuperà del redirect
       await ref.read(authStateProvider.notifier).login(token);
-
-      // Invalida il provider per ricaricare repo.
       ref.invalidate(crmRepositoryProvider);
 
-      final repo = await ref.read(crmRepositoryProvider.future);
-      final isOk = await repo.testConnection(baseUrl, token);
-
-      if (isOk) {
-        if (mounted) context.go('/contacts');
-      } else {
-        if (mounted) {
-          setState(
-            () => _error = 'Connessione fallita. Controlla URL e Token.',
-          );
-        }
-        await storage.delete(key: 'api_token');
-      }
+      if (mounted) context.go('/contacts');
     } catch (e) {
       if (mounted) {
-        setState(() => _error = 'Errore di connessione: $e');
+        setState(() => _error = 'Errore: $e');
       }
-      final storage = ref.read(storageServiceProvider);
-      await storage.delete(key: 'api_token');
     } finally {
       if (mounted) {
         setState(() => _isLoading = false);

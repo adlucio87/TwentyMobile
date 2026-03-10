@@ -10,6 +10,7 @@ _$CompanyImpl _$$CompanyImplFromJson(Map<String, dynamic> json) =>
     _$CompanyImpl(
       id: json['id'] as String,
       name: json['name'] as String,
+      domainName: json['domainName'] as String?,
       industry: json['industry'] as String?,
       website: json['website'] as String?,
       logoUrl: json['logoUrl'] as String?,
@@ -23,6 +24,7 @@ Map<String, dynamic> _$$CompanyImplToJson(_$CompanyImpl instance) =>
     <String, dynamic>{
       'id': instance.id,
       'name': instance.name,
+      'domainName': instance.domainName,
       'industry': instance.industry,
       'website': instance.website,
       'logoUrl': instance.logoUrl,

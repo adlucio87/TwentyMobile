@@ -11,6 +11,7 @@ _$NoteImpl _$$NoteImplFromJson(Map<String, dynamic> json) => _$NoteImpl(
   body: json['body'] as String,
   contactId: json['contactId'] as String?,
   companyId: json['companyId'] as String?,
+  dueAt: json['dueAt'] == null ? null : DateTime.parse(json['dueAt'] as String),
   createdAt: json['createdAt'] == null
       ? null
       : DateTime.parse(json['createdAt'] as String),
@@ -22,5 +23,6 @@ Map<String, dynamic> _$$NoteImplToJson(_$NoteImpl instance) =>
       'body': instance.body,
       'contactId': instance.contactId,
       'companyId': instance.companyId,
+      'dueAt': instance.dueAt?.toIso8601String(),
       'createdAt': instance.createdAt?.toIso8601String(),
     };

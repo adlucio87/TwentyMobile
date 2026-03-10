@@ -9,11 +9,13 @@ abstract class CRMRepository {
   Future<String> getCurrentUserName();
 
   // Contacts
-  Future<List<Contact>> getContacts({
+  Future<({List<Contact> contacts, String? endCursor, bool hasNextPage})> getContacts({
     String? search,
-    int page = 1,
     int pageSize = 20,
+    String? after,
   });
+  Future<List<Contact>> getContactsByCompany(String companyId);
+  Future<List<Contact>> getContactsByTask(String taskId);
   Future<Contact> getContactById(String id);
   Future<Contact> createContact({
     required String firstName,
@@ -35,7 +37,10 @@ abstract class CRMRepository {
 
   // Notes
   Future<List<Note>> getNotesByContact(String contactId);
-  Future<Note> createNote({required String contactId, required String body});
+  Future<List<Note>> getNotesByCompany(String companyId);
+  Future<Note> createNote({required String contactId, required String body, DateTime? dueAt});
+  Future<Note> updateNote(String id, {required String body, DateTime? dueAt});
+
 
   // Tasks
   Future<List<Task>> getTasks({bool? completed});
@@ -45,5 +50,11 @@ abstract class CRMRepository {
     DateTime? dueAt,
     String? contactId,
   });
-  Future<Task> completeTask(String id);
+  Future<Task> updateTask(String id, {
+    String? title,
+    String? body,
+    DateTime? dueAt,
+    bool clearDueDate = false,
+    bool? completed,
+  });
 }

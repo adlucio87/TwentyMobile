@@ -10,6 +10,7 @@ class Note with _$Note {
     required String body,
     String? contactId,
     String? companyId,
+    DateTime? dueAt,
     DateTime? createdAt,
   }) = _Note;
 
@@ -33,6 +34,7 @@ class Note with _$Note {
     return Note(
       id: json['id'],
       body: bodyText ?? '',
+      dueAt: json['dueAt'] != null ? DateTime.parse(json['dueAt']) : null,
       createdAt: json['createdAt'] != null
           ? DateTime.parse(json['createdAt'])
           : null,
