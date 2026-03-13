@@ -12,8 +12,13 @@ import 'package:pocketcrm/presentation/tasks/tasks_screen.dart';
 import 'package:pocketcrm/presentation/settings/settings_screen.dart';
 import 'package:pocketcrm/shared/main_shell.dart';
 import 'package:pocketcrm/core/di/auth_state.dart';
+import 'package:pocketcrm/presentation/onboarding/notification_permission_screen.dart';
 
 part 'router.g.dart';
+
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
+late GoRouter appRouterInstance;
 
 @riverpod
 GoRouter appRouter(AppRouterRef ref) {
@@ -23,7 +28,8 @@ GoRouter appRouter(AppRouterRef ref) {
   });
   ref.onDispose(authNotifier.dispose);
 
-  return GoRouter(
+  appRouterInstance = GoRouter(
+    navigatorKey: navigatorKey,
     initialLocation: '/',
     refreshListenable: authNotifier,
     redirect: (context, state) {
@@ -63,7 +69,7 @@ GoRouter appRouter(AppRouterRef ref) {
         return '/onboarding';
       }
 
-      if (hasToken && isOnboarding) {
+      if (hasToken && isOnboarding && state.matchedLocation != '/onboarding/notifications') {
         print('Router redirect: -> /contacts');
         return '/contacts';
       }
@@ -88,6 +94,10 @@ GoRouter appRouter(AppRouterRef ref) {
       GoRoute(
         path: '/onboarding/token',
         builder: (context, state) => const ApiTokenScreen(),
+      ),
+      GoRoute(
+        path: '/onboarding/notifications',
+        builder: (context, state) => const NotificationPermissionScreen(),
       ),
       ShellRoute(
         builder: (context, state, child) => MainShell(child: child),
@@ -122,4 +132,5 @@ GoRouter appRouter(AppRouterRef ref) {
       ),
     ],
   );
+  return appRouterInstance;
 }
