@@ -587,14 +587,12 @@ class TwentyConnector implements CRMRepository {
           filter: {
             and: [
               { dueAt: { lt: "${startOfToday.toIso8601String()}" } }
-              { status: { neq: "DONE" } }
+              { status: { neq: DONE } }
             ]
           }
           orderBy: { dueAt: AscNullsLast }
         ) {
-          edges { node { id title status dueAt taskTargets {
-            edges { node { personId person { name { firstName lastName } } } }
-          } } }
+          edges { node { id title status dueAt } }
         }
       }
     ''';
@@ -631,14 +629,12 @@ class TwentyConnector implements CRMRepository {
             and: [
               { dueAt: { gte: "${startOfToday.toIso8601String()}" } }
               { dueAt: { lt: "${endOfToday.toIso8601String()}" } }
-              { status: { neq: "DONE" } }
+              { status: { neq: DONE } }
             ]
           }
           orderBy: { dueAt: AscNullsLast }
         ) {
-          edges { node { id title status dueAt taskTargets {
-            edges { node { personId person { name { firstName lastName } } } }
-          } } }
+          edges { node { id title status dueAt } }
         }
       }
     ''';
@@ -675,14 +671,12 @@ class TwentyConnector implements CRMRepository {
             and: [
               { dueAt: { gte: "${startOfTomorrow.toIso8601String()}" } }
               { dueAt: { lt: "${endOfTomorrow.toIso8601String()}" } }
-              { status: { neq: "DONE" } }
+              { status: { neq: DONE } }
             ]
           }
           orderBy: { dueAt: AscNullsLast }
         ) {
-          edges { node { id title status dueAt taskTargets {
-            edges { node { personId person { name { firstName lastName } } } }
-          } } }
+          edges { node { id title status dueAt } }
         }
       }
     ''';
