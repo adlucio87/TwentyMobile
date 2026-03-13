@@ -10,6 +10,7 @@ import 'package:pocketcrm/presentation/companies/companies_screen.dart';
 import 'package:pocketcrm/presentation/companies/company_detail_screen.dart';
 import 'package:pocketcrm/presentation/tasks/tasks_screen.dart';
 import 'package:pocketcrm/presentation/settings/settings_screen.dart';
+import 'package:pocketcrm/presentation/home/today_screen.dart';
 import 'package:pocketcrm/shared/main_shell.dart';
 import 'package:pocketcrm/core/di/auth_state.dart';
 
@@ -64,8 +65,8 @@ GoRouter appRouter(AppRouterRef ref) {
       }
 
       if (hasToken && isOnboarding) {
-        print('Router redirect: -> /contacts');
-        return '/contacts';
+        print('Router redirect: -> /home');
+        return '/home';
       }
 
       print('Router redirect: allow null');
@@ -92,6 +93,10 @@ GoRouter appRouter(AppRouterRef ref) {
       ShellRoute(
         builder: (context, state, child) => MainShell(child: child),
         routes: [
+          GoRoute(
+            path: '/home',
+            builder: (context, state) => const TodayScreen(),
+          ),
           GoRoute(
             path: '/contacts',
             builder: (context, state) => const ContactsScreen(),

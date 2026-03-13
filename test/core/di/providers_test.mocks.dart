@@ -80,25 +80,44 @@ class MockCRMRepository extends _i1.Mock implements _i6.CRMRepository {
           as _i7.Future<String>);
 
   @override
-  _i7.Future<({List<_i2.Contact> contacts, String? endCursor, bool hasNextPage})> getContacts({
-    String? search,
-    int pageSize = 20,
-    String? after,
-  }) =>
+  _i7.Future<
+    ({List<_i2.Contact> contacts, String? endCursor, bool hasNextPage})
+  >
+  getContacts({String? search, int? pageSize = 20, String? after}) =>
       (super.noSuchMethod(
             Invocation.method(#getContacts, [], {
               #search: search,
               #pageSize: pageSize,
               #after: after,
             }),
-            returnValue: _i7.Future<({List<_i2.Contact> contacts, String? endCursor, bool hasNextPage})>.value(
-              (contacts: <_i2.Contact>[], endCursor: null, hasNextPage: false),
-            ),
-            returnValueForMissingStub: _i7.Future<({List<_i2.Contact> contacts, String? endCursor, bool hasNextPage})>.value(
-              (contacts: <_i2.Contact>[], endCursor: null, hasNextPage: false),
-            ),
+            returnValue:
+                _i7.Future<
+                  ({
+                    List<_i2.Contact> contacts,
+                    String? endCursor,
+                    bool hasNextPage,
+                  })
+                >.value((
+                  contacts: <_i2.Contact>[],
+                  endCursor: null,
+                  hasNextPage: false,
+                )),
+            returnValueForMissingStub:
+                _i7.Future<
+                  ({
+                    List<_i2.Contact> contacts,
+                    String? endCursor,
+                    bool hasNextPage,
+                  })
+                >.value((
+                  contacts: <_i2.Contact>[],
+                  endCursor: null,
+                  hasNextPage: false,
+                )),
           )
-          as _i7.Future<({List<_i2.Contact> contacts, String? endCursor, bool hasNextPage})>);
+          as _i7.Future<
+            ({List<_i2.Contact> contacts, String? endCursor, bool hasNextPage})
+          >);
 
   @override
   _i7.Future<List<_i2.Contact>> getContactsByCompany(String? companyId) =>
@@ -353,6 +372,39 @@ class MockCRMRepository extends _i1.Mock implements _i6.CRMRepository {
           as _i7.Future<List<_i5.Task>>);
 
   @override
+  _i7.Future<List<_i5.Task>> getOverdueTasks() =>
+      (super.noSuchMethod(
+            Invocation.method(#getOverdueTasks, []),
+            returnValue: _i7.Future<List<_i5.Task>>.value(<_i5.Task>[]),
+            returnValueForMissingStub: _i7.Future<List<_i5.Task>>.value(
+              <_i5.Task>[],
+            ),
+          )
+          as _i7.Future<List<_i5.Task>>);
+
+  @override
+  _i7.Future<List<_i5.Task>> getTodayTasks() =>
+      (super.noSuchMethod(
+            Invocation.method(#getTodayTasks, []),
+            returnValue: _i7.Future<List<_i5.Task>>.value(<_i5.Task>[]),
+            returnValueForMissingStub: _i7.Future<List<_i5.Task>>.value(
+              <_i5.Task>[],
+            ),
+          )
+          as _i7.Future<List<_i5.Task>>);
+
+  @override
+  _i7.Future<List<_i5.Task>> getTomorrowTasks() =>
+      (super.noSuchMethod(
+            Invocation.method(#getTomorrowTasks, []),
+            returnValue: _i7.Future<List<_i5.Task>>.value(<_i5.Task>[]),
+            returnValueForMissingStub: _i7.Future<List<_i5.Task>>.value(
+              <_i5.Task>[],
+            ),
+          )
+          as _i7.Future<List<_i5.Task>>);
+
+  @override
   _i7.Future<_i5.Task> createTask({
     required String? title,
     String? body,
@@ -446,4 +498,15 @@ class MockCRMRepository extends _i1.Mock implements _i6.CRMRepository {
             ),
           )
           as _i7.Future<_i5.Task>);
+
+  @override
+  _i7.Future<List<_i2.Contact>> getRecentContacts({int? limit = 5}) =>
+      (super.noSuchMethod(
+            Invocation.method(#getRecentContacts, [], {#limit: limit}),
+            returnValue: _i7.Future<List<_i2.Contact>>.value(<_i2.Contact>[]),
+            returnValueForMissingStub: _i7.Future<List<_i2.Contact>>.value(
+              <_i2.Contact>[],
+            ),
+          )
+          as _i7.Future<List<_i2.Contact>>);
 }

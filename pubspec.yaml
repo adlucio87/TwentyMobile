@@ -50,6 +50,7 @@ dependencies:
   shimmer: ^3.0.0
   google_fonts: ^8.0.2
   shared_preferences: ^2.5.4
+  flutter_speed_dial: ^7.0.0
 
 
 dev_dependencies:
