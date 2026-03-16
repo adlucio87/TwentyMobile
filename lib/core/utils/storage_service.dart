@@ -34,9 +34,8 @@ class StorageService {
         if (kDebugMode) print('StorageService: $key removed from Hive');
       }
     } else {
-      if (value == null) {
-        await _box.delete(key);
-      }
+      // Se è una chiave sensibile, assicuriamoci che sia rimossa da Hive (migrazione/pulizia)
+      await _box.delete(key);
     }
 
     try {
@@ -84,12 +83,27 @@ class StorageService {
         kDebugMode && defaultTargetPlatform == TargetPlatform.macOS;
     final bool blockPlaintext = _sensitiveKeys.contains(key) && !isMacOSDebug;
 
+    // Leggi da Hive come fallback
+    final hiveValue = _box.get(key);
+
     if (blockPlaintext) {
+      if (hiveValue != null) {
+        // Migrazione: se troviamo un dato sensibile in Hive, lo spostiamo in SecureStorage
+        if (kDebugMode) {
+          print('StorageService: Migrating sensitive $key from Hive to Secure');
+        }
+        try {
+          await _secureStorage.write(key: key, value: hiveValue);
+          await _box.delete(key);
+        } catch (e) {
+          if (kDebugMode) print('StorageService: Migration error: $e');
+        }
+        _cache[key] = hiveValue;
+        return hiveValue;
+      }
       return null;
     }
 
-    // Leggi da Hive come fallback
-    final hiveValue = _box.get(key);
     if (kDebugMode && hiveValue != null) {
       print('StorageService: $key read from Hive fallback');
     }

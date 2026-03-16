@@ -52,5 +52,25 @@ void main() {
       final result = await storageService.read(key: 'user_name');
       expect(result, 'John Doe');
     });
+
+    test('migrates sensitive key from Hive to secure storage on read', () async {
+      // Simula un vecchio stato dove api_token era in Hive
+      await box.put('api_token', 'old_token_123');
+
+      final result = await storageService.read(key: 'api_token');
+
+      expect(result, 'old_token_123');
+      // Dovrebbe essere stato rimosso da Hive dopo la migrazione
+      expect(box.get('api_token'), null);
+    });
+
+    test('cleans up sensitive key from Hive on write', () async {
+      // Simula un vecchio stato dove instance_url era in Hive
+      await box.put('instance_url', 'http://old-url.com');
+
+      await storageService.write(key: 'instance_url', value: 'https://new-url.com');
+
+      expect(box.get('instance_url'), null);
+    });
   });
 }
