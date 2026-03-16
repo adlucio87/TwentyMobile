@@ -48,14 +48,17 @@ class _InstanceSetupScreenState extends ConsumerState<InstanceSetupScreen> {
                 controller: _controller,
                 decoration: const InputDecoration(
                   labelText: 'URL Istanza',
-                  hintText: 'Es. http://localhost:3000',
+                  hintText: 'Es. https://twenty.example.com',
                   prefixIcon: Icon(Icons.link),
                 ),
                 validator: (val) {
-                  if (val == null || val.isEmpty)
+                  if (val == null || val.isEmpty) {
                     return 'Inserisci un URL valido';
-                  if (!Uri.parse(val).isAbsolute)
-                    return 'L\'URL deve iniziare con http:// o https://';
+                  }
+                  final uri = Uri.tryParse(val);
+                  if (uri == null || !uri.isAbsolute || uri.scheme != 'https') {
+                    return 'L\'URL deve iniziare con https://';
+                  }
                   return null;
                 },
               ),
