@@ -28,7 +28,13 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
       next.whenData((tasks) {
         NotificationService().syncTaskNotifications(tasks);
 
-        int overdueCount = tasks.where((t) => t.dueAt != null && t.dueAt!.isBefore(DateTime.now()) && t.completed != true).length;
+        final now = DateTime.now();
+        int overdueCount = tasks
+            .where((t) =>
+                t.dueAt != null &&
+                t.dueAt!.isBefore(now) &&
+                t.completed != true)
+            .length;
         if (overdueCount > 0) {
           NotificationService().scheduleOvernightSummary(overdueCount);
         }
