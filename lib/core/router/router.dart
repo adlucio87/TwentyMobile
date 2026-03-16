@@ -36,19 +36,13 @@ GoRouter appRouter(AppRouterRef ref) {
     redirect: (context, state) {
       final authState = ref.read(authStateProvider);
 
-      print(
-        'Router redirect: matchedLocation=${state.matchedLocation}, authState=$authState',
-      );
-
       // Aspettiamo che authState sia pronto
       if (authState.isLoading && !authState.hasValue) {
-        print('Router redirect: waiting for authState');
         return '/'; // Mostra caricamento (Splash)
       }
 
       // Errore o valore nullo: tratta come non autenticato
       if (authState.hasError || authState.value == null) {
-        print('Router redirect: allow null (error/null state)');
         return null;
       }
 
@@ -57,27 +51,21 @@ GoRouter appRouter(AppRouterRef ref) {
           state.matchedLocation.startsWith('/onboarding') ||
           state.matchedLocation == '/';
 
-      print('Router redirect: hasToken=$hasToken, isOnboarding=$isOnboarding');
-
       if (!hasToken && !isOnboarding) {
-        print('Router redirect: -> /onboarding');
         return '/onboarding';
       }
 
       // Se non abbiamo token e siamo root, mandiamo a /onboarding
       if (!hasToken && state.matchedLocation == '/') {
-        print('Router redirect: -> /onboarding from root');
         return '/onboarding';
       }
 
       if (hasToken &&
           isOnboarding &&
           state.matchedLocation != "/onboarding/notifications") {
-        print("Router redirect: -> /home");
         return "/home";
       }
 
-      print('Router redirect: allow null');
       return null;
     },
     routes: [
