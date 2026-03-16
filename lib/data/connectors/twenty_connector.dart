@@ -808,7 +808,8 @@ class TwentyConnector implements CRMRepository {
       };
     }
     if (dueAt != null) {
-      input['dueAt'] = "${dueAt.toIso8601String().split('.')[0]}Z";
+      final utcDueAt = dueAt.toUtc();
+      input['dueAt'] = "${utcDueAt.toIso8601String().split('.')[0]}Z";
     }
 
     final MutationOptions options = MutationOptions(
@@ -881,7 +882,8 @@ class TwentyConnector implements CRMRepository {
     if (clearDueDate) {
       input['dueAt'] = null;
     } else if (dueAt != null) {
-      input['dueAt'] = "${dueAt.toIso8601String().split('.')[0]}Z";
+      final utcDueAt = dueAt.toUtc();
+      input['dueAt'] = "${utcDueAt.toIso8601String().split('.')[0]}Z";
     }
 
     // In a real scenario we'd want to also be able to clear dueAt.

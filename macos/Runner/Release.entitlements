@@ -10,5 +10,9 @@
 	<array>
 		<string>$(AppIdentifierPrefix)com.example.pocketcrm</string>
 	</array>
+	<key>com.apple.security.keychain-access-groups</key>
+    <array>
+        <string>$(AppIdentifierPrefix)$(CFBundleIdentifier)</string>
+    </array>
 </dict>
 </plist>

@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -43,7 +44,11 @@ class LinkedContactsWidget extends ConsumerWidget {
 
         if (isCompact) {
           return Padding(
-            padding: const EdgeInsets.only(left: 16.0, right: 16.0, bottom: 8.0),
+            padding: const EdgeInsets.only(
+              left: 16.0,
+              right: 16.0,
+              bottom: 8.0,
+            ),
             child: Wrap(
               spacing: 8,
               runSpacing: 4,
@@ -56,20 +61,31 @@ class LinkedContactsWidget extends ConsumerWidget {
                     visualDensity: VisualDensity.compact,
                     avatar: CircleAvatar(
                       radius: 12,
-                      backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-                      backgroundImage: contact.avatarUrl != null ? NetworkImage(contact.avatarUrl!) : null,
+                      backgroundColor: Theme.of(
+                        context,
+                      ).colorScheme.primaryContainer,
+                      backgroundImage: contact.avatarUrl != null
+                          ? CachedNetworkImageProvider(contact.avatarUrl!)
+                          : null,
                       child: contact.avatarUrl == null
                           ? Text(
-                              contact.firstName.isNotEmpty ? contact.firstName[0].toUpperCase() : '?',
+                              contact.firstName.isNotEmpty
+                                  ? contact.firstName[0].toUpperCase()
+                                  : '?',
                               style: TextStyle(
                                 fontSize: 10,
-                                color: Theme.of(context).colorScheme.onPrimaryContainer,
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.onPrimaryContainer,
                                 fontWeight: FontWeight.bold,
                               ),
                             )
                           : null,
                     ),
-                    label: Text('${contact.firstName} ${contact.lastName}', style: const TextStyle(fontSize: 12)),
+                    label: Text(
+                      '${contact.firstName} ${contact.lastName}',
+                      style: const TextStyle(fontSize: 12),
+                    ),
                   ),
                 );
               }).toList(),
@@ -84,10 +100,7 @@ class LinkedContactsWidget extends ConsumerWidget {
               padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
               child: Text(
                 'Linked Contacts',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
             ),
             ListView.separated(
@@ -103,9 +116,11 @@ class LinkedContactsWidget extends ConsumerWidget {
                     vertical: 4,
                   ),
                   leading: CircleAvatar(
-                    backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+                    backgroundColor: Theme.of(
+                      context,
+                    ).colorScheme.primaryContainer,
                     backgroundImage: contact.avatarUrl != null
-                        ? NetworkImage(contact.avatarUrl!)
+                        ? CachedNetworkImageProvider(contact.avatarUrl!)
                         : null,
                     child: contact.avatarUrl == null
                         ? Text(
@@ -113,7 +128,9 @@ class LinkedContactsWidget extends ConsumerWidget {
                                 ? contact.firstName[0].toUpperCase()
                                 : '?',
                             style: TextStyle(
-                              color: Theme.of(context).colorScheme.onPrimaryContainer,
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.onPrimaryContainer,
                               fontWeight: FontWeight.bold,
                             ),
                           )
@@ -148,7 +165,10 @@ class LinkedContactsWidget extends ConsumerWidget {
           ? const SizedBox.shrink()
           : Padding(
               padding: const EdgeInsets.all(16.0),
-              child: Text('Error: $err', style: const TextStyle(color: Colors.red)),
+              child: Text(
+                'Error: $err',
+                style: const TextStyle(color: Colors.red),
+              ),
             ),
     );
   }

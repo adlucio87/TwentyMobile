@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pocketcrm/core/di/providers.dart';
-import 'package:pocketcrm/core/di/auth_state.dart';
 import 'package:pocketcrm/domain/models/contact.dart';
 import 'package:pocketcrm/domain/models/task.dart';
 import 'package:pocketcrm/presentation/shared/linked_contacts_widget.dart';
@@ -258,170 +257,172 @@ class AddTaskSheetState extends ConsumerState<AddTaskSheet> {
         right: 24,
         top: 24,
       ),
-      child: Form(
-        key: _formKey,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text(
-              'New Task',
-              style: Theme.of(context).textTheme.headlineSmall,
-            ),
-            const SizedBox(height: 24),
-            TextFormField(
-              controller: _titleController,
-              decoration: const InputDecoration(
-                labelText: 'Title',
-                hintText: 'What needs to be done?',
+      child: SingleChildScrollView(
+        child: Form(
+          key: _formKey,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                'New Task',
+                style: Theme.of(context).textTheme.headlineSmall,
               ),
-              autofocus: true,
-              enabled: !_isLoading,
-              validator: (v) =>
-                  v?.trim().isEmpty == true ? 'Please enter a title' : null,
-            ),
-            const SizedBox(height: 16),
-            contactsAsync.when(
-              data: (contacts) => Autocomplete<Contact>(
-                optionsBuilder: (TextEditingValue textEditingValue) {
-                  if (textEditingValue.text.isEmpty) {
-                    return const Iterable<Contact>.empty();
-                  }
-                  return contacts.where((Contact contact) {
-                    final fullName = '${contact.firstName} ${contact.lastName}'.toLowerCase();
-                    return fullName.contains(textEditingValue.text.toLowerCase());
-                  });
-                },
-                displayStringForOption: (Contact option) => '${option.firstName} ${option.lastName}',
-                onSelected: (Contact selection) {
-                  setState(() {
-                    _selectedContactId = selection.id;
-                  });
-                },
-                fieldViewBuilder: (context, controller, focusNode, onEditingComplete) {
-                  return TextFormField(
-                    controller: controller,
-                    focusNode: focusNode,
-                    onEditingComplete: onEditingComplete,
-                    enabled: !_isLoading,
-                    decoration: const InputDecoration(
-                      labelText: 'Search and link contact',
-                      hintText: 'Start typing name...',
-                    ),
-                  );
-                },
+              const SizedBox(height: 24),
+              TextFormField(
+                controller: _titleController,
+                decoration: const InputDecoration(
+                  labelText: 'Title',
+                  hintText: 'What needs to be done?',
+                ),
+                autofocus: true,
+                enabled: !_isLoading,
+                validator: (v) =>
+                    v?.trim().isEmpty == true ? 'Please enter a title' : null,
               ),
-              loading: () => const CircularProgressIndicator(),
-              error: (err, stack) => Text('Contacts error: $err'),
-            ),
-            const SizedBox(height: 16),
-            DueDatePicker(
-              selectedDate: _selectedDueDate,
-              onDateSelected: (date) => setState(() => _selectedDueDate = date),
-            ),
-            AnimatedSwitcher(
-              duration: const Duration(milliseconds: 300),
-              child: (_selectedDueDate != null && (_selectedDueDate!.hour != 0 || _selectedDueDate!.minute != 0))
-                  ? SwitchListTile(
-                      contentPadding: EdgeInsets.zero,
-                      title: const Text('Notifica promemoria'),
-                      subtitle: Text(
-                        _notifyReminder
-                            ? '30 min prima — ${_selectedDueDate!.hour.toString().padLeft(2, '0')}:${_selectedDueDate!.minute.toString().padLeft(2, '0')}'
-                            : 'Nessuna notifica'
-                      ),
-                      secondary: Icon(
-                        _notifyReminder ? Icons.notifications_active : Icons.notifications_off,
-                        color: _notifyReminder ? Theme.of(context).colorScheme.primary : null,
-                      ),
-                      value: _notifyReminder,
-                      onChanged: (bool value) {
-                        setState(() {
-                          _notifyReminder = value;
-                        });
-                      },
-                    )
-                  : const SizedBox.shrink(),
-            ),
-            if (_errorMessage != null) ...[
               const SizedBox(height: 16),
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.red.shade50,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.red.shade200),
-                ),
-                child: Row(
-                  children: [
-                    Icon(Icons.error_outline, color: Colors.red.shade700, size: 20),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                         _errorMessage!,
-                        style: TextStyle(color: Colors.red.shade700, fontSize: 13),
+              contactsAsync.when(
+                data: (contacts) => Autocomplete<Contact>(
+                  optionsBuilder: (TextEditingValue textEditingValue) {
+                    if (textEditingValue.text.isEmpty) {
+                      return const Iterable<Contact>.empty();
+                    }
+                    return contacts.where((Contact contact) {
+                      final fullName = '${contact.firstName} ${contact.lastName}'.toLowerCase();
+                      return fullName.contains(textEditingValue.text.toLowerCase());
+                    });
+                  },
+                  displayStringForOption: (Contact option) => '${option.firstName} ${option.lastName}',
+                  onSelected: (Contact selection) {
+                    setState(() {
+                      _selectedContactId = selection.id;
+                    });
+                  },
+                  fieldViewBuilder: (context, controller, focusNode, onEditingComplete) {
+                    return TextFormField(
+                      controller: controller,
+                      focusNode: focusNode,
+                      onEditingComplete: onEditingComplete,
+                      enabled: !_isLoading,
+                      decoration: const InputDecoration(
+                        labelText: 'Search and link contact',
+                        hintText: 'Start typing name...',
                       ),
-                    ),
-                  ],
+                    );
+                  },
                 ),
+                loading: () => const CircularProgressIndicator(),
+                error: (err, stack) => Text('Contacts error: $err'),
               ),
-            ],
-            const SizedBox(height: 32),
-            ElevatedButton(
-              onPressed: _isLoading
-                  ? null
-                  : () async {
-                      setState(() { _errorMessage = null; });
-                      if (_formKey.currentState!.validate()) {
-                        setState(() { _isLoading = true; });
-                        
-                        final navigator = Navigator.of(context);
-                        try {
-                          final newTask = await ref
-                              .read(tasksProvider.notifier)
-                              .addTask(
-                              _titleController.text.trim(),
-                              contactId: _selectedContactId,
-                              dueAt: _selectedDueDate,
-                            );
-                              
-                          final prefs = await SharedPreferences.getInstance();
-                          await prefs.setBool('task_notif_${newTask.id}', _notifyReminder);
-
-                          if (_selectedDueDate != null && (_selectedDueDate!.hour != 0 || _selectedDueDate!.minute != 0) && _notifyReminder) {
-                            NotificationService().scheduleTaskReminder(newTask);
-                          } else {
-                            NotificationService().cancelTaskReminder(newTask.id);
-                          }
-
-                          if (mounted) {
-                            navigator.pop(); // Chiudi solo in caso di successo
-                            SnackbarHelper.showSuccess(context, 'Task created successfully');
-                          }
-                        } catch (e) {
-                          if (mounted) {
-                            String errorMsg = e.toString();
-                            if (errorMsg.contains('Exception:')) {
-                              errorMsg = errorMsg.replaceAll('Exception:', '').trim();
+              const SizedBox(height: 16),
+              DueDatePicker(
+                selectedDate: _selectedDueDate,
+                onDateSelected: (date) => setState(() => _selectedDueDate = date),
+              ),
+              AnimatedSwitcher(
+                duration: const Duration(milliseconds: 300),
+                child: (_selectedDueDate != null && (_selectedDueDate!.hour != 0 || _selectedDueDate!.minute != 0))
+                    ? SwitchListTile(
+                        contentPadding: EdgeInsets.zero,
+                        title: const Text('Notifica promemoria'),
+                        subtitle: Text(
+                          _notifyReminder
+                              ? '30 min prima — ${_selectedDueDate!.hour.toString().padLeft(2, '0')}:${_selectedDueDate!.minute.toString().padLeft(2, '0')}'
+                              : 'Nessuna notifica'
+                        ),
+                        secondary: Icon(
+                          _notifyReminder ? Icons.notifications_active : Icons.notifications_off,
+                          color: _notifyReminder ? Theme.of(context).colorScheme.primary : null,
+                        ),
+                        value: _notifyReminder,
+                        onChanged: (bool value) {
+                          setState(() {
+                            _notifyReminder = value;
+                          });
+                        },
+                      )
+                    : const SizedBox.shrink(),
+              ),
+              if (_errorMessage != null) ...[
+                const SizedBox(height: 16),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.red.shade50,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.red.shade200),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(Icons.error_outline, color: Colors.red.shade700, size: 20),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                           _errorMessage!,
+                          style: TextStyle(color: Colors.red.shade700, fontSize: 13),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+              const SizedBox(height: 32),
+              ElevatedButton(
+                onPressed: _isLoading
+                    ? null
+                    : () async {
+                        setState(() { _errorMessage = null; });
+                        if (_formKey.currentState!.validate()) {
+                          setState(() { _isLoading = true; });
+                          
+                          final navigator = Navigator.of(context);
+                          try {
+                            final newTask = await ref
+                                .read(tasksProvider.notifier)
+                                .addTask(
+                                _titleController.text.trim(),
+                                contactId: _selectedContactId,
+                                dueAt: _selectedDueDate,
+                              );
+                                
+                            final prefs = await SharedPreferences.getInstance();
+                            await prefs.setBool('task_notif_${newTask.id}', _notifyReminder);
+  
+                            if (_selectedDueDate != null && (_selectedDueDate!.hour != 0 || _selectedDueDate!.minute != 0) && _notifyReminder) {
+                              NotificationService().scheduleTaskReminder(newTask);
+                            } else {
+                              NotificationService().cancelTaskReminder(newTask.id);
                             }
-                            setState(() {
-                              _isLoading = false;
-                              _errorMessage = errorMsg;
-                            });
+  
+                            if (mounted) {
+                              navigator.pop(); // Chiudi solo in caso di successo
+                              SnackbarHelper.showSuccess(context, 'Task created successfully');
+                            }
+                          } catch (e) {
+                            if (mounted) {
+                              String errorMsg = e.toString();
+                              if (errorMsg.contains('Exception:')) {
+                                errorMsg = errorMsg.replaceAll('Exception:', '').trim();
+                              }
+                              setState(() {
+                                _isLoading = false;
+                                _errorMessage = errorMsg;
+                              });
+                            }
                           }
                         }
-                      }
-                    },
-              child: _isLoading
-                  ? const SizedBox(
-                      height: 20, 
-                      width: 20, 
-                      child: CircularProgressIndicator(strokeWidth: 2)
-                    )
-                  : const Text('Create Task'),
-            ),
-            const SizedBox(height: 32),
-          ],
+                      },
+                child: _isLoading
+                    ? const SizedBox(
+                        height: 20, 
+                        width: 20, 
+                        child: CircularProgressIndicator(strokeWidth: 2)
+                      )
+                    : const Text('Create Task'),
+              ),
+              const SizedBox(height: 32),
+            ],
+          ),
         ),
       ),
     );
@@ -451,7 +452,7 @@ class _EditTaskSheetState extends ConsumerState<_EditTaskSheet> {
     super.initState();
     _titleController = TextEditingController(text: widget.task.title);
     _bodyController = TextEditingController(text: _extractPlainText(widget.task.body));
-    _selectedDueDate = widget.task.dueAt;
+    _selectedDueDate = widget.task.dueAt?.toLocal();
     _loadNotificationPreference();
   }
 

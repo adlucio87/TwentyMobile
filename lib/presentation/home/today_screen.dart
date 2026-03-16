@@ -28,7 +28,7 @@ class TodayScreen extends ConsumerWidget {
         spacing: 3,
         childPadding: const EdgeInsets.all(5),
         spaceBetweenChildren: 4,
-        tooltip: 'Aggiungi',
+        tooltip: 'Add',
         heroTag: 'speed-dial-hero-tag',
         elevation: 8.0,
         animationCurve: Curves.elasticInOut,
@@ -38,11 +38,11 @@ class TodayScreen extends ConsumerWidget {
             child: const Icon(Icons.document_scanner),
             backgroundColor: Theme.of(context).colorScheme.tertiaryContainer,
             foregroundColor: Theme.of(context).colorScheme.onTertiaryContainer,
-            label: 'Scan biglietto',
+            label: 'Scan business card',
             onTap: () {
               if (!PlatformUtils.supportsScan) {
                 ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                  content: Text('📱 Disponibile solo su iPhone e Android'),
+                  content: Text('📱 Only available on iPhone and Android'),
                 ));
                 return;
               }
@@ -54,7 +54,7 @@ class TodayScreen extends ConsumerWidget {
             child: const Icon(Icons.person_add),
             backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
             foregroundColor: Theme.of(context).colorScheme.onSecondaryContainer,
-            label: 'Nuovo contatto',
+            label: 'New contact',
             onTap: () => showModalBottomSheet(
               context: context,
               isScrollControlled: true,
@@ -68,7 +68,7 @@ class TodayScreen extends ConsumerWidget {
             child: const Icon(Icons.add_task),
             backgroundColor: Theme.of(context).colorScheme.primaryContainer,
             foregroundColor: Theme.of(context).colorScheme.onPrimaryContainer,
-            label: 'Nuovo task rapido',
+            label: 'New quick task',
             onTap: () => showModalBottomSheet(
               context: context,
               isScrollControlled: true,
@@ -101,20 +101,20 @@ class TodayScreen extends ConsumerWidget {
                 title: Consumer(
                   builder: (context, ref, child) {
                     final userNameAsync = ref.watch(currentUserNameProvider);
-                    final userName = userNameAsync.valueOrNull ?? 'Utente';
+                    final userName = userNameAsync.valueOrNull ?? 'User';
 
                     final now = DateTime.now();
                     final hour = now.hour;
-                    String greeting = "Buongiorno 👋";
+                    String greeting = "Good morning 👋";
                     if (hour >= 12 && hour < 18) {
-                      greeting = "Buon pomeriggio 👋";
+                      greeting = "Good afternoon 👋";
                     } else if (hour >= 18 && hour < 24) {
-                      greeting = "Buonasera 👋";
+                      greeting = "Good evening 👋";
                     } else if (hour >= 0 && hour < 5) {
-                      greeting = "Ancora sveglio? 👋";
+                      greeting = "Still awake? 👋";
                     }
 
-                    final dateFormat = DateFormat('EEEE, d MMMM y', 'it_IT');
+                    final dateFormat = DateFormat('EEEE, d MMMM y', 'en_US');
                     final dateString = dateFormat.format(now);
                     // Capitalize first letter of day
                     final formattedDate = dateString.replaceFirst(dateString[0], dateString[0].toUpperCase());
@@ -157,19 +157,19 @@ class TodayScreen extends ConsumerWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         if (hasRecent) ...[
-                          const SectionHeader(title: "Recenti"),
+                          const SectionHeader(title: "Recent"),
                           RecentContactsRow(contacts: data.recentContacts),
                           const Spacer(),
                         ],
                         const Text("🎉", style: TextStyle(fontSize: 64)),
                         const SizedBox(height: 16),
                         Text(
-                          "Tutto in ordine!",
+                          "Everything is in order!",
                           style: Theme.of(context).textTheme.headlineSmall,
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          "Nessun task in scadenza oggi",
+                          "No tasks due today",
                           style: Theme.of(context).textTheme.bodyMedium,
                         ),
                         const SizedBox(height: 24),
@@ -182,7 +182,7 @@ class TodayScreen extends ConsumerWidget {
                             ),
                             builder: (context) => const AddTaskSheet(),
                           ),
-                          child: const Text("Aggiungi task"),
+                          child: const Text("Add task"),
                         ),
                         if (hasRecent) const Spacer(flex: 2),
                       ],
@@ -194,7 +194,7 @@ class TodayScreen extends ConsumerWidget {
                   delegate: SliverChildListDelegate([
                     if (hasOverdue) ...[
                       SectionHeader(
-                        title: "Scaduti",
+                        title: "Overdue",
                         count: data.overdueTasks.length,
                         countColor: Theme.of(context).colorScheme.error,
                       ),
@@ -202,7 +202,7 @@ class TodayScreen extends ConsumerWidget {
                     ],
 
                     SectionHeader(
-                      title: "Oggi",
+                      title: "Today",
                       count: data.todayTasks.length,
                     ),
                     if (hasToday)
@@ -210,11 +210,11 @@ class TodayScreen extends ConsumerWidget {
                     else
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                        child: Text("Nessun task per oggi 🎉", style: Theme.of(context).textTheme.bodyMedium),
+                        child: Text("No tasks for today 🎉", style: Theme.of(context).textTheme.bodyMedium),
                       ),
 
                     if (hasTomorrow) ...[
-                      const SectionHeader(title: "Domani"),
+                      const SectionHeader(title: "Tomorrow"),
                       ...data.tomorrowTasks.take(3).map((t) => Opacity(
                         opacity: 0.7,
                         child: TaskTodayCard(task: t),
@@ -222,12 +222,12 @@ class TodayScreen extends ConsumerWidget {
                       if (data.tomorrowTasks.length > 3)
                         Padding(
                           padding: const EdgeInsets.only(left: 16, top: 8),
-                          child: Text("e altri ${data.tomorrowTasks.length - 3}...", style: Theme.of(context).textTheme.bodySmall),
+                          child: Text("and ${data.tomorrowTasks.length - 3} more...", style: Theme.of(context).textTheme.bodySmall),
                         ),
                     ],
 
                     if (hasRecent) ...[
-                      const SectionHeader(title: "Recenti"),
+                      const SectionHeader(title: "Recent"),
                       RecentContactsRow(contacts: data.recentContacts),
                     ],
 

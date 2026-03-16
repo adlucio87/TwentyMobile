@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -110,8 +111,9 @@ class _ContactsScreenState extends ConsumerState<ContactsScreen> {
               controller: _scrollController,
               physics: const AlwaysScrollableScrollPhysics(),
               itemCount: contacts.length + 1, // +1 for footer
-              separatorBuilder: (context, index) =>
-                  index < contacts.length - 1 ? const Divider(height: 1) : const SizedBox.shrink(),
+              separatorBuilder: (context, index) => index < contacts.length - 1
+                  ? const Divider(height: 1)
+                  : const SizedBox.shrink(),
               itemBuilder: (context, index) {
                 // Footer: spinner or end-of-list indicator
                 if (index == contacts.length) {
@@ -134,8 +136,10 @@ class _ContactsScreenState extends ConsumerState<ContactsScreen> {
                     backgroundColor: Theme.of(
                       context,
                     ).colorScheme.primaryContainer,
-                    backgroundImage: contact.avatarUrl != null
-                        ? NetworkImage(contact.avatarUrl!)
+                    backgroundImage:
+                        (contact.avatarUrl != null &&
+                            contact.avatarUrl!.isNotEmpty)
+                        ? CachedNetworkImageProvider(contact.avatarUrl!)
                         : null,
                     child: contact.avatarUrl == null
                         ? Text(
@@ -246,41 +250,43 @@ class AddContactSheetState extends ConsumerState<AddContactSheet> {
                   IconButton(
                     icon: const Icon(Icons.import_contacts),
                     tooltip: 'Import from contacts',
-                    onPressed: _isLoading ? null : () async {
-                      if (await fc.FlutterContacts.permissions.request(
-                            fc.PermissionType.read,
-                          ) ==
-                          fc.PermissionStatus.granted) {
-                        final contactId = await fc.FlutterContacts.native
-                            .showPicker();
-                        if (contactId != null) {
-                          final contact = await fc.FlutterContacts.get(
-                            contactId,
-                            properties: {
-                              fc.ContactProperty.name,
-                              fc.ContactProperty.phone,
-                              fc.ContactProperty.email,
-                            },
-                          );
-                          if (contact != null) {
-                            setState(() {
-                              _firstNameController.text =
-                                  contact.name?.first ?? '';
-                              _lastNameController.text =
-                                  contact.name?.last ?? '';
-                              if (contact.phones.isNotEmpty) {
-                                _phoneController.text =
-                                    contact.phones.first.number;
+                    onPressed: _isLoading
+                        ? null
+                        : () async {
+                            if (await fc.FlutterContacts.permissions.request(
+                                  fc.PermissionType.read,
+                                ) ==
+                                fc.PermissionStatus.granted) {
+                              final contactId = await fc.FlutterContacts.native
+                                  .showPicker();
+                              if (contactId != null) {
+                                final contact = await fc.FlutterContacts.get(
+                                  contactId,
+                                  properties: {
+                                    fc.ContactProperty.name,
+                                    fc.ContactProperty.phone,
+                                    fc.ContactProperty.email,
+                                  },
+                                );
+                                if (contact != null) {
+                                  setState(() {
+                                    _firstNameController.text =
+                                        contact.name?.first ?? '';
+                                    _lastNameController.text =
+                                        contact.name?.last ?? '';
+                                    if (contact.phones.isNotEmpty) {
+                                      _phoneController.text =
+                                          contact.phones.first.number;
+                                    }
+                                    if (contact.emails.isNotEmpty) {
+                                      _emailController.text =
+                                          contact.emails.first.address;
+                                    }
+                                  });
+                                }
                               }
-                              if (contact.emails.isNotEmpty) {
-                                _emailController.text =
-                                    contact.emails.first.address;
-                              }
-                            });
-                          }
-                        }
-                      }
-                    },
+                            }
+                          },
                   ),
                 ],
               ),
@@ -303,17 +309,17 @@ class AddContactSheetState extends ConsumerState<AddContactSheet> {
                 controller: _emailController,
                 decoration: const InputDecoration(labelText: 'Email'),
                 keyboardType: TextInputType.emailAddress,
-                validator: (v) => !_isValidEmail(v ?? '') ? 'Invalid email format' : null,
+                validator: (v) =>
+                    !_isValidEmail(v ?? '') ? 'Invalid email format' : null,
                 enabled: !_isLoading,
               ),
               const SizedBox(height: 16),
               TextFormField(
                 controller: _phoneController,
-                decoration: const InputDecoration(
-                  labelText: 'Phone (Mobile)',
-                ),
+                decoration: const InputDecoration(labelText: 'Phone (Mobile)'),
                 keyboardType: TextInputType.phone,
-                validator: (v) => !_isValidPhone(v ?? '') ? 'Invalid number format' : null,
+                validator: (v) =>
+                    !_isValidPhone(v ?? '') ? 'Invalid number format' : null,
                 enabled: !_isLoading,
               ),
               if (_errorMessage != null) ...[
@@ -327,12 +333,19 @@ class AddContactSheetState extends ConsumerState<AddContactSheet> {
                   ),
                   child: Row(
                     children: [
-                      Icon(Icons.error_outline, color: Colors.red.shade700, size: 20),
+                      Icon(
+                        Icons.error_outline,
+                        color: Colors.red.shade700,
+                        size: 20,
+                      ),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
                           _errorMessage!,
-                          style: TextStyle(color: Colors.red.shade700, fontSize: 13),
+                          style: TextStyle(
+                            color: Colors.red.shade700,
+                            fontSize: 13,
+                          ),
                         ),
                       ),
                     ],
@@ -351,9 +364,9 @@ class AddContactSheetState extends ConsumerState<AddContactSheet> {
                           setState(() {
                             _isLoading = true;
                           });
-                          
+
                           final navigator = Navigator.of(context);
-                          
+
                           try {
                             await ref
                                 .read(contactsProvider.notifier)
@@ -367,23 +380,31 @@ class AddContactSheetState extends ConsumerState<AddContactSheet> {
                                       ? _phoneController.text.trim()
                                       : null,
                                 );
-                            
+
                             if (mounted) {
                               navigator.pop(); // Pop solo se successo
-                              SnackbarHelper.showSuccess(context, 'Contact created successfully');
+                              SnackbarHelper.showSuccess(
+                                context,
+                                'Contact created successfully',
+                              );
                             }
                           } catch (e) {
                             if (mounted) {
                               // Extract a readable message if it's a GraphQL error
                               String errorMsg = e.toString();
                               if (errorMsg.contains('INVALID_PHONE_NUMBER')) {
-                                errorMsg = 'The phone number (${_phoneController.text}) is invalid or the international prefix is incorrect.';
-                              } else if (errorMsg.contains('Provided phone number is invalid')) {
+                                errorMsg =
+                                    'The phone number (${_phoneController.text}) is invalid or the international prefix is incorrect.';
+                              } else if (errorMsg.contains(
+                                'Provided phone number is invalid',
+                              )) {
                                 errorMsg = 'Phone number rejected by server.';
                               } else if (errorMsg.contains('Exception:')) {
-                                errorMsg = errorMsg.replaceAll('Exception:', '').trim();
+                                errorMsg = errorMsg
+                                    .replaceAll('Exception:', '')
+                                    .trim();
                               }
-                              
+
                               setState(() {
                                 _isLoading = false;
                                 _errorMessage = errorMsg;
@@ -392,11 +413,11 @@ class AddContactSheetState extends ConsumerState<AddContactSheet> {
                           }
                         }
                       },
-                child: _isLoading 
+                child: _isLoading
                     ? const SizedBox(
-                        height: 20, 
-                        width: 20, 
-                        child: CircularProgressIndicator(strokeWidth: 2)
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2),
                       )
                     : const Text('Save Contact'),
               ),

@@ -30,8 +30,9 @@ class Contact with _$Contact {
     }
 
     final rawAvatar = json['avatarUrl'];
-    final avatarUrl = rawAvatar is String ? rawAvatar : null;
-
+    final avatarUrl = (rawAvatar is String && rawAvatar.startsWith('http'))
+        ? rawAvatar
+        : null;
     final phones = json['phones'];
     String? parsedPhone;
     if (phones != null) {

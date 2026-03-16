@@ -67,13 +67,13 @@ class _ScanCardScreenState extends ConsumerState<ScanCardScreen> {
                       ),
                       const Expanded(
                         child: Text(
-                          'Inquadra il biglietto',
+                          'Frame the business card',
                           textAlign: TextAlign.center,
                           style: TextStyle(color: Colors.white, fontSize: 16,
                               fontWeight: FontWeight.w600),
                         ),
                       ),
-                      // Scegli da galleria
+                      // Pick from gallery
                       IconButton(
                         icon: const Icon(Icons.photo_library, color: Colors.white),
                         onPressed: _pickFromGallery,
@@ -88,7 +88,7 @@ class _ScanCardScreenState extends ConsumerState<ScanCardScreen> {
                 const Padding(
                   padding: EdgeInsets.only(bottom: 32),
                   child: Text(
-                    'Tieni il biglietto orizzontale e ben illuminato',
+                    'Keep the card horizontal and well-lit',
                     style: TextStyle(color: Colors.white70, fontSize: 13),
                   ),
                 ),
@@ -140,13 +140,13 @@ class _ScanCardScreenState extends ConsumerState<ScanCardScreen> {
   }
 
   Future<void> _processAndNavigate(XFile image) async {
-    // Crop opzionale
+    // Optional Crop
     final cropped = await ImageCropper().cropImage(
       sourcePath: image.path,
-      aspectRatio: const CropAspectRatio(ratioX: 85, ratioY: 55), // proporzioni biglietto da visita
+      aspectRatio: const CropAspectRatio(ratioX: 85, ratioY: 55), // business card proportions
       uiSettings: [
         AndroidUiSettings(
-          toolbarTitle: 'Ritaglia biglietto',
+          toolbarTitle: 'Crop business card',
           toolbarColor: Colors.black,
           statusBarColor: Colors.black,
           toolbarWidgetColor: Colors.white,
@@ -156,7 +156,7 @@ class _ScanCardScreenState extends ConsumerState<ScanCardScreen> {
           showCropGrid: true,
         ),
         IOSUiSettings(
-          title: 'Ritaglia',
+          title: 'Crop',
           aspectRatioLockEnabled: true,
           resetAspectRatioEnabled: false,
           hidesNavigationBar: false,
@@ -171,7 +171,7 @@ class _ScanCardScreenState extends ConsumerState<ScanCardScreen> {
     await ref.read(scanNotifierProvider.notifier).processImage(finalImage);
 
     if (mounted) {
-      Navigator.pushReplacement(
+      Navigator.push(
         context,
         MaterialPageRoute(builder: (_) => const ScanReviewScreen()),
       );

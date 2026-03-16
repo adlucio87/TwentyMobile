@@ -27,13 +27,21 @@ class RecentContactsRow extends StatelessWidget {
                 children: [
                   CircleAvatar(
                     radius: 28,
-                    backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.1),
-                    backgroundImage: contact.avatarUrl != null
+                    backgroundColor: Theme.of(
+                      context,
+                    ).colorScheme.primary.withOpacity(0.1),
+                    backgroundImage:
+                        (contact.avatarUrl != null &&
+                            contact.avatarUrl!.isNotEmpty)
                         ? CachedNetworkImageProvider(contact.avatarUrl!)
                         : null,
-                    child: contact.avatarUrl == null
+                    child:
+                        (contact.avatarUrl == null ||
+                            contact.avatarUrl!.isEmpty)
                         ? Text(
-                            contact.firstName.isNotEmpty ? contact.firstName[0].toUpperCase() : '?',
+                            contact.firstName.isNotEmpty
+                                ? contact.firstName[0].toUpperCase()
+                                : '?',
                             style: TextStyle(
                               color: Theme.of(context).colorScheme.primary,
                               fontWeight: FontWeight.bold,

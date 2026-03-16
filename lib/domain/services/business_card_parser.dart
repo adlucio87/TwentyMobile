@@ -6,6 +6,7 @@ class BusinessCardParser {
   static BusinessCardData parse(String rawText) {
     // Normalizza il testo: rimuovi caratteri strani, normalizza spazi
     final lines = _normalizeText(rawText);
+    print('PARSER: Normalized ${lines.length} lines');
 
     return BusinessCardData(
       firstName: _extractFirstName(lines),
@@ -33,11 +34,14 @@ class BusinessCardParser {
   // La più affidabile — regex standard
 
   static String? _extractEmail(String text) {
+    // Rimuovi spazi comuni aggiunti dall'OCR attorno a @
+    final normalized = text.replaceAll(RegExp(r'\s*@\s*'), '@');
+    
     final regex = RegExp(
       r'[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}',
       caseSensitive: false,
     );
-    final match = regex.firstMatch(text);
+    final match = regex.firstMatch(normalized);
     return match?.group(0)?.toLowerCase();
   }
 
@@ -198,10 +202,12 @@ class BusinessCardParser {
     }
 
     // Poi cerca linee tutto maiuscolo (lunghezza ragionevole)
+    final nameLine = _findNameLine(lines);
     for (final line in lines) {
       if (line == line.toUpperCase() &&
           line.length > 3 &&
           line.length < 50 &&
+          line != nameLine && // Evita di scambiare il nome per l'azienda
           !RegExp(r'\d{4,}').hasMatch(line) &&
           !line.contains('@')) {
         return _titleCase(line);
@@ -278,4 +284,9 @@ class BusinessCardData {
   }
 
   bool get hasMinimumData => firstName != null || email != null || phone != null;
+
+  @override
+  String toString() {
+    return 'BusinessCardData(firstName: $firstName, lastName: $lastName, email: $email, phone: $phone, company: $company, jobTitle: $jobTitle, website: $website)';
+  }
 }

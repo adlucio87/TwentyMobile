@@ -20,13 +20,18 @@ class ScanState with _$ScanState {
   }) = _ScanState;
 }
 
-@riverpod
+@Riverpod(keepAlive: true)
 class ScanNotifier extends _$ScanNotifier {
   @override
-  ScanState build() => ScanState();
+  ScanState build() {
+    print('SCAN: ScanNotifier build() called (isNew: true)');
+    ref.keepAlive();
+    return ScanState();
+  }
 
   Future<void> processImage(XFile imageFile) async {
     state = state.copyWith(status: ScanStatus.processing);
+    print('SCAN: Starting processImage for ${imageFile.path}');
 
     try {
       // 1. ML Kit OCR
@@ -36,7 +41,11 @@ class ScanNotifier extends _$ScanNotifier {
       await recognizer.close();
 
       final rawText = recognized.text;
+      print('SCAN: OCR Raw Text length: ${rawText.length}');
+      print('SCAN: OCR Raw Text: \n$rawText');
+
       if (rawText.trim().isEmpty) {
+        print('SCAN: Error - Raw text is empty');
         state = state.copyWith(
           status: ScanStatus.error,
           errorMessage: 'Nessun testo trovato. Riprova con una foto più nitida.',
@@ -47,7 +56,11 @@ class ScanNotifier extends _$ScanNotifier {
       // 2. Parsing algoritmo
       final parsed = BusinessCardParser.parse(rawText);
 
+      print('SCAN: Parsing complete. Confidence: ${parsed.confidence}');
+      print('SCAN: Parsed Data: $parsed');
+
       if (!parsed.hasMinimumData) {
+        print('SCAN: Error - Not enough data found');
         state = state.copyWith(
           status: ScanStatus.error,
           errorMessage: 'Non riesco a leggere il biglietto. Riprova.',
@@ -60,7 +73,9 @@ class ScanNotifier extends _$ScanNotifier {
         parsedData: parsed,
         rawText: rawText,
       );
-    } catch (e) {
+    } catch (e, stack) {
+      print('SCAN: Catch error: $e');
+      print('SCAN: Stack trace: $stack');
       state = state.copyWith(
         status: ScanStatus.error,
         errorMessage: 'Errore durante la scansione: $e',

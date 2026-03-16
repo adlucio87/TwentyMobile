@@ -1,5 +1,6 @@
 //
 import 'dart:io' show Platform;
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -19,7 +20,8 @@ class ContactDetailScreen extends ConsumerStatefulWidget {
   const ContactDetailScreen({super.key, required this.id});
 
   @override
-  ConsumerState<ContactDetailScreen> createState() => _ContactDetailScreenState();
+  ConsumerState<ContactDetailScreen> createState() =>
+      _ContactDetailScreenState();
 }
 
 class _ContactDetailScreenState extends ConsumerState<ContactDetailScreen> {
@@ -32,18 +34,19 @@ class _ContactDetailScreenState extends ConsumerState<ContactDetailScreen> {
         title: const Text('Contact Details'),
         actions: [
           detailAsync.whenOrNull(
-            data: (contact) => IconButton(
-              icon: const Icon(Icons.edit),
-              tooltip: 'Edit contact',
-              onPressed: () {
-                showModalBottomSheet(
-                  context: context,
-                  isScrollControlled: true,
-                  builder: (_) => EditContactSheet(contact: contact),
-                );
-              },
-            ),
-          ) ?? const SizedBox.shrink(),
+                data: (contact) => IconButton(
+                  icon: const Icon(Icons.edit),
+                  tooltip: 'Edit contact',
+                  onPressed: () {
+                    showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      builder: (_) => EditContactSheet(contact: contact),
+                    );
+                  },
+                ),
+              ) ??
+              const SizedBox.shrink(),
         ],
       ),
       floatingActionButton: detailAsync.whenOrNull(
@@ -75,8 +78,9 @@ class _ContactDetailScreenState extends ConsumerState<ContactDetailScreen> {
         children: [
           CircleAvatar(
             radius: 50,
-            backgroundImage: contact.avatarUrl != null
-                ? NetworkImage(contact.avatarUrl!)
+            backgroundImage:
+                contact.avatarUrl != null && contact.avatarUrl!.isNotEmpty
+                ? CachedNetworkImageProvider(contact.avatarUrl!)
                 : null,
             child: contact.avatarUrl == null
                 ? Text(
@@ -106,7 +110,9 @@ class _ContactDetailScreenState extends ConsumerState<ContactDetailScreen> {
                     contact.email ?? 'No email',
                     style: TextStyle(
                       color: contact.email != null ? Colors.blue : null,
-                      decoration: contact.email != null ? TextDecoration.underline : null,
+                      decoration: contact.email != null
+                          ? TextDecoration.underline
+                          : null,
                     ),
                   ),
                   onTap: contact.email != null
@@ -117,7 +123,9 @@ class _ContactDetailScreenState extends ConsumerState<ContactDetailScreen> {
                           } else {
                             if (context.mounted) {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('Unable to open email client')),
+                                const SnackBar(
+                                  content: Text('Unable to open email client'),
+                                ),
                               );
                             }
                           }
@@ -130,15 +138,22 @@ class _ContactDetailScreenState extends ConsumerState<ContactDetailScreen> {
                     contact.phone ?? 'No phone',
                     style: TextStyle(
                       color: contact.phone != null ? Colors.blue : null,
-                      decoration: contact.phone != null ? TextDecoration.underline : null,
+                      decoration: contact.phone != null
+                          ? TextDecoration.underline
+                          : null,
                     ),
                   ),
                   onTap: contact.phone != null
                       ? () async {
-                          if (kIsWeb || (!Platform.isIOS && !Platform.isAndroid)) {
+                          if (kIsWeb ||
+                              (!Platform.isIOS && !Platform.isAndroid)) {
                             if (context.mounted) {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('Calls are only supported on mobile devices')),
+                                const SnackBar(
+                                  content: Text(
+                                    'Calls are only supported on mobile devices',
+                                  ),
+                                ),
                               );
                             }
                             return;
@@ -149,7 +164,9 @@ class _ContactDetailScreenState extends ConsumerState<ContactDetailScreen> {
                           } else {
                             if (context.mounted) {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('Unable to start the call')),
+                                const SnackBar(
+                                  content: Text('Unable to start the call'),
+                                ),
                               );
                             }
                           }
@@ -162,15 +179,27 @@ class _ContactDetailScreenState extends ConsumerState<ContactDetailScreen> {
           const SizedBox(height: 16),
           ElevatedButton.icon(
             onPressed: () async {
-              if (await fc.FlutterContacts.permissions.request(fc.PermissionType.write) == fc.PermissionStatus.granted) {
-                final emails = contact.email != null ? [fc.Email(address: contact.email!)] : <fc.Email>[];
-                final phones = contact.phone != null ? [fc.Phone(number: contact.phone!)] : <fc.Phone>[];
+              if (await fc.FlutterContacts.permissions.request(
+                    fc.PermissionType.write,
+                  ) ==
+                  fc.PermissionStatus.granted) {
+                final emails = contact.email != null
+                    ? [fc.Email(address: contact.email!)]
+                    : <fc.Email>[];
+                final phones = contact.phone != null
+                    ? [fc.Phone(number: contact.phone!)]
+                    : <fc.Phone>[];
                 final newContact = fc.Contact(
-                  name: fc.Name(first: contact.firstName, last: contact.lastName),
+                  name: fc.Name(
+                    first: contact.firstName,
+                    last: contact.lastName,
+                  ),
                   emails: emails,
                   phones: phones,
                 );
-                await fc.FlutterContacts.native.showCreator(contact: newContact);
+                await fc.FlutterContacts.native.showCreator(
+                  contact: newContact,
+                );
               }
             },
             icon: const Icon(Icons.save_alt),
@@ -211,7 +240,8 @@ class _NotesList extends ConsumerWidget {
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           itemCount: notes.length,
-          itemBuilder: (context, index) => _NoteCard(note: notes[index], contactId: contactId),
+          itemBuilder: (context, index) =>
+              _NoteCard(note: notes[index], contactId: contactId),
         );
       },
       loading: () => const ListSkeleton(shrinkWrap: true),
@@ -254,7 +284,11 @@ class _NoteCard extends StatelessWidget {
                         style: Theme.of(context).textTheme.bodySmall,
                       ),
                     ),
-                    Icon(Icons.open_in_full, size: 14, color: Colors.grey.shade400),
+                    Icon(
+                      Icons.open_in_full,
+                      size: 14,
+                      color: Colors.grey.shade400,
+                    ),
                   ],
                 ),
               ],
@@ -313,10 +347,8 @@ class _NoteCard extends StatelessWidget {
                       showModalBottomSheet(
                         context: context,
                         isScrollControlled: true,
-                        builder: (_) => EditNoteSheet(
-                          note: note,
-                          contactId: contactId,
-                        ),
+                        builder: (_) =>
+                            EditNoteSheet(note: note, contactId: contactId),
                       );
                     },
                   ),
@@ -369,10 +401,9 @@ class _AddNoteSheetState extends ConsumerState<_AddNoteSheet> {
     if (text.isEmpty) return;
     setState(() => _isLoading = true);
     try {
-      await ref.read(contactNotesProvider(widget.contactId).notifier).addNote(
-            widget.contactId,
-            text,
-          );
+      await ref
+          .read(contactNotesProvider(widget.contactId).notifier)
+          .addNote(widget.contactId, text);
       if (mounted) {
         Navigator.of(context).pop();
         SnackbarHelper.showSuccess(context, 'Note added successfully');
@@ -418,7 +449,11 @@ class _AddNoteSheetState extends ConsumerState<_AddNoteSheet> {
             ElevatedButton(
               onPressed: _isLoading ? null : _save,
               child: _isLoading
-                  ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2))
+                  ? const SizedBox(
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
                   : const Text('Save Note'),
             ),
             const SizedBox(height: 32),

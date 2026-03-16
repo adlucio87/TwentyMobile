@@ -25,7 +25,9 @@ class _ScanReviewScreenState extends ConsumerState<ScanReviewScreen> {
   @override
   void initState() {
     super.initState();
-    final data = ref.read(scanNotifierProvider).parsedData;
+    final state = ref.read(scanNotifierProvider);
+    final data = state.parsedData;
+    print('REVIEW: initState - status: ${state.status}, data: $data');
     _firstName = TextEditingController(text: data?.firstName ?? '');
     _lastName = TextEditingController(text: data?.lastName ?? '');
     _email = TextEditingController(text: data?.email ?? '');
@@ -37,6 +39,7 @@ class _ScanReviewScreenState extends ConsumerState<ScanReviewScreen> {
   @override
   Widget build(BuildContext context) {
     final scanState = ref.watch(scanNotifierProvider);
+    print('REVIEW: build - status: ${scanState.status}, data: ${scanState.parsedData}');
 
     // Mostra loading se ancora in elaborazione
     if (scanState.status == ScanStatus.processing) {
@@ -47,7 +50,7 @@ class _ScanReviewScreenState extends ConsumerState<ScanReviewScreen> {
             children: [
               CircularProgressIndicator(),
               SizedBox(height: 16),
-              Text('Analisi biglietto in corso...'),
+              Text('Analyzing business card...'),
             ],
           ),
         ),
@@ -63,11 +66,11 @@ class _ScanReviewScreenState extends ConsumerState<ScanReviewScreen> {
             children: [
               const Icon(Icons.error_outline, size: 64, color: Colors.red),
               const SizedBox(height: 16),
-              Text(scanState.errorMessage ?? 'Errore sconosciuto'),
+              Text(scanState.errorMessage ?? 'Unknown error'),
               const SizedBox(height: 24),
               FilledButton(
                 onPressed: () => Navigator.pop(context),
-                child: const Text('Riprova'),
+                child: const Text('Try Again'),
               ),
             ],
           ),
@@ -80,7 +83,7 @@ class _ScanReviewScreenState extends ConsumerState<ScanReviewScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Verifica dati'),
+        title: const Text('Verify data'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
@@ -101,27 +104,27 @@ class _ScanReviewScreenState extends ConsumerState<ScanReviewScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('CONTATTO',
+                  const Text('CONTACT',
                     style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600,
                         letterSpacing: 1.2, color: Colors.grey)),
                   const SizedBox(height: 8),
                   Row(children: [
-                    Expanded(child: _Field('Nome', _firstName, Icons.person)),
+                    Expanded(child: _Field('Name', _firstName, Icons.person)),
                     const SizedBox(width: 12),
-                    Expanded(child: _Field('Cognome', _lastName, null)),
+                    Expanded(child: _Field('Last Name', _lastName, null)),
                   ]),
                   const SizedBox(height: 12),
                   _Field('Email', _email, Icons.email),
                   const SizedBox(height: 12),
-                  _Field('Telefono', _phone, Icons.phone),
+                  _Field('Phone', _phone, Icons.phone),
                   const SizedBox(height: 24),
-                  const Text('AZIENDA',
+                  const Text('COMPANY',
                     style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600,
                         letterSpacing: 1.2, color: Colors.grey)),
                   const SizedBox(height: 8),
-                  _Field('Azienda', _company, Icons.business),
+                  _Field('Company', _company, Icons.business),
                   const SizedBox(height: 12),
-                  _Field('Ruolo', _jobTitle, Icons.work_outline),
+                  _Field('Role', _jobTitle, Icons.work_outline),
                 ],
               ),
             ),
@@ -134,7 +137,7 @@ class _ScanReviewScreenState extends ConsumerState<ScanReviewScreen> {
               onPressed: _isSaving ? null : _save,
               child: _isSaving
                   ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                  : const Text('Crea Contatto'),
+                  : const Text('Create Contact'),
             ),
           ),
         ],
@@ -155,7 +158,7 @@ class _ScanReviewScreenState extends ConsumerState<ScanReviewScreen> {
   Future<void> _save() async {
     if (_firstName.text.trim().isEmpty && _email.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Inserisci almeno nome o email')),
+        const SnackBar(content: Text('Enter at least name or email')),
       );
       return;
     }
@@ -177,17 +180,17 @@ class _ScanReviewScreenState extends ConsumerState<ScanReviewScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('✅ Contatto creato con successo'),
+            content: Text('✅ Contact created successfully'),
             backgroundColor: Colors.green,
           ),
         );
-        // Naviga al dettaglio del contatto appena creato
+        // Navigate to contact details
         context.go('/contacts/${contact.id}');
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Errore: $e'), backgroundColor: Colors.red),
+          SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
         );
       }
     } finally {
@@ -218,10 +221,10 @@ class _ConfidenceBanner extends StatelessWidget {
             : Colors.red;
 
     final message = confidence >= 0.7
-        ? '✅ Lettura ottima — verifica i dati'
+        ? '✅ Excellent capture — verify data'
         : confidence >= 0.4
-            ? '⚠️ Lettura parziale — controlla i campi'
-            : '❌ Lettura difficile — compila manualmente';
+            ? '⚠️ Partial capture — check fields'
+            : '❌ Difficult to read — fill manually';
 
     return Container(
       width: double.infinity,

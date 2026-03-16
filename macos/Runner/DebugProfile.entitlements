@@ -10,5 +10,9 @@
 	<true/>
 	<key>com.apple.security.network.server</key>
 	<true/>
+	<key>com.apple.security.keychain-access-groups</key>
+	<array>
+		<string>$(AppIdentifierPrefix)$(CFBundleIdentifier)</string>
+	</array>
 </dict>
 </plist>

@@ -8,16 +8,20 @@ class MainShell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: child,
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: _calculateSelectedIndex(context),
-        onDestinationSelected: (int index) => _onItemTapped(index, context),
-        destinations: const [
-          NavigationDestination(icon: Icon(Icons.home), label: 'Home'),
-          NavigationDestination(icon: Icon(Icons.people), label: 'Contacts'),
-          NavigationDestination(icon: Icon(Icons.business), label: 'Companies'),
-          NavigationDestination(icon: Icon(Icons.task), label: 'Tasks'),
+    return Material(
+      child: Column(
+        children: [
+          Expanded(child: child),
+          NavigationBar(
+            selectedIndex: _calculateSelectedIndex(context),
+            onDestinationSelected: (int index) => _onItemTapped(index, context),
+            destinations: const [
+              NavigationDestination(icon: Icon(Icons.home), label: 'Home'),
+              NavigationDestination(icon: Icon(Icons.people), label: 'Contacts'),
+              NavigationDestination(icon: Icon(Icons.business), label: 'Companies'),
+              NavigationDestination(icon: Icon(Icons.task), label: 'Tasks'),
+            ],
+          ),
         ],
       ),
     );

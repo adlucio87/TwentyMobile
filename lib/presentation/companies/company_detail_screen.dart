@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -15,7 +16,8 @@ class CompanyDetailScreen extends ConsumerStatefulWidget {
   const CompanyDetailScreen({super.key, required this.id});
 
   @override
-  ConsumerState<CompanyDetailScreen> createState() => _CompanyDetailScreenState();
+  ConsumerState<CompanyDetailScreen> createState() =>
+      _CompanyDetailScreenState();
 }
 
 class _CompanyDetailScreenState extends ConsumerState<CompanyDetailScreen> {
@@ -55,7 +57,7 @@ class _CompanyDetailScreenState extends ConsumerState<CompanyDetailScreen> {
           CircleAvatar(
             radius: 50,
             backgroundImage: company.logoUrl != null
-                ? NetworkImage(company.logoUrl!)
+                ? CachedNetworkImageProvider(company.logoUrl!)
                 : null,
             child: company.logoUrl == null
                 ? const Icon(Icons.business, size: 40)
@@ -79,9 +81,9 @@ class _CompanyDetailScreenState extends ConsumerState<CompanyDetailScreen> {
               child: Text(
                 company.domainName!,
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: Colors.blue,
-                      decoration: TextDecoration.underline,
-                    ),
+                  color: Colors.blue,
+                  decoration: TextDecoration.underline,
+                ),
               ),
             ),
           ],
@@ -150,7 +152,8 @@ class _CompanyNotesList extends ConsumerWidget {
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           itemCount: notes.length,
-          itemBuilder: (context, index) => _NoteCard(note: notes[index], companyId: companyId),
+          itemBuilder: (context, index) =>
+              _NoteCard(note: notes[index], companyId: companyId),
         );
       },
       loading: () => const ListSkeleton(shrinkWrap: true),
@@ -193,7 +196,11 @@ class _NoteCard extends StatelessWidget {
                         style: Theme.of(context).textTheme.bodySmall,
                       ),
                     ),
-                    Icon(Icons.open_in_full, size: 14, color: Colors.grey.shade400),
+                    Icon(
+                      Icons.open_in_full,
+                      size: 14,
+                      color: Colors.grey.shade400,
+                    ),
                   ],
                 ),
               ],
@@ -250,10 +257,8 @@ class _NoteCard extends StatelessWidget {
                       showModalBottomSheet(
                         context: context,
                         isScrollControlled: true,
-                        builder: (_) => EditNoteSheet(
-                          note: note,
-                          companyId: companyId,
-                        ),
+                        builder: (_) =>
+                            EditNoteSheet(note: note, companyId: companyId),
                       );
                     },
                   ),
@@ -287,7 +292,8 @@ class _AddCompanyNoteSheet extends ConsumerStatefulWidget {
   const _AddCompanyNoteSheet({required this.companyId});
 
   @override
-  ConsumerState<_AddCompanyNoteSheet> createState() => _AddCompanyNoteSheetState();
+  ConsumerState<_AddCompanyNoteSheet> createState() =>
+      _AddCompanyNoteSheetState();
 }
 
 class _AddCompanyNoteSheetState extends ConsumerState<_AddCompanyNoteSheet> {
@@ -305,10 +311,9 @@ class _AddCompanyNoteSheetState extends ConsumerState<_AddCompanyNoteSheet> {
     if (text.isEmpty) return;
     setState(() => _isLoading = true);
     try {
-      await ref.read(companyNotesProvider(widget.companyId).notifier).addNote(
-            widget.companyId,
-            text,
-          );
+      await ref
+          .read(companyNotesProvider(widget.companyId).notifier)
+          .addNote(widget.companyId, text);
       if (mounted) {
         Navigator.of(context).pop();
         SnackbarHelper.showSuccess(context, 'Note added successfully');
@@ -354,7 +359,11 @@ class _AddCompanyNoteSheetState extends ConsumerState<_AddCompanyNoteSheet> {
             ElevatedButton(
               onPressed: _isLoading ? null : _save,
               child: _isLoading
-                  ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2))
+                  ? const SizedBox(
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
                   : const Text('Save Note'),
             ),
             const SizedBox(height: 32),
