@@ -40,31 +40,37 @@ class _ContactDetailScreenState extends ConsumerState<ContactDetailScreen> {
         title: const Text('Contact Details'),
         actions: [
           if (detailAsync.hasValue)
-            IconButton(
-              icon: _isSharing
-                  ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : Icon(Platform.isIOS ? Icons.ios_share : Icons.share),
-              tooltip: 'Condividi contatto',
-              onPressed: _isSharing
-                  ? null
-                  : () async {
-                      setState(() => _isSharing = true);
-                      try {
-                        await ContactShareService()
-                            .shareContact(detailAsync.value!);
-                      } catch (e) {
-                        if (context.mounted) {
-                          SnackbarHelper.showError(
-                              context, 'Impossibile condividere il contatto');
+            Builder(
+              builder: (btnContext) => IconButton(
+                icon: _isSharing
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : Icon(Platform.isIOS ? Icons.ios_share : Icons.share),
+                tooltip: 'Share contact',
+                onPressed: _isSharing
+                    ? null
+                    : () async {
+                        setState(() => _isSharing = true);
+                        try {
+                          final box = btnContext.findRenderObject() as RenderBox?;
+                          final origin = box != null
+                              ? box.localToGlobal(Offset.zero) & box.size
+                              : null;
+                          await ContactShareService()
+                              .shareContact(detailAsync.value!, sharePositionOrigin: origin);
+                        } catch (e) {
+                          if (context.mounted) {
+                            SnackbarHelper.showError(
+                                context, 'Unable to share contact: $e');
+                          }
+                        } finally {
+                          if (mounted) setState(() => _isSharing = false);
                         }
-                      } finally {
-                        if (mounted) setState(() => _isSharing = false);
-                      }
-                    },
+                      },
+              ),
             ),
           if (detailAsync.hasValue)
             IconButton(

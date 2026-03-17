@@ -1,12 +1,12 @@
 import 'dart:io';
+import 'dart:ui';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:pocketcrm/domain/models/contact.dart';
 import 'package:pocketcrm/domain/services/vcard_generator.dart';
 
 class ContactShareService {
-  /// Generates a vCard and shares it using the native share sheet.
-  Future<void> shareContact(Contact contact) async {
+  Future<void> shareContact(Contact contact, {Rect? sharePositionOrigin}) async {
     final vCardData = VCardGenerator.generate(contact);
 
     // Generate filename
@@ -43,14 +43,11 @@ class ContactShareService {
 
       await Share.shareXFiles(
         [xFile],
-        text: 'Condividi contatto',
+        text: 'Share contact',
+        sharePositionOrigin: sharePositionOrigin,
       );
-    } finally {
-      if (await file.exists()) {
-        try {
-          await file.delete();
-        } catch (_) {}
-      }
+    } catch (e) {
+      rethrow;
     }
   }
 }
