@@ -51,6 +51,10 @@
 	<string>TwentyMobile usa la fotocamera per scansionare biglietti da visita</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>TwentyMobile accede alla galleria per importare biglietti da visita</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>TwentyMobile usa il riconoscimento vocale per trascrivere note vocali sui tuoi contatti</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>TwentyMobile usa il microfono per registrare note vocali</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>

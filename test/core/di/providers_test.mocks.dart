@@ -246,6 +246,15 @@ class MockCRMRepository extends _i1.Mock implements _i6.CRMRepository {
           as _i7.Future<_i2.Contact>);
 
   @override
+  _i7.Future<void> deleteContact(String? id) =>
+      (super.noSuchMethod(
+            Invocation.method(#deleteContact, [id]),
+            returnValue: _i7.Future<void>.value(),
+            returnValueForMissingStub: _i7.Future<void>.value(),
+          )
+          as _i7.Future<void>);
+
+  @override
   _i7.Future<List<_i3.Company>> getCompanies({String? search, int? page = 1}) =>
       (super.noSuchMethod(
             Invocation.method(#getCompanies, [], {
@@ -359,6 +368,15 @@ class MockCRMRepository extends _i1.Mock implements _i6.CRMRepository {
             ),
           )
           as _i7.Future<_i4.Note>);
+
+  @override
+  _i7.Future<void> deleteNote(String? id) =>
+      (super.noSuchMethod(
+            Invocation.method(#deleteNote, [id]),
+            returnValue: _i7.Future<void>.value(),
+            returnValueForMissingStub: _i7.Future<void>.value(),
+          )
+          as _i7.Future<void>);
 
   @override
   _i7.Future<List<_i5.Task>> getTasks({bool? completed}) =>
@@ -498,6 +516,15 @@ class MockCRMRepository extends _i1.Mock implements _i6.CRMRepository {
             ),
           )
           as _i7.Future<_i5.Task>);
+
+  @override
+  _i7.Future<void> deleteTask(String? id) =>
+      (super.noSuchMethod(
+            Invocation.method(#deleteTask, [id]),
+            returnValue: _i7.Future<void>.value(),
+            returnValueForMissingStub: _i7.Future<void>.value(),
+          )
+          as _i7.Future<void>);
 
   @override
   _i7.Future<List<_i2.Contact>> getRecentContacts({int? limit = 5}) =>

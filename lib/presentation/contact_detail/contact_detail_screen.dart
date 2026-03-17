@@ -18,6 +18,8 @@ import 'package:pocketcrm/presentation/shared/swipe_to_delete_wrapper.dart';
 import 'package:pocketcrm/presentation/shared/dialog_helper.dart';
 import 'package:pocketcrm/core/notifications/notification_service.dart';
 import 'package:pocketcrm/domain/services/contact_share_service.dart';
+import 'package:pocketcrm/core/utils/platform_utils.dart';
+import 'package:pocketcrm/presentation/contact_detail/voice_note_sheet.dart';
 
 class ContactDetailScreen extends ConsumerStatefulWidget {
   final String id;
@@ -131,16 +133,35 @@ class _ContactDetailScreenState extends ConsumerState<ContactDetailScreen> {
         ],
       ),
       floatingActionButton: detailAsync.whenOrNull(
-        data: (contact) => FloatingActionButton.extended(
-          onPressed: () {
-            showModalBottomSheet(
-              context: context,
-              isScrollControlled: true,
-              builder: (_) => _AddNoteSheet(contactId: contact.id),
-            );
-          },
-          icon: const Icon(Icons.add),
-          label: const Text('New Note'),
+        data: (contact) => Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (PlatformUtils.isMobile)
+              FloatingActionButton(
+                heroTag: 'mic_fab',
+                onPressed: () {
+                  showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true,
+                    builder: (_) => VoiceNoteSheet(contactId: contact.id),
+                  );
+                },
+                child: const Icon(Icons.mic),
+              ),
+            if (PlatformUtils.isMobile) const SizedBox(width: 16),
+            FloatingActionButton.extended(
+              heroTag: 'note_fab',
+              onPressed: () {
+                showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  builder: (_) => _AddNoteSheet(contactId: contact.id),
+                );
+              },
+              icon: const Icon(Icons.add),
+              label: const Text('New Note'),
+            ),
+          ],
         ),
       ),
       body: detailAsync.when(
