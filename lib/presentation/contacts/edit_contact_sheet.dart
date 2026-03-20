@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pocketcrm/core/di/providers.dart';
 import 'package:pocketcrm/domain/models/contact.dart';
 import 'package:pocketcrm/presentation/shared/snackbar_helper.dart';
+import 'package:pocketcrm/shared/widgets/phone_input_field.dart';
 
 class EditContactSheet extends ConsumerStatefulWidget {
   final Contact contact;
@@ -105,23 +106,27 @@ class _EditContactSheetState extends ConsumerState<EditContactSheet> {
                 },
               ),
               const SizedBox(height: 16),
-              TextFormField(
-                controller: _phoneController,
-                enabled: !_isLoading,
-                decoration: const InputDecoration(
-                  labelText: 'Phone',
-                  prefixIcon: Icon(Icons.phone),
-                ),
-                keyboardType: TextInputType.phone,
-                validator: (v) {
-                  if (v != null && v.trim().isNotEmpty) {
-                    final phoneRegex = RegExp(r'^\+?[0-9]{8,15}$');
-                    if (!phoneRegex.hasMatch(v.trim().replaceAll(' ', ''))) {
-                      return 'Please enter a valid phone number';
-                    }
-                  }
-                  return null;
-                },
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Phone',
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      fontSize: 12,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  AbsorbPointer(
+                    absorbing: _isLoading,
+                    child: PhoneInputField(
+                      initialValue: _phoneController.text,
+                      onChanged: (val) {
+                        _phoneController.text = val ?? '';
+                      },
+                    ),
+                  ),
+                ],
               ),
               if (_errorMessage != null) ...[
                 const SizedBox(height: 16),

@@ -4,6 +4,8 @@ import 'package:pocketcrm/domain/models/company.dart';
 import 'package:pocketcrm/domain/models/contact.dart';
 import 'package:pocketcrm/domain/models/note.dart';
 import 'package:pocketcrm/domain/models/task.dart';
+import 'package:pocketcrm/shared/widgets/phone_input_field.dart';
+import 'package:pocketcrm/core/data/country_codes.dart';
 import 'package:pocketcrm/domain/repositories/crm_repository.dart';
 
 class TwentyConnector implements CRMRepository {
@@ -259,10 +261,22 @@ class TwentyConnector implements CRMRepository {
       }
     ''';
 
+    String? phoneCountryCode;
+    if (phone != null) {
+      final parsed = PhoneInputField.parseE164(phone);
+      final match = countryCodes.where((c) => c.dialCode == parsed.$1).toList();
+      if (match.isNotEmpty) {
+        phoneCountryCode = match.first.isoCode;
+      }
+    }
+
     final input = {
       'name': {'firstName': firstName, 'lastName': lastName},
       if (email != null) 'emails': {'primaryEmail': email},
-      if (phone != null) 'phones': {'primaryPhoneNumber': phone},
+      if (phone != null) 'phones': {
+        'primaryPhoneNumber': phone,
+        if (phoneCountryCode != null) 'primaryPhoneCountryCode': phoneCountryCode,
+      },
     };
 
     final MutationOptions options = MutationOptions(
@@ -308,7 +322,17 @@ class TwentyConnector implements CRMRepository {
       input['emails'] = {'primaryEmail': email};
     }
     if (phone != null) {
-      input['phones'] = {'primaryPhoneNumber': phone};
+      String? phoneCountryCode;
+      final parsed = PhoneInputField.parseE164(phone);
+      final match = countryCodes.where((c) => c.dialCode == parsed.$1).toList();
+      if (match.isNotEmpty) {
+        phoneCountryCode = match.first.isoCode;
+      }
+
+      input['phones'] = {
+        'primaryPhoneNumber': phone,
+        if (phoneCountryCode != null) 'primaryPhoneCountryCode': phoneCountryCode,
+      };
     }
 
     final MutationOptions options = MutationOptions(

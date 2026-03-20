@@ -8,6 +8,7 @@ import 'package:pocketcrm/core/di/auth_state.dart';
 import 'package:flutter_contacts/flutter_contacts.dart' as fc;
 import 'package:pocketcrm/presentation/shared/skeleton_loading.dart';
 import 'package:pocketcrm/presentation/shared/snackbar_helper.dart';
+import 'package:pocketcrm/shared/widgets/phone_input_field.dart';
 import 'package:pocketcrm/presentation/shared/empty_state_widget.dart';
 import 'package:pocketcrm/presentation/shared/swipe_to_delete_wrapper.dart';
 
@@ -332,13 +333,27 @@ class AddContactSheetState extends ConsumerState<AddContactSheet> {
                 enabled: !_isLoading,
               ),
               const SizedBox(height: 16),
-              TextFormField(
-                controller: _phoneController,
-                decoration: const InputDecoration(labelText: 'Phone (Mobile)'),
-                keyboardType: TextInputType.phone,
-                validator: (v) =>
-                    !_isValidPhone(v ?? '') ? 'Invalid number format' : null,
-                enabled: !_isLoading,
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Phone (Mobile)',
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      fontSize: 12,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  AbsorbPointer(
+                    absorbing: _isLoading,
+                    child: PhoneInputField(
+                      initialValue: _phoneController.text,
+                      onChanged: (val) {
+                        _phoneController.text = val ?? '';
+                      },
+                    ),
+                  ),
+                ],
               ),
               if (_errorMessage != null) ...[
                 const SizedBox(height: 16),

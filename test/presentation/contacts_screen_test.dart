@@ -55,7 +55,7 @@ void main() {
         firstName: 'Jane',
         lastName: 'Smith',
         email: 'jane@example.com',
-        phone: '1234567890',
+        phone: '+11234567890',
       );
       final updatedContacts = [...initialContacts, newContact];
 
@@ -68,7 +68,7 @@ void main() {
         firstName: 'Jane',
         lastName: 'Smith',
         email: 'jane@example.com',
-        phone: '1234567890',
+        phone: '+11234567890',
       )).thenAnswer((_) async => newContact);
 
       // 3. Pump the widget
@@ -91,7 +91,7 @@ void main() {
       await tester.enterText(find.widgetWithText(TextFormField, 'First Name').first, 'Jane');
       await tester.enterText(find.widgetWithText(TextFormField, 'Last Name').first, 'Smith');
       await tester.enterText(find.widgetWithText(TextFormField, 'Email').first, 'jane@example.com');
-      await tester.enterText(find.widgetWithText(TextFormField, 'Phone (Mobile)').first, '1234567890');
+      await tester.enterText(find.byType(TextFormField).last, '1234567890');
 
       // 7. Tap Salva Contatto
       await tester.tap(find.text('Save Contact'));
@@ -106,7 +106,7 @@ void main() {
         firstName: 'Jane',
         lastName: 'Smith',
         email: 'jane@example.com',
-        phone: '1234567890',
+        phone: '+11234567890',
       )).called(1);
 
       // Called once on initial build
