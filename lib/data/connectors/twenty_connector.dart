@@ -17,9 +17,13 @@ class TwentyConnector implements CRMRepository {
   Future<bool> testConnection(String baseUrl, String apiToken) async {
     const String query = r'''
       query Me {
-        currentWorkspaceMember {
-          id
-          name
+        workspaceMembers(first: 1) {
+          edges {
+            node {
+              id
+              name { firstName lastName }
+            }
+          }
         }
       }
     ''';
@@ -34,26 +38,32 @@ class TwentyConnector implements CRMRepository {
     final QueryOptions options = QueryOptions(document: gql(query));
     final QueryResult result = await tempClient.query(options);
 
-    if (result.hasException) {
-      return false;
-    }
-    return result.data?['currentWorkspaceMember'] != null;
+    final edges = result.data?['workspaceMembers']?['edges'] as List?;
+    return edges != null && edges.isNotEmpty;
   }
 
   @override
   Future<String> getCurrentUserName() async {
     const String query = r'''
       query Me {
-        currentWorkspaceMember {
-          name
+        workspaceMembers(first: 1) {
+          edges {
+            node {
+              name { firstName lastName }
+            }
+          }
         }
       }
     ''';
     final QueryOptions options = QueryOptions(document: gql(query));
     final QueryResult result = await client.query(options);
 
-    if (result.hasException) throw Exception(result.exception.toString());
-    return result.data?['currentWorkspaceMember']?['name'] ?? '';
+    final edges = result.data?['workspaceMembers']?['edges'] as List?;
+    if (edges == null || edges.isEmpty) return '';
+    
+    final name = edges.first['node']?['name'];
+    if (name == null) return '';
+    return '${name['firstName']} ${name['lastName']}'.trim();
   }
 
   @override
