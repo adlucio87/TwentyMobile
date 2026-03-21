@@ -70,6 +70,7 @@ dev_dependencies:
   json_serializable: ^6.7.0
   riverpod_generator: ^2.3.0
   mockito: ^5.4.6
+  flutter_launcher_icons: ^0.13.1
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
