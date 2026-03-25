@@ -30,7 +30,7 @@ class AppTheme {
       color: AppColors.darkSurface,
       elevation: 0,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.all(Radius.circular(12)),
+        borderRadius: BorderRadius.all(Radius.circular(14)),
         side: BorderSide(color: AppColors.darkBorder, width: 1),
       ),
       margin: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
@@ -114,9 +114,10 @@ class AppTheme {
     ),
     cardTheme: const CardThemeData(
       color: AppColors.lightSurface,
-      elevation: 0,
+      elevation: 2,
+      shadowColor: Colors.black12,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.all(Radius.circular(12)),
+        borderRadius: BorderRadius.all(Radius.circular(14)),
         side: BorderSide(color: AppColors.lightBorder, width: 1),
       ),
       margin: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
@@ -179,11 +180,11 @@ class AppTheme {
     headlineLarge: GoogleFonts.inter(fontSize: 28, fontWeight: FontWeight.w700, color: primary),
     headlineMedium: GoogleFonts.inter(fontSize: 22, fontWeight: FontWeight.w600, color: primary),
     titleLarge: GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.w600, color: primary),
-    titleMedium: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w600, color: primary),
+    titleMedium: GoogleFonts.inter(fontSize: 17, fontWeight: FontWeight.w600, color: primary),
     titleSmall: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w500, color: primary),
     bodyLarge: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w400, color: primary),
-    bodyMedium: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w400, color: primary),
-    bodySmall: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w400, color: secondary),
+    bodyMedium: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w400, color: secondary.withOpacity(0.6)),
+    bodySmall: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w400, color: secondary.withOpacity(0.45)),
     labelLarge: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w500, color: primary),
     labelSmall: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w400, color: secondary),
   );

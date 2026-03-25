@@ -33,6 +33,7 @@ class TodayScreen extends ConsumerWidget {
         elevation: 8.0,
         animationCurve: Curves.easeOutCubic,
         isOpenOnStart: false,
+        label: const Text('New'),
         children: [
           SpeedDialChild(
             child: const Icon(Icons.document_scanner),
@@ -97,7 +98,7 @@ class TodayScreen extends ConsumerWidget {
                 ),
               ],
               flexibleSpace: FlexibleSpaceBar(
-                titlePadding: const EdgeInsets.only(left: 16, bottom: 16, right: 16),
+                titlePadding: const EdgeInsets.only(left: 20, bottom: 20, right: 20),
                 title: Consumer(
                   builder: (context, ref, child) {
                     final userNameAsync = ref.watch(currentUserNameProvider);
@@ -116,7 +117,6 @@ class TodayScreen extends ConsumerWidget {
 
                     final dateFormat = DateFormat('EEEE, d MMMM y', 'en_US');
                     final dateString = dateFormat.format(now);
-                    // Capitalize first letter of day
                     final formattedDate = dateString.replaceFirst(dateString[0], dateString[0].toUpperCase());
 
                     return Column(
@@ -126,17 +126,27 @@ class TodayScreen extends ConsumerWidget {
                       children: [
                         Text(
                           greeting,
-                          style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 24,
+                          ),
                         ),
+                        const SizedBox(height: 4),
                         Text(
                           formattedDate,
-                          style: Theme.of(context).textTheme.bodySmall,
+                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                          ),
                         ),
-                        if (userName.isNotEmpty)
+                        if (userName.isNotEmpty) ...[
+                          const SizedBox(height: 2),
                           Text(
                             userName,
-                            style: Theme.of(context).textTheme.bodySmall,
+                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.45),
+                            ),
                           ),
+                        ],
                       ],
                     );
                   },

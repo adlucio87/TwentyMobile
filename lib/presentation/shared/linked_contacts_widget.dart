@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pocketcrm/core/di/providers.dart';
 import 'package:pocketcrm/domain/models/contact.dart';
+import 'package:pocketcrm/presentation/shared/skeleton_loading.dart';
+import 'package:pocketcrm/core/utils/color_utils.dart';
 
 enum LinkedContactType { company, task }
 
@@ -52,18 +54,17 @@ class LinkedContactsWidget extends ConsumerWidget {
             child: Wrap(
               spacing: 8,
               runSpacing: 4,
-              children: contacts.map((contact) {
-                return InkWell(
-                  onTap: () => context.push('/contacts/${contact.id}'),
-                  borderRadius: BorderRadius.circular(16),
-                  child: Chip(
-                    padding: EdgeInsets.zero,
+              children: [
+                ...contacts.take(3).map<Widget>((contact) {
+                  final bgColor = ColorUtils.avatarColor(contact.firstName);
+                  return GestureDetector(
+                    onTap: () => context.push('/contacts/${contact.id}'),
+                    child: Chip(
+                      padding: EdgeInsets.zero,
                     visualDensity: VisualDensity.compact,
                     avatar: CircleAvatar(
                       radius: 12,
-                      backgroundColor: Theme.of(
-                        context,
-                      ).colorScheme.primaryContainer,
+                      backgroundColor: bgColor.withOpacity(0.2),
                       backgroundImage: contact.avatarUrl != null
                           ? CachedNetworkImageProvider(contact.avatarUrl!)
                           : null,
@@ -74,21 +75,32 @@ class LinkedContactsWidget extends ConsumerWidget {
                                   : '?',
                               style: TextStyle(
                                 fontSize: 10,
-                                color: Theme.of(
-                                  context,
-                                ).colorScheme.onPrimaryContainer,
+                                color: bgColor,
                                 fontWeight: FontWeight.bold,
                               ),
                             )
                           : null,
                     ),
                     label: Text(
-                      '${contact.firstName} ${contact.lastName}',
-                      style: const TextStyle(fontSize: 12),
+                        '${contact.firstName} ${contact.lastName}',
+                        style: const TextStyle(fontSize: 12),
+                      ),
+                    ),
+                  );
+                }),
+                if (contacts.length > 3)
+                  Chip(
+                    padding: EdgeInsets.zero,
+                    visualDensity: VisualDensity.compact,
+                    label: Text(
+                      '+${contacts.length - 3} others',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                      ),
                     ),
                   ),
-                );
-              }).toList(),
+              ],
             ),
           );
         }
@@ -155,11 +167,9 @@ class LinkedContactsWidget extends ConsumerWidget {
       },
       loading: () => isCompact
           ? const SizedBox.shrink()
-          : const Center(
-              child: Padding(
-                padding: EdgeInsets.all(16.0),
-                child: CircularProgressIndicator(),
-              ),
+          : const Padding(
+              padding: EdgeInsets.symmetric(vertical: 8),
+              child: ListSkeleton(itemCount: 2, shrinkWrap: true),
             ),
       error: (err, stack) => isCompact
           ? const SizedBox.shrink()

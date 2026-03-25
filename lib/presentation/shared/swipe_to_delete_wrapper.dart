@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:pocketcrm/presentation/shared/dialog_helper.dart';
 
 class SwipeToDeleteWrapper extends StatelessWidget {
@@ -32,6 +33,7 @@ class SwipeToDeleteWrapper extends StatelessWidget {
         ),
       ),
       confirmDismiss: (direction) async {
+        HapticFeedback.mediumImpact();
         return await DialogHelper.showDeleteConfirmDialog(
           context: context,
           title: confirmTitle,

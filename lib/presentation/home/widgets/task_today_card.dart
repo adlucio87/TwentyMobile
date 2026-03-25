@@ -35,44 +35,56 @@ class TaskTodayCard extends ConsumerWidget {
         }
       },
       child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+        margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
         decoration: BoxDecoration(
-        color: isOverdue
-          ? Theme.of(context).colorScheme.error.withOpacity(0.08)
-          : Theme.of(context).cardColor,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
           color: isOverdue
-            ? Theme.of(context).colorScheme.error.withOpacity(0.3)
-            : Theme.of(context).dividerColor,
-        ),
-      ),
-      child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-        leading: Checkbox(
-          value: task.completed ?? false,
-          onChanged: (_) async {
-            if (!await DemoUtils.checkDemoAction(context, ref)) return;
-            ref.read(todayNotifierProvider.notifier).completeTask(task.id);
-          },
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
-        ),
-        title: Text(
-          task.title,
-          style: Theme.of(context).textTheme.titleSmall?.copyWith(
-            decoration: (task.completed ?? false)
-              ? TextDecoration.lineThrough
-              : null,
+            ? Theme.of(context).colorScheme.error.withOpacity(0.08)
+            : Theme.of(context).cardColor,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color: isOverdue
+              ? Theme.of(context).colorScheme.error.withOpacity(0.3)
+              : Theme.of(context).dividerColor,
           ),
         ),
-        subtitle: task.contactName != null ? Row(
-          children: [
-            const Icon(Icons.person_outline, size: 12),
-            const SizedBox(width: 4),
-            Text(task.contactName!,
-              style: Theme.of(context).textTheme.bodySmall),
-          ],
-        ) : null,
+        child: ListTile(
+          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          leading: Transform.scale(
+            scale: 1.2,
+            child: Checkbox(
+              value: task.completed ?? false,
+              onChanged: (_) async {
+                if (!await DemoUtils.checkDemoAction(context, ref)) return;
+                ref.read(todayNotifierProvider.notifier).completeTask(task.id);
+              },
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+            ),
+          ),
+          title: AnimatedDefaultTextStyle(
+            duration: const Duration(milliseconds: 300),
+            style: Theme.of(context).textTheme.titleMedium!.copyWith(
+              decoration: (task.completed ?? false)
+                ? TextDecoration.lineThrough
+                : null,
+              color: (task.completed ?? false)
+                ? Theme.of(context).textTheme.bodySmall?.color
+                : Theme.of(context).textTheme.titleMedium?.color,
+            ),
+            child: Text(task.title),
+          ),
+          subtitle: task.contactName != null ? Padding(
+            padding: const EdgeInsets.only(top: 4.0),
+            child: Row(
+              children: [
+                Icon(Icons.person_outline, size: 14, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5)),
+                const SizedBox(width: 4),
+                Text(task.contactName!,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5)
+                  )),
+              ],
+            ),
+          ) : null,
           trailing: task.dueAt != null ? _buildTrailing(context, task.dueAt!) : null,
         ),
       ),

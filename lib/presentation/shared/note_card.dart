@@ -31,13 +31,13 @@ class NoteCard extends StatelessWidget {
                 const SizedBox(height: 8),
                 Row(
                   children: [
-                    Expanded(
-                      child: Text(
-                        note.createdAt!.toLocal().toString().split('.')[0],
-                        style: Theme.of(context).textTheme.bodySmall,
+                    const Spacer(),
+                    Text(
+                      note.createdAt!.toLocal().toString().split('.')[0],
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
                       ),
                     ),
-                    Icon(Icons.open_in_full, size: 14, color: Colors.grey.shade400),
                   ],
                 ),
               ],

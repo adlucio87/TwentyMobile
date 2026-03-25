@@ -12,6 +12,7 @@ import 'package:pocketcrm/shared/widgets/phone_input_field.dart';
 import 'package:pocketcrm/presentation/shared/empty_state_widget.dart';
 import 'package:pocketcrm/presentation/shared/swipe_to_delete_wrapper.dart';
 import 'package:pocketcrm/core/utils/demo_utils.dart';
+import 'package:pocketcrm/core/utils/color_utils.dart';
 
 class ContactsScreen extends ConsumerStatefulWidget {
   const ContactsScreen({super.key});
@@ -73,13 +74,13 @@ class _ContactsScreenState extends ConsumerState<ContactsScreen> {
                 prefixIcon: const Icon(Icons.search),
                 contentPadding: const EdgeInsets.symmetric(vertical: 0),
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(20),
                   borderSide: BorderSide.none,
                 ),
                 filled: true,
-                fillColor: Theme.of(
-                  context,
-                ).colorScheme.surfaceVariant.withOpacity(0.5),
+                fillColor: Theme.of(context).brightness == Brightness.dark
+                    ? Theme.of(context).colorScheme.surfaceContainerHighest
+                    : Colors.white,
               ),
               onChanged: _onSearchChanged,
             ),
@@ -114,9 +115,8 @@ class _ContactsScreenState extends ConsumerState<ContactsScreen> {
               controller: _scrollController,
               physics: const AlwaysScrollableScrollPhysics(),
               itemCount: contacts.length + 1, // +1 for footer
-              separatorBuilder: (context, index) => index < contacts.length - 1
-                  ? const Divider(height: 1)
-                  : const SizedBox.shrink(),
+              separatorBuilder: (context, index) => const SizedBox(height: 8),
+              padding: const EdgeInsets.symmetric(vertical: 8),
               itemBuilder: (context, index) {
                 // Footer: spinner or end-of-list indicator
                 if (index == contacts.length) {
@@ -130,6 +130,7 @@ class _ContactsScreenState extends ConsumerState<ContactsScreen> {
                   }
                 }
                 final contact = contacts[index];
+                final bgColor = ColorUtils.avatarColor(contact.firstName);
                 return SwipeToDeleteWrapper(
                   itemKey: ValueKey('contact_${contact.id}'),
                   confirmTitle: 'Elimina contatto',
@@ -147,46 +148,48 @@ class _ContactsScreenState extends ConsumerState<ContactsScreen> {
                       }
                     }
                   },
-                  child: ListTile(
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 4,
+                  child: Card(
+                    child: ListTile(
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 10,
+                      ),
+                      leading: CircleAvatar(
+                        radius: 24,
+                        backgroundColor: bgColor.withOpacity(0.2),
+                        backgroundImage:
+                            (contact.avatarUrl != null &&
+                                contact.avatarUrl!.isNotEmpty)
+                            ? CachedNetworkImageProvider(contact.avatarUrl!)
+                            : null,
+                        child: contact.avatarUrl == null
+                            ? Text(
+                                contact.firstName.isNotEmpty
+                                    ? contact.firstName[0].toUpperCase()
+                                    : '?',
+                                style: TextStyle(
+                                  color: bgColor,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
+                              )
+                            : null,
+                      ),
+                      title: Text(
+                        '${contact.firstName} ${contact.lastName}',
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      subtitle: Text(
+                        contact.companyName ?? contact.email ?? 'No details',
+                        style: Theme.of(context).textTheme.bodySmall,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      trailing: Icon(Icons.chevron_right, size: 20, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3)),
+                      onTap: () => context.push('/contacts/${contact.id}'),
                     ),
-                    leading: CircleAvatar(
-                    backgroundColor: Theme.of(
-                      context,
-                    ).colorScheme.primaryContainer,
-                    backgroundImage:
-                        (contact.avatarUrl != null &&
-                            contact.avatarUrl!.isNotEmpty)
-                        ? CachedNetworkImageProvider(contact.avatarUrl!)
-                        : null,
-                    child: contact.avatarUrl == null
-                        ? Text(
-                            contact.firstName.isNotEmpty
-                                ? contact.firstName[0].toUpperCase()
-                                : '?',
-                            style: TextStyle(
-                              color: Theme.of(
-                                context,
-                              ).colorScheme.onPrimaryContainer,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          )
-                        : null,
-                  ),
-                  title: Text(
-                    '${contact.firstName} ${contact.lastName}',
-                    style: Theme.of(context).textTheme.titleMedium,
-                  ),
-                  subtitle: Text(
-                    contact.companyName ?? contact.email ?? 'No details',
-                    style: Theme.of(context).textTheme.bodySmall,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                    trailing: const Icon(Icons.chevron_right, size: 20),
-                    onTap: () => context.push('/contacts/${contact.id}'),
                   ),
                 );
               },

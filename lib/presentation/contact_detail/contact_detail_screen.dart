@@ -21,6 +21,7 @@ import 'package:pocketcrm/domain/services/contact_share_service.dart';
 import 'package:pocketcrm/core/utils/platform_utils.dart';
 import 'package:pocketcrm/presentation/contact_detail/voice_note_sheet.dart';
 import 'package:pocketcrm/core/utils/demo_utils.dart';
+import 'package:pocketcrm/core/utils/color_utils.dart';
 
 class ContactDetailScreen extends ConsumerStatefulWidget {
   final String id;
@@ -176,41 +177,57 @@ class _ContactDetailScreenState extends ConsumerState<ContactDetailScreen> {
   }
 
   Widget _buildDetail(BuildContext context, Contact contact) {
+    final bgColor = ColorUtils.avatarColor(contact.firstName);
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           CircleAvatar(
-            radius: 50,
+            radius: 56,
+            backgroundColor: bgColor.withOpacity(0.2),
             backgroundImage:
                 contact.avatarUrl != null && contact.avatarUrl!.isNotEmpty
                 ? CachedNetworkImageProvider(contact.avatarUrl!)
                 : null,
             child: contact.avatarUrl == null
                 ? Text(
-                    contact.firstName.isNotEmpty ? contact.firstName[0] : '?',
-                    style: const TextStyle(fontSize: 40),
+                    contact.firstName.isNotEmpty ? contact.firstName[0].toUpperCase() : '?',
+                    style: TextStyle(fontSize: 40, color: bgColor, fontWeight: FontWeight.bold),
                   )
                 : null,
           ),
           const SizedBox(height: 16),
           Text(
             '${contact.firstName} ${contact.lastName}',
-            style: Theme.of(context).textTheme.headlineMedium,
+            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+              fontSize: 22,
+            ),
           ),
-          if (contact.companyName != null)
+          if (contact.companyName != null) ...[
+            const SizedBox(height: 4),
             Text(
               contact.companyName!,
-              style: Theme.of(context).textTheme.titleMedium,
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+              ),
             ),
+          ],
           const SizedBox(height: 32),
           Card(
             margin: EdgeInsets.zero,
             child: Column(
               children: [
                 ListTile(
-                  leading: const Icon(Icons.email),
+                  leading: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.blue.withOpacity(0.1),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(Icons.email, color: Colors.blue, size: 20),
+                  ),
                   title: Text(
                     contact.email ?? 'No email',
                     style: TextStyle(
@@ -237,8 +254,16 @@ class _ContactDetailScreenState extends ConsumerState<ContactDetailScreen> {
                         }
                       : null,
                 ),
+                const Divider(height: 1),
                 ListTile(
-                  leading: const Icon(Icons.phone),
+                  leading: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.green.withOpacity(0.1),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(Icons.phone, color: Colors.green, size: 20),
+                  ),
                   title: Text(
                     contact.phone ?? 'No phone',
                     style: TextStyle(

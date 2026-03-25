@@ -4,13 +4,14 @@ class SectionHeader extends StatelessWidget {
   final String title;
   final int? count;
   final Color? countColor;
+  final Widget? trailing;
 
-  const SectionHeader({super.key, required this.title, this.count, this.countColor});
+  const SectionHeader({super.key, required this.title, this.count, this.countColor, this.trailing});
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 20, 16, 8),
+      padding: const EdgeInsets.fromLTRB(20, 24, 20, 12),
       child: Row(
         children: [
           Text(title, style: Theme.of(context).textTheme.titleMedium),
@@ -32,6 +33,10 @@ class SectionHeader extends StatelessWidget {
                 ),
               ),
             ),
+          ],
+          if (trailing != null) ...[
+            const Spacer(),
+            trailing!,
           ],
         ],
       ),
