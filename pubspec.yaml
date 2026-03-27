@@ -71,6 +71,7 @@ dev_dependencies:
   riverpod_generator: ^2.3.0
   mockito: ^5.4.6
   flutter_launcher_icons: ^0.13.1
+  flutter_native_splash: ^2.4.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -113,3 +114,20 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+# Flutter Assets
+  assets:
+    - assets/images/logo.png
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/images/logo.png"
+  min_sdk_android: 21
+  remove_alpha_ios: true
+
+flutter_native_splash:
+  color: "#0D0D0D"
+  image: "assets/images/logo.png"
+  android: true
+  ios: true
+  fullscreen: true
