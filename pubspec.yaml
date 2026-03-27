@@ -58,6 +58,7 @@ dependencies:
   image_picker: ^1.0.0
   image_cropper: ^8.0.0
   share_plus: ^10.0.0
+  sentry_flutter: ^9.16.0
 
 
 dev_dependencies:

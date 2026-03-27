@@ -8,31 +8,43 @@ import 'package:pocketcrm/core/theme/theme_provider.dart';
 import 'package:pocketcrm/core/di/providers.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import "package:pocketcrm/core/notifications/notification_service.dart";
-import "package:go_router/go_router.dart";
+import 'package:pocketcrm/core/notifications/notification_service.dart';
+import 'package:go_router/go_router.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
+import 'package:pocketcrm/core/config/app_config.dart';
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+Future<void> main() async {
+  await SentryFlutter.init(
+    (options) {
+      options.dsn = kDebugMode
+          ? ''
+          : AppConfig.glitchtipDsn; // disabilitato in debug
+      options.tracesSampleRate = 1.0;
+      options.debug = false;
+    },
+    appRunner: () async {
+      WidgetsFlutterBinding.ensureInitialized();
 
-  await NotificationService().initialize();
+      await NotificationService().initialize();
 
-  // Inizializza Hive nella directory dei dati applicazione (persistente)
-  final appDocDir = await getApplicationSupportDirectory();
-  if (kDebugMode) print('Hive storage path: ${appDocDir.path}');
-  Hive.init(appDocDir.path);
+      final appDocDir = await getApplicationSupportDirectory();
+      if (kDebugMode) print('Hive storage path: ${appDocDir.path}');
+      Hive.init(appDocDir.path);
 
-  final box = await Hive.openBox<String>('app_storage');
-  if (kDebugMode) {
-    print('Hive box keys at startup: ${box.keys.toList()}');
-  }
+      final box = await Hive.openBox<String>('app_storage');
+      if (kDebugMode) {
+        print('Hive box keys at startup: ${box.keys.toList()}');
+      }
 
-  await initializeDateFormatting('it_IT', null);
+      await initializeDateFormatting('it_IT', null);
 
-  runApp(
-    ProviderScope(
-      overrides: [hiveStorageBoxProvider.overrideWithValue(box)],
-      child: const PocketCRMApp(),
-    ),
+      runApp(
+        ProviderScope(
+          overrides: [hiveStorageBoxProvider.overrideWithValue(box)],
+          child: const PocketCRMApp(),
+        ),
+      );
+    },
   );
 }
 

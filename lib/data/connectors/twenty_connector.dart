@@ -28,18 +28,58 @@ class TwentyConnector implements CRMRepository {
       }
     ''';
 
-    // Per il test potremmo usare un client temporaneo se i token sono nuovi
-    final tempLink = HttpLink(
-      '$baseUrl/graphql', // Utilizziamo graphql o api/graphql in base all'istanza
-      defaultHeaders: {'Authorization': 'Bearer $apiToken'},
-    );
-    final tempClient = GraphQLClient(link: tempLink, cache: GraphQLCache());
+    try {
+      final tempLink = HttpLink(
+        '$baseUrl/graphql',
+        defaultHeaders: {'Authorization': 'Bearer $apiToken'},
+      );
+      
+      final tempClient = GraphQLClient(
+        link: tempLink, 
+        cache: GraphQLCache(),
+      );
 
-    final QueryOptions options = QueryOptions(document: gql(query));
-    final QueryResult result = await tempClient.query(options);
+      final QueryResult result = await tempClient.query(
+        QueryOptions(
+          document: gql(query),
+          fetchPolicy: FetchPolicy.networkOnly,
+        ),
+      );
 
-    final edges = result.data?['workspaceMembers']?['edges'] as List?;
-    return edges != null && edges.isNotEmpty;
+      if (result.hasException) {
+        final exception = result.exception!;
+        if (exception.graphqlErrors.isNotEmpty) {
+          final error = exception.graphqlErrors.first;
+          // Check for common auth errors
+          if (error.message.toLowerCase().contains('unauthorized') || 
+              error.message.toLowerCase().contains('forbidden')) {
+            throw Exception('Invalid API Token');
+          }
+          throw Exception(error.message);
+        }
+        
+        if (exception.linkException != null) {
+          final linkError = exception.linkException.toString();
+          if (linkError.contains('404')) {
+            throw Exception('URL not found. Verify your Instance URL.');
+          }
+          if (linkError.contains('Connection refused') || linkError.contains('SocketException')) {
+            throw Exception('Server unreachable. Check your internet or URL.');
+          }
+          throw Exception('Network error: $linkError');
+        }
+        
+        throw Exception('Something went wrong: ${exception.toString()}');
+      }
+
+      final edges = result.data?['workspaceMembers']?['edges'] as List?;
+      if (edges == null || edges.isEmpty) {
+        throw Exception('Connected, but no access to workspace.');
+      }
+      return true;
+    } catch (e) {
+      rethrow;
+    }
   }
 
   @override

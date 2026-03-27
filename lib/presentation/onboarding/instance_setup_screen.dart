@@ -5,6 +5,7 @@ import 'package:pocketcrm/core/di/providers.dart';
 import 'package:pocketcrm/core/di/auth_state.dart';
 import 'package:pocketcrm/core/config/demo_config.dart';
 import 'package:pocketcrm/presentation/shared/snackbar_helper.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 
 class InstanceSetupScreen extends ConsumerStatefulWidget {
   const InstanceSetupScreen({super.key});
@@ -18,11 +19,29 @@ class _InstanceSetupScreenState extends ConsumerState<InstanceSetupScreen> {
   final _controller = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   bool _isDemoLoading = false;
+  bool _isNextLoading = false;
 
   @override
   void initState() {
     super.initState();
     _loadStoredUrl();
+  }
+
+  Future<void> _trackServerConnection(
+    String serverUrl, {
+    required bool isDemo,
+  }) async {
+    await Sentry.captureMessage(
+      'app_connected',
+      level: SentryLevel.info,
+      withScope: (scope) {
+        scope.setTag('server_type', isDemo ? 'demo' : 'own_server');
+        scope.setContexts('connection', {
+          'is_demo': isDemo,
+          'platform': Theme.of(context).platform.name,
+        });
+      },
+    );
   }
 
   Future<void> _loadStoredUrl() async {
@@ -58,7 +77,9 @@ class _InstanceSetupScreenState extends ConsumerState<InstanceSetupScreen> {
                 label: const Text('Try the demo'),
                 style: OutlinedButton.styleFrom(
                   minimumSize: const Size.fromHeight(50),
-                  side: BorderSide(color: Theme.of(context).colorScheme.primary),
+                  side: BorderSide(
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
                   backgroundColor: Colors.transparent,
                 ),
               ),
@@ -74,7 +95,10 @@ class _InstanceSetupScreenState extends ConsumerState<InstanceSetupScreen> {
                   const Expanded(child: Divider()),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Text('or', style: TextStyle(color: Colors.grey.shade600)),
+                    child: Text(
+                      'or',
+                      style: TextStyle(color: Colors.grey.shade600),
+                    ),
                   ),
                   const Expanded(child: Divider()),
                 ],
@@ -90,31 +114,59 @@ class _InstanceSetupScreenState extends ConsumerState<InstanceSetupScreen> {
                   prefixIcon: Icon(Icons.link),
                 ),
                 validator: (val) {
-                  if (val == null || val.isEmpty)
+                  if (val == null || val.isEmpty) {
                     return 'Please enter a valid URL';
-                  if (!Uri.parse(val).isAbsolute)
+                  }
+                  if (!Uri.parse(val).isAbsolute) {
                     return 'URL must start with http:// or https://';
+                  }
                   return null;
                 },
               ),
               const Spacer(),
               ElevatedButton(
-                onPressed: () async {
-                  if (_formKey.currentState!.validate()) {
-                    final storage = ref.read(storageServiceProvider);
-                    // Rimuovi slash finale
-                    var url = _controller.text.trim();
-                    if (url.endsWith('/')) {
-                      url = url.substring(0, url.length - 1);
-                    }
-                    await storage.write(key: 'instance_url', value: url);
-                    await storage.delete(key: 'is_demo_mode');
-                    if (context.mounted) {
-                      context.push('/onboarding/token');
-                    }
-                  }
-                },
-                child: const Text('Next'),
+                onPressed: (_isNextLoading || _isDemoLoading)
+                    ? null
+                    : () async {
+                        if (_formKey.currentState!.validate()) {
+                          setState(() => _isNextLoading = true);
+                          try {
+                            final storage = ref.read(storageServiceProvider);
+                            // Rimuovi slash finale
+                            var url = _controller.text.trim();
+                            if (url.endsWith('/')) {
+                              url = url.substring(0, url.length - 1);
+                            }
+
+                            // URL is format-validated by the TextFormField.
+                            // Full connection validation (URL + Token) happens in the next screen.
+
+                            await storage.write(
+                              key: 'instance_url',
+                              value: url,
+                            );
+                            await storage.delete(key: 'is_demo_mode');
+                            if (mounted) {
+                              context.push('/onboarding/token');
+                              await _trackServerConnection(url, isDemo: false);
+                            }
+                          } finally {
+                            if (mounted) {
+                              setState(() => _isNextLoading = false);
+                            }
+                          }
+                        }
+                      },
+                child: _isNextLoading
+                    ? const SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      )
+                    : const Text('Next'),
               ),
               const SizedBox(height: 24),
             ],
@@ -132,7 +184,9 @@ class _InstanceSetupScreenState extends ConsumerState<InstanceSetupScreen> {
       await storage.write(key: 'instance_url', value: DemoConfig.instanceUrl);
       await storage.write(key: 'api_token', value: DemoConfig.apiToken);
 
-      await ref.read(authStateProvider.notifier).login(DemoConfig.apiToken, isDemo: true);
+      await ref
+          .read(authStateProvider.notifier)
+          .login(DemoConfig.apiToken, isDemo: true);
       ref.invalidate(crmRepositoryProvider);
 
       // Attempt connection implicitly, by navigating and letting app structure resolve.
@@ -142,6 +196,7 @@ class _InstanceSetupScreenState extends ConsumerState<InstanceSetupScreen> {
         await repo.getCurrentUserName(); // A simple check
         if (mounted) {
           context.go('/home');
+          await _trackServerConnection(DemoConfig.instanceUrl, isDemo: true);
         }
       } catch (e) {
         // Test failed

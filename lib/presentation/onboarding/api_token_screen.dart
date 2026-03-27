@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pocketcrm/core/di/providers.dart';
 import 'package:pocketcrm/core/di/auth_state.dart';
+import 'package:pocketcrm/data/connectors/twenty_connector.dart';
+import 'package:graphql_flutter/graphql_flutter.dart';
 
 class ApiTokenScreen extends ConsumerStatefulWidget {
   const ApiTokenScreen({super.key});
@@ -102,6 +104,16 @@ class _ApiTokenScreenState extends ConsumerState<ApiTokenScreen> {
 
       final token = _controller.text.trim();
 
+      // Test validation: creiamo un connector "usa e getta" per il test
+      final repo = TwentyConnector(
+        client: GraphQLClient(
+          link: HttpLink(''), // dummy link for construction
+          cache: GraphQLCache(),
+        ),
+      );
+      
+      await repo.testConnection(baseUrl, token);
+
       // Salva il token e aggiorna authState → il router si occuperà del redirect
       await ref.read(authStateProvider.notifier).login(token);
       ref.invalidate(crmRepositoryProvider);
@@ -109,7 +121,11 @@ class _ApiTokenScreenState extends ConsumerState<ApiTokenScreen> {
       if (mounted) context.go('/onboarding/notifications');
     } catch (e) {
       if (mounted) {
-        setState(() => _error = 'Error: $e');
+        String message = e.toString();
+        if (message.startsWith('Exception: ')) {
+          message = message.substring(11);
+        }
+        setState(() => _error = message);
       }
     } finally {
       if (mounted) {
