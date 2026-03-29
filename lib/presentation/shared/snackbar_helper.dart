@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pocketcrm/core/utils/demo_utils.dart';
 
 class SnackbarHelper {
   static void showSuccess(BuildContext context, String message) {
@@ -20,6 +21,12 @@ class SnackbarHelper {
   }
 
   static void showError(BuildContext context, String message) {
+    if (message.contains('Demo mode: Modification is not allowed') || 
+        message.contains('Exception: Demo mode')) {
+      DemoUtils.showDemoBlockSheet(context);
+      return;
+    }
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(

@@ -25,12 +25,16 @@ class DemoUtils {
     if (!isDemo) return true;
 
     if (context.mounted) {
-      showModalBottomSheet(
-        context: context,
-        builder: (context) => const _DemoBlockSheet(),
-      );
+      showDemoBlockSheet(context);
     }
     return false;
+  }
+
+  static void showDemoBlockSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => const _DemoBlockSheet(),
+    );
   }
 }
 

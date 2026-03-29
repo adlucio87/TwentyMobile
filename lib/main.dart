@@ -15,6 +15,9 @@ import 'package:pocketcrm/core/config/app_config.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 
 Future<void> main() async {
+  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+
   await SentryFlutter.init(
     (options) {
       options.dsn = kDebugMode
@@ -24,8 +27,6 @@ Future<void> main() async {
       options.debug = false;
     },
     appRunner: () async {
-      WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
-      FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
       await NotificationService().initialize();
 
