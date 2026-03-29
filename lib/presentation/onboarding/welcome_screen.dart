@@ -59,7 +59,7 @@ class WelcomeScreen extends StatelessWidget {
               ),
               const SizedBox(height: 48),
               Text(
-                'TwentyMobileCRM',
+                'TwentyMobile',
                 style: Theme.of(context).textTheme.headlineLarge?.copyWith(
                   fontWeight: FontWeight.bold,
                   letterSpacing: -0.5,

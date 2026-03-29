@@ -109,7 +109,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           ),
           const SizedBox(height: 32),
           const Text(
-            'Notifiche',
+            'Notifications',
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
@@ -117,21 +117,21 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           ),
           const SizedBox(height: 16),
           ListTile(
-            title: const Text('Promemoria task'),
-            subtitle: const Text('Ricevi notifica prima della scadenza'),
+            title: const Text('Task reminders'),
+            subtitle: const Text('Receive notification before due date'),
             trailing: Switch(
               value: _notificationsEnabled,
               onChanged: _saveNotificationEnabled,
             ),
           ),
           ListTile(
-            title: const Text('Anticipo promemoria'),
+            title: const Text('Reminder advance'),
             trailing: DropdownButton<int>(
               value: _reminderAdvanceMinutes,
               items: const [
-                DropdownMenuItem(value: 15, child: Text('15 minuti prima')),
-                DropdownMenuItem(value: 30, child: Text('30 minuti prima')),
-                DropdownMenuItem(value: 60, child: Text('1 ora prima')),
+                DropdownMenuItem(value: 15, child: Text('15 minutes before')),
+                DropdownMenuItem(value: 30, child: Text('30 minutes before')),
+                DropdownMenuItem(value: 60, child: Text('1 hour before')),
               ],
               onChanged: _notificationsEnabled
                   ? (value) {
@@ -140,9 +140,22 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   : null,
             ),
           ),
+          const SizedBox(height: 48),
+          const Divider(),
+          const SizedBox(height: 16),
+          ListTile(
+            leading: const Icon(Icons.logout, color: Colors.red),
+            title: const Text(
+              'Logout / Reset Token',
+              style: TextStyle(color: Colors.red),
+            ),
+            onTap: () {
+              ref.read(authStateProvider.notifier).logout();
+            },
+          ),
           const SizedBox(height: 32),
           const Text(
-            'Privacy & Termini',
+            'Privacy & Terms',
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
@@ -157,22 +170,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           ),
           ListTile(
             leading: const Icon(Icons.description_outlined),
-            title: const Text('Termini di Utilizzo (EULA)'),
+            title: const Text('Terms of Use (EULA)'),
             trailing: const Icon(Icons.open_in_new, size: 20),
             onTap: () => launchUrl(Uri.parse('https://www.apple.com/legal/internet-services/itunes/dev/stdeula/')),
-          ),
-          const SizedBox(height: 48),
-          const Divider(),
-          const SizedBox(height: 16),
-          ListTile(
-            leading: const Icon(Icons.logout, color: Colors.red),
-            title: const Text(
-              'Logout / Reset Token',
-              style: TextStyle(color: Colors.red),
-            ),
-            onTap: () {
-              ref.read(authStateProvider.notifier).logout();
-            },
           ),
         ],
       ),

@@ -14,7 +14,7 @@
     <uses-feature android:name="android.hardware.camera" android:required="false"/>
 
     <application
-        android:label="TwentyMobileCRM"
+        android:label="TwentyMobile"
         android:name="${applicationName}"
         android:icon="@mipmap/launcher_icon">
         <activity

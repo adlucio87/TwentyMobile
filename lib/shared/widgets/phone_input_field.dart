@@ -163,13 +163,13 @@ class _PhoneInputFieldState extends State<PhoneInputField> {
               final fullNumber = '${_selectedCountry.dialCode}$cleanValue';
 
               if (!fullNumber.startsWith('+')) {
-                 return 'Numero non valido';
+                 return 'Invalid number';
               }
               if (cleanValue.length < 8) {
-                return 'Numero non valido — inserisci almeno 8 cifre';
+                return 'Invalid number — enter at least 8 digits';
               }
               if (fullNumber.length > 15) {
-                return 'Numero non valido — inserisci massimo 15 cifre totali';
+                return 'Invalid number — enter at most 15 digits';
               }
               if (widget.validator != null) {
                  return widget.validator!(value);
@@ -237,7 +237,7 @@ class _CountryPickerSheetState extends State<_CountryPickerSheet> {
                 controller: _searchController,
                 decoration: const InputDecoration(
                   prefixIcon: Icon(Icons.search),
-                  hintText: 'Cerca paese o prefisso',
+                  hintText: 'Search country or prefix',
                   border: OutlineInputBorder(),
                 ),
               ),

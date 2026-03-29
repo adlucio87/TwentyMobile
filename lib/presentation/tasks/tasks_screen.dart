@@ -182,7 +182,7 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
                                     dateColor = Theme.of(context).colorScheme.error; // Overdue or today past
                                     dateWeight = FontWeight.w600;
                                   } else if (difference == 0 && !hasTime) {
-                                     dateColor = Theme.of(context).colorScheme.error; // Oggi, scaduto oggi
+                                     dateColor = Theme.of(context).colorScheme.error; // Today, overdue today
                                      dateWeight = FontWeight.w600;
                                   } else if (difference <= 3) {
                                     dateColor = Colors.orange.shade700; // Next 3 days
@@ -634,11 +634,11 @@ class EditTaskSheetState extends ConsumerState<EditTaskSheet> {
                 child: (_selectedDueDate != null && (_selectedDueDate!.hour != 0 || _selectedDueDate!.minute != 0))
                     ? SwitchListTile(
                         contentPadding: EdgeInsets.zero,
-                        title: const Text('Notifica promemoria'),
+                        title: const Text('Reminder notification'),
                         subtitle: Text(
                           _notifyReminder
-                              ? '30 min prima — ${_selectedDueDate!.hour.toString().padLeft(2, '0')}:${_selectedDueDate!.minute.toString().padLeft(2, '0')}'
-                              : 'Nessuna notifica'
+                              ? '30 min before — ${_selectedDueDate!.hour.toString().padLeft(2, '0')}:${_selectedDueDate!.minute.toString().padLeft(2, '0')}'
+                              : 'No notification'
                         ),
                         secondary: Icon(
                           _notifyReminder ? Icons.notifications_active : Icons.notifications_off,
