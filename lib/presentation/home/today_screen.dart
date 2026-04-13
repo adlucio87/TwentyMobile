@@ -90,7 +90,7 @@ class TodayScreen extends ConsumerWidget {
             SliverAppBar(
               floating: true,
               pinned: true,
-              expandedHeight: 140.0,
+              expandedHeight: 110.0,
               actions: [
                 IconButton(
                   icon: const Icon(Icons.settings),
@@ -98,61 +98,98 @@ class TodayScreen extends ConsumerWidget {
                   tooltip: 'Settings',
                 ),
               ],
-              flexibleSpace: FlexibleSpaceBar(
-                titlePadding: const EdgeInsets.only(left: 20, bottom: 20, right: 20),
-                title: Consumer(
-                  builder: (context, ref, child) {
-                    final userNameAsync = ref.watch(currentUserNameProvider);
-                    final userName = userNameAsync.valueOrNull ?? 'User';
+              flexibleSpace: LayoutBuilder(
+                builder: (context, constraints) {
+                  final top = constraints.biggest.height;
+                  final statusBarHeight = MediaQuery.of(context).padding.top;
+                  final minHeight = kToolbarHeight + statusBarHeight;
+                  final maxHeight = 110.0 + statusBarHeight;
+                  final t = ((top - minHeight) / (maxHeight - minHeight)).clamp(0.0, 1.0);
 
-                    final now = DateTime.now();
-                    final hour = now.hour;
-                    String greeting = "Good morning 👋  ";
-                    if (hour >= 12 && hour < 18) {
-                      greeting = "Good afternoon 👋  ";
-                    } else if (hour >= 18 && hour < 24) {
-                      greeting = "Good evening 👋  ";
-                    } else if (hour >= 0 && hour < 5) {
-                      greeting = "Still awake? 👋  ";
-                    }
+                  return Consumer(
+                    builder: (context, ref, child) {
+                      final userNameAsync = ref.watch(currentUserNameProvider);
+                      final userName = userNameAsync.valueOrNull ?? 'User';
 
-                    final dateFormat = DateFormat('EEEE, d MMMM y', 'en_US');
-                    final dateString = dateFormat.format(now);
-                    final formattedDate = dateString.replaceFirst(dateString[0], dateString[0].toUpperCase());
+                      final now = DateTime.now();
+                      final hour = now.hour;
+                      String greeting = "Good morning 👋  ";
+                      if (hour >= 12 && hour < 18) {
+                        greeting = "Good afternoon 👋  ";
+                      } else if (hour >= 18 && hour < 24) {
+                        greeting = "Good evening 👋  ";
+                      } else if (hour >= 0 && hour < 5) {
+                        greeting = "Still awake? 👋  ";
+                      }
 
-                    return Column(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const SizedBox(height: 16),
-                        Text(
-                          greeting,
-                          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 24,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          formattedDate,
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
-                          ),
-                        ),
-                        if (userName.isNotEmpty) ...[
-                          const SizedBox(height: 2),
-                          Text(
-                            userName,
-                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.45),
+                      final dateFormat = DateFormat('EEEE, d MMMM y', 'en_US');
+                      final dateString = dateFormat.format(now);
+                      final formattedDate = dateString.replaceFirst(dateString[0], dateString[0].toUpperCase());
+
+                      return Stack(
+                        children: [
+                          Positioned(
+                            left: 20,
+                            right: 20,
+                            bottom: 16,
+                            child: Stack(
+                              alignment: Alignment.bottomLeft,
+                              children: [
+                                Opacity(
+                                  opacity: t,
+                                  child: Transform.translate(
+                                    offset: Offset(0, 10 * (1 - t)),
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Text(
+                                          greeting,
+                                          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Text(
+                                          formattedDate,
+                                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                                          ),
+                                        ),
+                                        if (userName.isNotEmpty) ...[
+                                          const SizedBox(height: 2),
+                                          Text(
+                                            userName,
+                                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.45),
+                                            ),
+                                          ),
+                                        ],
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                Opacity(
+                                  opacity: 1 - t,
+                                  child: Transform.translate(
+                                    offset: Offset(0, -10 * t),
+                                    child: Text(
+                                      formattedDate,
+                                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ],
-                      ],
-                    );
-                  },
-                ),
+                      );
+                    },
+                  );
+                },
               ),
             ),
             todayState.when(
