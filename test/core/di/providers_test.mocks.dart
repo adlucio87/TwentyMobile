@@ -200,6 +200,8 @@ class MockCRMRepository extends _i1.Mock implements _i6.CRMRepository {
     String? lastName,
     String? email,
     String? phone,
+    String? companyId,
+    bool? clearCompany = false,
   }) =>
       (super.noSuchMethod(
             Invocation.method(
@@ -210,6 +212,8 @@ class MockCRMRepository extends _i1.Mock implements _i6.CRMRepository {
                 #lastName: lastName,
                 #email: email,
                 #phone: phone,
+                #companyId: companyId,
+                #clearCompany: clearCompany,
               },
             ),
             returnValue: _i7.Future<_i2.Contact>.value(
@@ -223,6 +227,8 @@ class MockCRMRepository extends _i1.Mock implements _i6.CRMRepository {
                     #lastName: lastName,
                     #email: email,
                     #phone: phone,
+                    #companyId: companyId,
+                    #clearCompany: clearCompany,
                   },
                 ),
               ),
@@ -238,6 +244,8 @@ class MockCRMRepository extends _i1.Mock implements _i6.CRMRepository {
                     #lastName: lastName,
                     #email: email,
                     #phone: phone,
+                    #companyId: companyId,
+                    #clearCompany: clearCompany,
                   },
                 ),
               ),
@@ -277,6 +285,37 @@ class MockCRMRepository extends _i1.Mock implements _i6.CRMRepository {
             ),
             returnValueForMissingStub: _i7.Future<_i3.Company>.value(
               _FakeCompany_1(this, Invocation.method(#getCompanyById, [id])),
+            ),
+          )
+          as _i7.Future<_i3.Company>);
+
+  @override
+  _i7.Future<_i3.Company> createCompany({
+    required String? name,
+    String? domainName,
+  }) =>
+      (super.noSuchMethod(
+            Invocation.method(#createCompany, [], {
+              #name: name,
+              #domainName: domainName,
+            }),
+            returnValue: _i7.Future<_i3.Company>.value(
+              _FakeCompany_1(
+                this,
+                Invocation.method(#createCompany, [], {
+                  #name: name,
+                  #domainName: domainName,
+                }),
+              ),
+            ),
+            returnValueForMissingStub: _i7.Future<_i3.Company>.value(
+              _FakeCompany_1(
+                this,
+                Invocation.method(#createCompany, [], {
+                  #name: name,
+                  #domainName: domainName,
+                }),
+              ),
             ),
           )
           as _i7.Future<_i3.Company>);

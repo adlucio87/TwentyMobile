@@ -29,12 +29,15 @@ abstract class CRMRepository {
     String? lastName,
     String? email,
     String? phone,
+    String? companyId,
+    bool clearCompany = false,
   });
   Future<void> deleteContact(String id);
 
   // Companies
   Future<List<Company>> getCompanies({String? search, int page = 1});
   Future<Company> getCompanyById(String id);
+  Future<Company> createCompany({required String name, String? domainName});
 
   // Notes
   Future<List<Note>> getNotesByContact(String contactId);

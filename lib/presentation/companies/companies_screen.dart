@@ -9,15 +9,79 @@ import 'package:pocketcrm/presentation/shared/empty_state_widget.dart';
 import 'package:pocketcrm/presentation/shared/error_state_widget.dart';
 import 'package:pocketcrm/core/utils/color_utils.dart';
 
-class CompaniesScreen extends ConsumerWidget {
+import 'package:pocketcrm/presentation/shared/company_picker_bottom_sheet.dart';
+import 'package:pocketcrm/domain/models/company.dart';
+import 'dart:async';
+
+class CompaniesScreen extends ConsumerStatefulWidget {
   const CompaniesScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<CompaniesScreen> createState() => _CompaniesScreenState();
+}
+
+class _CompaniesScreenState extends ConsumerState<CompaniesScreen> {
+  bool _isSearching = false;
+  final TextEditingController _searchController = TextEditingController();
+  Timer? _debounce;
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    _debounce?.cancel();
+    super.dispose();
+  }
+
+  void _onSearchChanged(String query) {
+    if (_debounce?.isActive ?? false) _debounce!.cancel();
+    _debounce = Timer(const Duration(milliseconds: 500), () {
+      ref.read(companiesProvider.notifier).search(query);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final companiesAsync = ref.watch(companiesProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Companies'), actions: const []),
+      appBar: AppBar(
+        title: _isSearching
+            ? TextField(
+                controller: _searchController,
+                autofocus: true,
+                decoration: const InputDecoration(
+                  hintText: 'Search companies...',
+                  border: InputBorder.none,
+                ),
+                onChanged: _onSearchChanged,
+              )
+            : const Text('Companies'),
+        actions: [
+          IconButton(
+            icon: Icon(_isSearching ? Icons.close : Icons.search),
+            onPressed: () {
+              setState(() {
+                _isSearching = !_isSearching;
+                if (!_isSearching) {
+                  _searchController.clear();
+                  ref.read(companiesProvider.notifier).search('');
+                }
+              });
+            },
+          ),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          await showModalBottomSheet<Company>(
+            context: context,
+            isScrollControlled: true,
+            backgroundColor: Colors.transparent,
+            builder: (context) => const CompanyPickerBottomSheet(),
+          );
+        },
+        child: const Icon(Icons.add),
+      ),
       body: companiesAsync.when(
         data: (companies) {
           if (companies.isEmpty) {

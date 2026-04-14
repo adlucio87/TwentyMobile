@@ -91,7 +91,7 @@ final currentUserNameProvider = FutureProvider<String>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef CurrentUserNameRef = FutureProviderRef<String>;
-String _$contactsHash() => r'e2f94eefaaec7bfd567c03b82d99cea913e33a1f';
+String _$contactsHash() => r'a7303ad7ae630a6b45cdbf4a5a324879dcf931c3';
 
 /// See also [Contacts].
 @ProviderFor(Contacts)
@@ -260,7 +260,7 @@ class _ContactDetailProviderElement
   String get id => (origin as ContactDetailProvider).id;
 }
 
-String _$contactNotesHash() => r'a83f5d95a8994bbbe13e8a58693b7b0b28539b26';
+String _$contactNotesHash() => r'94836b03c1a57cd68311ce0c330da4b448ec724d';
 
 abstract class _$ContactNotes
     extends BuildlessAutoDisposeAsyncNotifier<List<Note>> {
@@ -524,7 +524,7 @@ class _CompanyDetailProviderElement
   String get id => (origin as CompanyDetailProvider).id;
 }
 
-String _$companyNotesHash() => r'ca8b8df94f8403be5b1c9a974786daee24a72fd3';
+String _$companyNotesHash() => r'f04175e171d779ebe67b234f7ae20b77ea4ad684';
 
 abstract class _$CompanyNotes
     extends BuildlessAutoDisposeAsyncNotifier<List<Note>> {
@@ -922,7 +922,7 @@ class _TaskContactsProviderElement
   String get id => (origin as TaskContactsProvider).id;
 }
 
-String _$companiesHash() => r'f4cf134b3b9809a569d794d695aa0a1db11950ae';
+String _$companiesHash() => r'35829951659966391dcc2fcf466003f3b0c4913e';
 
 /// See also [Companies].
 @ProviderFor(Companies)

@@ -61,11 +61,11 @@ void main() {
       expect(safeArea.bottom, isFalse);
       
       // Verify the demo banner is present
-      expect(find.textContaining('Modalità demo'), findsOneWidget);
+      expect(find.textContaining('Demo mode'), findsOneWidget);
 
       // Verify content is below the status bar (in terms of local coordinates)
       // By default widget tests have no padding, but we can check the layout
-      final bannerLabel = find.textContaining('Modalità demo');
+      final bannerLabel = find.textContaining('Demo mode');
       final bannerPosition = tester.getTopLeft(bannerLabel);
       
       // If we provided a MediaQuery with top padding, we could verify it's shifted
@@ -105,7 +105,7 @@ void main() {
         (widget) => widget is SafeArea && widget.top == true
       );
       expect(safeAreaFinder, findsAtLeastNWidgets(1));
-      expect(find.textContaining('Modalità demo'), findsNothing);
+      expect(find.textContaining('Demo mode'), findsNothing);
     });
   });
 }

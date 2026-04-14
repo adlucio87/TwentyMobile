@@ -382,6 +382,8 @@ class TwentyConnector implements CRMRepository {
     String? lastName,
     String? email,
     String? phone,
+    String? companyId,
+    bool clearCompany = false,
   }) async {
     const String mutation = r'''
       mutation UpdatePerson($id: UUID!, $input: PersonUpdateInput!) {
@@ -390,6 +392,7 @@ class TwentyConnector implements CRMRepository {
           name { firstName lastName }
           emails { primaryEmail }
           phones { primaryPhoneNumber primaryPhoneCallingCode }
+          company { id name }
         }
       }
     ''';
@@ -416,6 +419,11 @@ class TwentyConnector implements CRMRepository {
         'primaryPhoneNumber': phone,
         if (phoneCountryCode != null) 'primaryPhoneCountryCode': phoneCountryCode,
       };
+    }
+    if (clearCompany) {
+      input['companyId'] = null;
+    } else if (companyId != null) {
+      input['companyId'] = companyId;
     }
 
     final MutationOptions options = MutationOptions(
@@ -446,6 +454,40 @@ class TwentyConnector implements CRMRepository {
 
     final QueryResult result = await client.mutate(options);
     _handleResultException(result);
+  }
+
+  @override
+  Future<Company> createCompany({required String name, String? domainName}) async {
+    const String mutation = r'''
+      mutation CreateCompany($input: CompanyCreateInput!) {
+        createCompany(data: $input) {
+          id
+          name
+          domainName { primaryLinkUrl }
+          createdAt
+        }
+      }
+    ''';
+
+    final input = <String, dynamic>{
+      'name': name,
+    };
+    if (domainName != null && domainName.isNotEmpty) {
+      input['domainName'] = {'primaryLinkUrl': domainName};
+    }
+
+    final MutationOptions options = MutationOptions(
+      document: gql(mutation),
+      variables: {'input': input},
+    );
+
+    final QueryResult result = await client.mutate(options);
+    _handleResultException(result);
+
+    final data = result.data?['createCompany'];
+    if (data == null) throw Exception('Failed to create company');
+
+    return Company.fromTwenty(data as Map<String, dynamic>);
   }
 
   @override

@@ -146,6 +146,8 @@ class Contacts extends _$Contacts {
     String? lastName,
     String? email,
     String? phone,
+    String? companyId,
+    bool clearCompany = false,
   }) async {
     final isDemo = await ref.read(isDemoModeProvider.future);
     if (isDemo) throw Exception('Demo mode: Modification is not allowed.');
@@ -157,6 +159,8 @@ class Contacts extends _$Contacts {
       lastName: lastName,
       email: email,
       phone: phone,
+      companyId: companyId,
+      clearCompany: clearCompany,
     );
     
     // Optimistic update: replace the old contact with the updated one
@@ -174,6 +178,8 @@ class Contacts extends _$Contacts {
           lastName: updatedContact.lastName.isNotEmpty ? updatedContact.lastName : oldContact.lastName,
           email: updatedContact.email ?? oldContact.email,
           phone: updatedContact.phone ?? oldContact.phone,
+          companyId: clearCompany ? null : (updatedContact.companyId ?? oldContact.companyId),
+          companyName: clearCompany ? null : (updatedContact.companyName ?? oldContact.companyName),
         );
         state = AsyncValue.data(newList);
       }
@@ -427,6 +433,23 @@ class Companies extends _$Companies {
       final repo = await ref.watch(crmRepositoryProvider.future);
       return repo.getCompanies(search: query);
     });
+  }
+
+  Future<Company> addCompany({required String name, String? domainName}) async {
+    final isDemo = await ref.read(isDemoModeProvider.future);
+    if (isDemo) throw Exception('Demo mode: Modification is not allowed.');
+
+    final repo = await ref.read(crmRepositoryProvider.future);
+    final newCompany = await repo.createCompany(name: name, domainName: domainName);
+
+    final currentState = state.value;
+    if (currentState != null) {
+      state = AsyncValue.data([newCompany, ...currentState]);
+    } else {
+      ref.invalidateSelf();
+    }
+
+    return newCompany;
   }
 }
 

@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pocketcrm/core/di/providers.dart';
 import 'package:pocketcrm/domain/models/contact.dart';
+import 'package:pocketcrm/domain/models/company.dart';
 import 'package:pocketcrm/presentation/shared/snackbar_helper.dart';
+import 'package:pocketcrm/presentation/shared/company_picker_bottom_sheet.dart';
 import 'package:pocketcrm/shared/widgets/phone_input_field.dart';
 import 'package:pocketcrm/core/utils/demo_utils.dart';
 
@@ -25,9 +27,15 @@ class _EditContactSheetState extends ConsumerState<EditContactSheet> {
   bool _isLoading = false;
   String? _errorMessage;
 
+  String? _selectedCompanyId;
+  String? _selectedCompanyName;
+
   @override
   void initState() {
     super.initState();
+    _selectedCompanyId = widget.contact.companyId;
+    _selectedCompanyName = widget.contact.companyName;
+
     _firstNameController = TextEditingController(text: widget.contact.firstName);
     _lastNameController = TextEditingController(text: widget.contact.lastName);
     _emailController = TextEditingController(text: widget.contact.email ?? '');
@@ -129,6 +137,72 @@ class _EditContactSheetState extends ConsumerState<EditContactSheet> {
                   ),
                 ],
               ),
+              const SizedBox(height: 16),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Company',
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      fontSize: 12,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  InkWell(
+                    onTap: _isLoading
+                        ? null
+                        : () async {
+                            final result = await showModalBottomSheet<Company>(
+                              context: context,
+                              isScrollControlled: true,
+                              backgroundColor: Colors.transparent,
+                              builder: (context) => const CompanyPickerBottomSheet(),
+                            );
+                            if (result != null) {
+                              setState(() {
+                                _selectedCompanyId = result.id;
+                                _selectedCompanyName = result.name;
+                              });
+                            }
+                          },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: Theme.of(context).colorScheme.outline.withOpacity(0.5),
+                        ),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            _selectedCompanyName ?? 'Select a company',
+                            style: TextStyle(
+                              color: _selectedCompanyName != null
+                                  ? Theme.of(context).colorScheme.onSurface
+                                  : Theme.of(context).colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                          if (_selectedCompanyName != null)
+                            GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  _selectedCompanyId = null;
+                                  _selectedCompanyName = null;
+                                });
+                              },
+                              child: const Icon(Icons.clear, size: 20),
+                            )
+                          else
+                            const Icon(Icons.business, size: 20),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
               if (_errorMessage != null) ...[
                 const SizedBox(height: 16),
                 Container(
@@ -191,6 +265,8 @@ class _EditContactSheetState extends ConsumerState<EditContactSheet> {
               lastName: _lastNameController.text.trim(),
               email: _emailController.text.trim().isEmpty ? null : _emailController.text.trim(),
               phone: _phoneController.text.trim().isEmpty ? null : _phoneController.text.trim(),
+              companyId: _selectedCompanyId,
+              clearCompany: _selectedCompanyId == null,
             );
 
         if (mounted) {
