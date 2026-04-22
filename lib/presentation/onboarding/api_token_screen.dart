@@ -5,6 +5,7 @@ import 'package:pocketcrm/core/di/providers.dart';
 import 'package:pocketcrm/core/di/auth_state.dart';
 import 'package:pocketcrm/data/connectors/twenty_connector.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 
 class ApiTokenScreen extends ConsumerStatefulWidget {
   const ApiTokenScreen({super.key});
@@ -61,6 +62,7 @@ class _ApiTokenScreenState extends ConsumerState<ApiTokenScreen> {
                   hintText: 'Enter token...',
                   prefixIcon: const Icon(Icons.key),
                   errorText: _error,
+                  errorMaxLines: 10,
                 ),
                 validator: (val) {
                   if (val == null || val.isEmpty) return 'Please enter a token';
@@ -119,7 +121,9 @@ class _ApiTokenScreenState extends ConsumerState<ApiTokenScreen> {
       ref.invalidate(crmRepositoryProvider);
 
       if (mounted) context.go('/onboarding/notifications');
-    } catch (e) {
+    } catch (e, stackTrace) {
+      debugPrint('CONNECTION ERROR: $e');
+      Sentry.captureException(e, stackTrace: stackTrace);
       if (mounted) {
         String message = e.toString();
         if (message.startsWith('Exception: ')) {

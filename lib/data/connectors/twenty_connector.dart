@@ -7,6 +7,7 @@ import 'package:pocketcrm/domain/models/task.dart';
 import 'package:pocketcrm/shared/widgets/phone_input_field.dart';
 import 'package:pocketcrm/core/data/country_codes.dart';
 import 'package:pocketcrm/domain/repositories/crm_repository.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 
 class TwentyConnector implements CRMRepository {
   final GraphQLClient client;
@@ -18,6 +19,11 @@ class TwentyConnector implements CRMRepository {
     
     final exception = result.exception!;
     final linkException = exception.linkException;
+    
+    // Log exception to Sentry (fire and forget)
+    try {
+      Sentry.captureException(exception, stackTrace: StackTrace.current, hint: Hint.withMap({'operation': result.context.toString()}));
+    } catch (_) {}
     
     if (linkException != null) {
       final errorStr = linkException.toString();
@@ -46,6 +52,7 @@ class TwentyConnector implements CRMRepository {
     throw Exception('An unexpected error occurred while communicating with the server.');
   }
 
+
   @override
   Future<bool> testConnection(String baseUrl, String apiToken) async {
     const String query = r'''
@@ -54,7 +61,6 @@ class TwentyConnector implements CRMRepository {
           edges {
             node {
               id
-              name { firstName lastName }
             }
           }
         }
