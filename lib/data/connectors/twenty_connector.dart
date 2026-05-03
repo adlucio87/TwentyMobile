@@ -8,6 +8,7 @@ import 'package:pocketcrm/domain/models/task.dart';
 import 'package:pocketcrm/shared/widgets/phone_input_field.dart';
 import 'package:pocketcrm/core/data/country_codes.dart';
 import 'package:pocketcrm/domain/repositories/crm_repository.dart';
+import 'package:pocketcrm/core/network/custom_http_client.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
 class TwentyConnector implements CRMRepository {
@@ -87,15 +88,23 @@ class TwentyConnector implements CRMRepository {
       }
     ''';
 
+    final customHttpClient = TimeoutHttpClient(
+      timeoutDuration: const Duration(seconds: 30),
+    );
+
     final tempLink = HttpLink(
       '$baseUrl/graphql',
       defaultHeaders: {'Authorization': 'Bearer $apiToken'},
+      httpClient: customHttpClient,
     );
 
     final tempClient = GraphQLClient(link: tempLink, cache: GraphQLCache());
 
     final QueryResult result = await tempClient.query(
-      QueryOptions(document: parseString(query), fetchPolicy: FetchPolicy.networkOnly),
+      QueryOptions(
+        document: parseString(query),
+        fetchPolicy: FetchPolicy.networkOnly,
+      ),
     );
 
     if (result.hasException) {

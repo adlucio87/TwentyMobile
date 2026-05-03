@@ -2,6 +2,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:pocketcrm/core/utils/storage_service.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:pocketcrm/core/network/custom_http_client.dart';
 import 'package:pocketcrm/data/connectors/twenty_connector.dart';
 import 'package:pocketcrm/domain/models/company.dart';
 import 'package:pocketcrm/domain/models/contact.dart';
@@ -44,9 +45,14 @@ Future<CRMRepository> crmRepository(CrmRepositoryRef ref) async {
     throw Exception('Not connected');
   }
 
+  final customHttpClient = TimeoutHttpClient(
+    timeoutDuration: const Duration(seconds: 30),
+  );
+
   final link = HttpLink(
     '$baseUrl/graphql', // Twenty CRM graphql endpoint
     defaultHeaders: {'Authorization': 'Bearer $apiToken'},
+    httpClient: customHttpClient,
   );
 
   final client = GraphQLClient(link: link, cache: GraphQLCache());
@@ -126,8 +132,8 @@ class Contacts extends _$Contacts {
       email: email,
       phone: phone,
     );
-    
-    // Aggiorniamo ottimisticamente lo stato inserendo il nuovo contatto in cima 
+
+    // Aggiorniamo ottimisticamente lo stato inserendo il nuovo contatto in cima
     // alla lista attuale. In questo modo l'UI si aggiorna all'istante!
     final currentState = state.value;
     if (currentState != null) {
@@ -136,7 +142,7 @@ class Contacts extends _$Contacts {
       // Se era vuoto o in errore, forziamo il reload dal backend
       ref.invalidateSelf();
     }
-    
+
     return newContact;
   }
 
@@ -162,33 +168,41 @@ class Contacts extends _$Contacts {
       companyId: companyId,
       clearCompany: clearCompany,
     );
-    
+
     // Optimistic update: replace the old contact with the updated one
     final currentState = state.value;
     if (currentState != null) {
       final index = currentState.indexWhere((c) => c.id == id);
       if (index != -1) {
         final newList = [...currentState];
-        // We preserve some fields like avatarUrl and company that the update 
+        // We preserve some fields like avatarUrl and company that the update
         // mutation might not return fully, by merging with the old contact.
         // Wait, updatePerson returns the updated fields. Let's merge.
         final oldContact = newList[index];
         newList[index] = oldContact.copyWith(
-          firstName: updatedContact.firstName.isNotEmpty ? updatedContact.firstName : oldContact.firstName,
-          lastName: updatedContact.lastName.isNotEmpty ? updatedContact.lastName : oldContact.lastName,
+          firstName: updatedContact.firstName.isNotEmpty
+              ? updatedContact.firstName
+              : oldContact.firstName,
+          lastName: updatedContact.lastName.isNotEmpty
+              ? updatedContact.lastName
+              : oldContact.lastName,
           email: updatedContact.email ?? oldContact.email,
           phone: updatedContact.phone ?? oldContact.phone,
-          companyId: clearCompany ? null : (updatedContact.companyId ?? oldContact.companyId),
-          companyName: clearCompany ? null : (updatedContact.companyName ?? oldContact.companyName),
+          companyId: clearCompany
+              ? null
+              : (updatedContact.companyId ?? oldContact.companyId),
+          companyName: clearCompany
+              ? null
+              : (updatedContact.companyName ?? oldContact.companyName),
         );
         state = AsyncValue.data(newList);
       }
     }
-    
+
     // Also invalidate the contactDetailProvider for this specific contact
     // so the detail screen gets the fresh data next time it's accessed or currently viewed.
     ref.invalidate(contactDetailProvider(id));
-    
+
     return updatedContact;
   }
 
@@ -309,7 +323,6 @@ class ContactNotes extends _$ContactNotes {
   }
 }
 
-
 @riverpod
 class CompanyDetail extends _$CompanyDetail {
   @override
@@ -353,7 +366,8 @@ class CompanyNotes extends _$CompanyNotes {
 
     final repo = await ref.read(crmRepositoryProvider.future);
     final newNote = await repo.createNote(
-      contactId: '', // Usually handled differently for companies, but matching signature
+      contactId:
+          '', // Usually handled differently for companies, but matching signature
       body: body,
       dueAt: dueAt,
     );
@@ -440,7 +454,10 @@ class Companies extends _$Companies {
     if (isDemo) throw Exception('Demo mode: Modification is not allowed.');
 
     final repo = await ref.read(crmRepositoryProvider.future);
-    final newCompany = await repo.createCompany(name: name, domainName: domainName);
+    final newCompany = await repo.createCompany(
+      name: name,
+      domainName: domainName,
+    );
 
     final currentState = state.value;
     if (currentState != null) {
@@ -452,12 +469,20 @@ class Companies extends _$Companies {
     return newCompany;
   }
 
-  Future<Company> updateCompany(String id, {String? name, String? domainName}) async {
+  Future<Company> updateCompany(
+    String id, {
+    String? name,
+    String? domainName,
+  }) async {
     final isDemo = await ref.read(isDemoModeProvider.future);
     if (isDemo) throw Exception('Demo mode: Modification is not allowed.');
 
     final repo = await ref.read(crmRepositoryProvider.future);
-    final updatedCompany = await repo.updateCompany(id, name: name, domainName: domainName);
+    final updatedCompany = await repo.updateCompany(
+      id,
+      name: name,
+      domainName: domainName,
+    );
 
     final currentState = state.value;
     if (currentState != null) {
@@ -520,8 +545,11 @@ class Tasks extends _$Tasks {
     return repo.getTasks(completed: filter);
   }
 
-
-  Future<Task> addTask(String title, {DateTime? dueAt, String? contactId}) async {
+  Future<Task> addTask(
+    String title, {
+    DateTime? dueAt,
+    String? contactId,
+  }) async {
     final isDemo = await ref.read(isDemoModeProvider.future);
     if (isDemo) throw Exception('Demo mode: Modification is not allowed.');
 
@@ -531,21 +559,28 @@ class Tasks extends _$Tasks {
       dueAt: dueAt,
       contactId: contactId,
     );
-    
-    // Aggiorniamo ottimisticamente lo stato inserendo il nuovo task in cima 
+
+    // Aggiorniamo ottimisticamente lo stato inserendo il nuovo task in cima
     final currentState = state.value;
     if (currentState != null) {
       state = AsyncValue.data([newTask, ...currentState]);
     } else {
       ref.invalidateSelf();
     }
-    
+
     await NotificationService().scheduleTaskReminder(newTask);
 
     return newTask;
   }
 
-  Future<Task> updateTask(String id, {String? title, String? body, DateTime? dueAt, bool clearDueDate = false, bool? completed}) async {
+  Future<Task> updateTask(
+    String id, {
+    String? title,
+    String? body,
+    DateTime? dueAt,
+    bool clearDueDate = false,
+    bool? completed,
+  }) async {
     final isDemo = await ref.read(isDemoModeProvider.future);
     if (isDemo) throw Exception('Demo mode: Modification is not allowed.');
 
