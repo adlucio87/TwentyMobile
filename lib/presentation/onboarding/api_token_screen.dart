@@ -111,6 +111,9 @@ class _ApiTokenScreenState extends ConsumerState<ApiTokenScreen> {
 
       await TwentyConnector.testConnection(baseUrl, token);
 
+      final authService = ref.read(authServiceProvider);
+      await authService.loginWithApiKey(baseUrl, token);
+
       // Salva il token e aggiorna authState → il router si occuperà del redirect
       await ref.read(authStateProvider.notifier).login(token);
       ref.invalidate(crmRepositoryProvider);

@@ -6,7 +6,7 @@ part of 'today_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$todayNotifierHash() => r'0ae725b61e2f90903d3889453aad71c9718c8982';
+String _$todayNotifierHash() => r'389488c63cd07df9682a9be056fc9d4e38d4bc3f';
 
 /// See also [TodayNotifier].
 @ProviderFor(TodayNotifier)

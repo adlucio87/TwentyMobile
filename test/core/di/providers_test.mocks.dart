@@ -52,15 +52,6 @@ class _FakeTask_3 extends _i1.SmartFake implements _i5.Task {
 /// See the documentation for Mockito's code generation for more information.
 class MockCRMRepository extends _i1.Mock implements _i6.CRMRepository {
   @override
-  _i7.Future<bool> testConnection(String? baseUrl, String? apiToken) =>
-      (super.noSuchMethod(
-            Invocation.method(#testConnection, [baseUrl, apiToken]),
-            returnValue: _i7.Future<bool>.value(false),
-            returnValueForMissingStub: _i7.Future<bool>.value(false),
-          )
-          as _i7.Future<bool>);
-
-  @override
   _i7.Future<String> getCurrentUserName() =>
       (super.noSuchMethod(
             Invocation.method(#getCurrentUserName, []),
@@ -319,6 +310,50 @@ class MockCRMRepository extends _i1.Mock implements _i6.CRMRepository {
             ),
           )
           as _i7.Future<_i3.Company>);
+
+  @override
+  _i7.Future<_i3.Company> updateCompany(
+    String? id, {
+    String? name,
+    String? domainName,
+  }) =>
+      (super.noSuchMethod(
+            Invocation.method(
+              #updateCompany,
+              [id],
+              {#name: name, #domainName: domainName},
+            ),
+            returnValue: _i7.Future<_i3.Company>.value(
+              _FakeCompany_1(
+                this,
+                Invocation.method(
+                  #updateCompany,
+                  [id],
+                  {#name: name, #domainName: domainName},
+                ),
+              ),
+            ),
+            returnValueForMissingStub: _i7.Future<_i3.Company>.value(
+              _FakeCompany_1(
+                this,
+                Invocation.method(
+                  #updateCompany,
+                  [id],
+                  {#name: name, #domainName: domainName},
+                ),
+              ),
+            ),
+          )
+          as _i7.Future<_i3.Company>);
+
+  @override
+  _i7.Future<void> deleteCompany(String? id) =>
+      (super.noSuchMethod(
+            Invocation.method(#deleteCompany, [id]),
+            returnValue: _i7.Future<void>.value(),
+            returnValueForMissingStub: _i7.Future<void>.value(),
+          )
+          as _i7.Future<void>);
 
   @override
   _i7.Future<List<_i4.Note>> getNotesByContact(String? contactId) =>

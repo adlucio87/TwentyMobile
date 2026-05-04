@@ -2,13 +2,11 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:pocketcrm/core/utils/storage_service.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
-import 'package:pocketcrm/core/network/custom_http_client.dart';
 import 'package:pocketcrm/data/connectors/twenty_connector.dart';
 import 'package:pocketcrm/domain/models/company.dart';
 import 'package:pocketcrm/domain/models/contact.dart';
 import 'package:pocketcrm/domain/models/note.dart';
 import 'package:pocketcrm/domain/models/task.dart';
-import 'package:pocketcrm/core/auth/auth_service.dart';
 import 'package:pocketcrm/domain/repositories/crm_repository.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:pocketcrm/core/notifications/notification_service.dart';
@@ -30,22 +28,6 @@ StorageService storageService(StorageServiceRef ref) {
 }
 
 @Riverpod(keepAlive: true)
-AuthService authService(AuthServiceRef ref) {
-  const secure = FlutterSecureStorage(
-    aOptions: AndroidOptions(encryptedSharedPreferences: true),
-  );
-  return AuthService(secure);
-}
-
-@Riverpod(keepAlive: true)
-Future<String> authMethod(AuthMethodRef ref) async {
-  const storage = FlutterSecureStorage(
-    aOptions: AndroidOptions(encryptedSharedPreferences: true),
-  );
-  return await storage.read(key: 'auth_method') ?? 'api_key';
-}
-
-@Riverpod(keepAlive: true)
 Future<bool> isDemoMode(IsDemoModeRef ref) async {
   final storage = ref.watch(storageServiceProvider);
   final value = await storage.read(key: 'is_demo_mode');
@@ -56,39 +38,20 @@ Future<bool> isDemoMode(IsDemoModeRef ref) async {
 Future<CRMRepository> crmRepository(CrmRepositoryRef ref) async {
   final storage = ref.watch(storageServiceProvider);
   final baseUrl = await storage.read(key: 'instance_url');
-  final initialApiToken = await storage.read(key: 'api_token');
+  final apiToken = await storage.read(key: 'api_token');
 
-  if (baseUrl == null || initialApiToken == null) {
+  if (baseUrl == null || apiToken == null) {
     throw Exception('Not connected');
   }
-
-  final customHttpClient = TimeoutHttpClient(
-    timeoutDuration: const Duration(seconds: 30),
-  );
 
   final link = HttpLink(
     '$baseUrl/graphql', // Twenty CRM graphql endpoint
     defaultHeaders: {'Authorization': 'Bearer $apiToken'},
-    httpClient: customHttpClient,
   );
-  final authLink = AuthLink(
-    getToken: () async {
-      // Fetch the latest token from storage
-      final currentToken = await storage.read(key: 'api_token');
-      return currentToken != null ? 'Bearer $currentToken' : null;
-    },
-  );
-
-  final httpLink = HttpLink(
-    '$baseUrl/graphql', // Twenty CRM graphql endpoint
-  );
-
-  final link = authLink.concat(httpLink);
 
   final client = GraphQLClient(link: link, cache: GraphQLCache());
-  final authService = ref.read(authServiceProvider);
 
-  return TwentyConnector(client: client, authService: authService);
+  return TwentyConnector(client: client);
 }
 
 @Riverpod(keepAlive: true)
@@ -211,20 +174,12 @@ class Contacts extends _$Contacts {
         // Wait, updatePerson returns the updated fields. Let's merge.
         final oldContact = newList[index];
         newList[index] = oldContact.copyWith(
-          firstName: updatedContact.firstName.isNotEmpty
-              ? updatedContact.firstName
-              : oldContact.firstName,
-          lastName: updatedContact.lastName.isNotEmpty
-              ? updatedContact.lastName
-              : oldContact.lastName,
+          firstName: updatedContact.firstName.isNotEmpty ? updatedContact.firstName : oldContact.firstName,
+          lastName: updatedContact.lastName.isNotEmpty ? updatedContact.lastName : oldContact.lastName,
           email: updatedContact.email ?? oldContact.email,
           phone: updatedContact.phone ?? oldContact.phone,
-          companyId: clearCompany
-              ? null
-              : (updatedContact.companyId ?? oldContact.companyId),
-          companyName: clearCompany
-              ? null
-              : (updatedContact.companyName ?? oldContact.companyName),
+          companyId: clearCompany ? null : (updatedContact.companyId ?? oldContact.companyId),
+          companyName: clearCompany ? null : (updatedContact.companyName ?? oldContact.companyName),
         );
         state = AsyncValue.data(newList);
       }
@@ -354,6 +309,7 @@ class ContactNotes extends _$ContactNotes {
   }
 }
 
+
 @riverpod
 class CompanyDetail extends _$CompanyDetail {
   @override
@@ -397,8 +353,7 @@ class CompanyNotes extends _$CompanyNotes {
 
     final repo = await ref.read(crmRepositoryProvider.future);
     final newNote = await repo.createNote(
-      contactId:
-          '', // Usually handled differently for companies, but matching signature
+      contactId: '', // Usually handled differently for companies, but matching signature
       body: body,
       dueAt: dueAt,
     );
@@ -460,17 +415,6 @@ class TaskContacts extends _$TaskContacts {
 
 @Riverpod(keepAlive: true)
 Future<String> currentUserName(CurrentUserNameRef ref) async {
-  final storage = FlutterSecureStorage(
-    aOptions: const AndroidOptions(encryptedSharedPreferences: true),
-  );
-  final authMethod = await storage.read(key: 'auth_method');
-  if (authMethod == 'email') {
-    final firstName = await storage.read(key: 'user_first_name') ?? '';
-    final lastName = await storage.read(key: 'user_last_name') ?? '';
-    if (firstName.isEmpty && lastName.isEmpty) return '';
-    return '$firstName $lastName'.trim();
-  }
-
   final repo = await ref.watch(crmRepositoryProvider.future);
   return repo.getCurrentUserName();
 }
@@ -496,10 +440,7 @@ class Companies extends _$Companies {
     if (isDemo) throw Exception('Demo mode: Modification is not allowed.');
 
     final repo = await ref.read(crmRepositoryProvider.future);
-    final newCompany = await repo.createCompany(
-      name: name,
-      domainName: domainName,
-    );
+    final newCompany = await repo.createCompany(name: name, domainName: domainName);
 
     final currentState = state.value;
     if (currentState != null) {
@@ -511,20 +452,12 @@ class Companies extends _$Companies {
     return newCompany;
   }
 
-  Future<Company> updateCompany(
-    String id, {
-    String? name,
-    String? domainName,
-  }) async {
+  Future<Company> updateCompany(String id, {String? name, String? domainName}) async {
     final isDemo = await ref.read(isDemoModeProvider.future);
     if (isDemo) throw Exception('Demo mode: Modification is not allowed.');
 
     final repo = await ref.read(crmRepositoryProvider.future);
-    final updatedCompany = await repo.updateCompany(
-      id,
-      name: name,
-      domainName: domainName,
-    );
+    final updatedCompany = await repo.updateCompany(id, name: name, domainName: domainName);
 
     final currentState = state.value;
     if (currentState != null) {
@@ -587,11 +520,8 @@ class Tasks extends _$Tasks {
     return repo.getTasks(completed: filter);
   }
 
-  Future<Task> addTask(
-    String title, {
-    DateTime? dueAt,
-    String? contactId,
-  }) async {
+
+  Future<Task> addTask(String title, {DateTime? dueAt, String? contactId}) async {
     final isDemo = await ref.read(isDemoModeProvider.future);
     if (isDemo) throw Exception('Demo mode: Modification is not allowed.');
 
@@ -615,14 +545,7 @@ class Tasks extends _$Tasks {
     return newTask;
   }
 
-  Future<Task> updateTask(
-    String id, {
-    String? title,
-    String? body,
-    DateTime? dueAt,
-    bool clearDueDate = false,
-    bool? completed,
-  }) async {
+  Future<Task> updateTask(String id, {String? title, String? body, DateTime? dueAt, bool clearDueDate = false, bool? completed}) async {
     final isDemo = await ref.read(isDemoModeProvider.future);
     if (isDemo) throw Exception('Demo mode: Modification is not allowed.');
 
