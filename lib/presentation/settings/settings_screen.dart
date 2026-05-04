@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:pocketcrm/core/notifications/notification_service.dart';
 import 'package:pocketcrm/core/di/providers.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:go_router/go_router.dart';
 import 'package:pocketcrm/shared/widgets/constrained_content.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
@@ -80,6 +81,73 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         padding: const EdgeInsets.all(16.0),
         children: [
           const Text(
+            'Account',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Consumer(
+            builder: (context, ref, _) {
+              final authMethodAsync = ref.watch(authMethodProvider);
+              final userNameAsync = ref.watch(currentUserNameProvider);
+
+              return authMethodAsync.when(
+                data: (method) {
+                  final isEmail = method == 'email';
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: isEmail ? Colors.green.withValues(alpha: 0.1) : Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Text(
+                              isEmail ? 'Account personale' : 'API Key Admin',
+                              style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                                color: isEmail ? Colors.green : Theme.of(context).colorScheme.primary,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      if (isEmail) ...[
+                        const SizedBox(height: 16),
+                        userNameAsync.when(
+                          data: (name) => name.isNotEmpty
+                              ? Text(name, style: Theme.of(context).textTheme.titleMedium)
+                              : const SizedBox.shrink(),
+                          loading: () => const CircularProgressIndicator(),
+                          error: (_, __) => const SizedBox.shrink(),
+                        ),
+                      ],
+                      const SizedBox(height: 16),
+                      OutlinedButton.icon(
+                        onPressed: () {
+                          context.push('/onboarding/method');
+                        },
+                        icon: const Icon(Icons.swap_horiz),
+                        label: const Text('Cambia metodo di accesso'),
+                        style: OutlinedButton.styleFrom(
+                          minimumSize: const Size.fromHeight(40),
+                        ),
+                      ),
+                    ],
+                  );
+                },
+                loading: () => const CircularProgressIndicator(),
+                error: (_, __) => const Text('Error loading account data'),
+              );
+            },
+          ),
+          const SizedBox(height: 32),
+          const Text(
             'Application Theme',
             style: TextStyle(
               fontSize: 16,
@@ -152,7 +220,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               'Logout / Reset Token',
               style: TextStyle(color: Colors.red),
             ),
-            onTap: () {
+            onTap: () async {
+              await ref.read(authServiceProvider).logout();
               ref.read(authStateProvider.notifier).logout();
             },
           ),

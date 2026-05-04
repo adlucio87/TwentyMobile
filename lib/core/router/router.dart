@@ -13,7 +13,11 @@ import 'package:pocketcrm/presentation/settings/settings_screen.dart';
 import 'package:pocketcrm/presentation/home/today_screen.dart';
 import 'package:pocketcrm/shared/main_shell.dart';
 import 'package:pocketcrm/core/di/auth_state.dart';
+import 'package:pocketcrm/core/di/providers.dart';
+
 import 'package:pocketcrm/presentation/onboarding/notification_permission_screen.dart';
+import 'package:pocketcrm/presentation/onboarding/auth_method_screen.dart';
+import 'package:pocketcrm/presentation/onboarding/email_login_screen.dart';
 
 part 'router.g.dart';
 
@@ -33,15 +37,13 @@ GoRouter appRouter(AppRouterRef ref) {
     navigatorKey: navigatorKey,
     initialLocation: '/',
     refreshListenable: authNotifier,
-    redirect: (context, state) {
+    redirect: (context, state) async {
       final authState = ref.read(authStateProvider);
 
-      // Aspettiamo che authState sia pronto
       if (authState.isLoading && !authState.hasValue) {
-        return '/'; // Mostra caricamento (Splash)
+        return '/';
       }
 
-      // Errore o valore nullo: tratta come non autenticato
       if (authState.hasError || authState.value == null) {
         return null;
       }
@@ -55,15 +57,27 @@ GoRouter appRouter(AppRouterRef ref) {
         return '/onboarding';
       }
 
-      // Se non abbiamo token e siamo root, mandiamo a /onboarding
       if (!hasToken && state.matchedLocation == '/') {
         return '/onboarding';
       }
 
-      if (hasToken &&
-          isOnboarding &&
-          state.matchedLocation != "/onboarding/notifications") {
+      if (hasToken && isOnboarding && state.matchedLocation != "/onboarding/notifications") {
         return "/home";
+      }
+
+      // Automatically refresh token if expired before going to any page (except onboarding)
+      if (hasToken && !isOnboarding) {
+        final authService = ref.read(authServiceProvider);
+        final storage = ref.read(storageServiceProvider);
+        final method = await storage.read(key: 'auth_method');
+        if (method == 'email') {
+          if (await authService.isTokenExpired()) {
+            final refreshed = await authService.refreshAccessToken();
+            if (!refreshed) {
+              return '/onboarding';
+            }
+          }
+        }
       }
 
       return null;
@@ -81,6 +95,14 @@ GoRouter appRouter(AppRouterRef ref) {
       GoRoute(
         path: '/onboarding/instance',
         builder: (context, state) => const InstanceSetupScreen(),
+      ),
+      GoRoute(
+        path: '/onboarding/method',
+        builder: (context, state) => const AuthMethodScreen(),
+      ),
+      GoRoute(
+        path: '/onboarding/email',
+        builder: (context, state) => const EmailLoginScreen(),
       ),
       GoRoute(
         path: '/onboarding/token',

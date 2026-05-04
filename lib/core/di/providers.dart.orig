@@ -7,7 +7,6 @@ import 'package:pocketcrm/domain/models/company.dart';
 import 'package:pocketcrm/domain/models/contact.dart';
 import 'package:pocketcrm/domain/models/note.dart';
 import 'package:pocketcrm/domain/models/task.dart';
-import 'package:pocketcrm/core/auth/auth_service.dart';
 import 'package:pocketcrm/domain/repositories/crm_repository.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:pocketcrm/core/notifications/notification_service.dart';
@@ -29,22 +28,6 @@ StorageService storageService(StorageServiceRef ref) {
 }
 
 @Riverpod(keepAlive: true)
-AuthService authService(AuthServiceRef ref) {
-  const secure = FlutterSecureStorage(
-    aOptions: AndroidOptions(encryptedSharedPreferences: true),
-  );
-  return AuthService(secure);
-}
-
-@Riverpod(keepAlive: true)
-Future<String> authMethod(AuthMethodRef ref) async {
-  const storage = FlutterSecureStorage(
-    aOptions: AndroidOptions(encryptedSharedPreferences: true),
-  );
-  return await storage.read(key: 'auth_method') ?? 'api_key';
-}
-
-@Riverpod(keepAlive: true)
 Future<bool> isDemoMode(IsDemoModeRef ref) async {
   final storage = ref.watch(storageServiceProvider);
   final value = await storage.read(key: 'is_demo_mode');
@@ -55,30 +38,20 @@ Future<bool> isDemoMode(IsDemoModeRef ref) async {
 Future<CRMRepository> crmRepository(CrmRepositoryRef ref) async {
   final storage = ref.watch(storageServiceProvider);
   final baseUrl = await storage.read(key: 'instance_url');
-  final initialApiToken = await storage.read(key: 'api_token');
+  final apiToken = await storage.read(key: 'api_token');
 
-  if (baseUrl == null || initialApiToken == null) {
+  if (baseUrl == null || apiToken == null) {
     throw Exception('Not connected');
   }
 
-  final authLink = AuthLink(
-    getToken: () async {
-      // Fetch the latest token from storage
-      final currentToken = await storage.read(key: 'api_token');
-      return currentToken != null ? 'Bearer $currentToken' : null;
-    },
-  );
-
-  final httpLink = HttpLink(
+  final link = HttpLink(
     '$baseUrl/graphql', // Twenty CRM graphql endpoint
+    defaultHeaders: {'Authorization': 'Bearer $apiToken'},
   );
-
-  final link = authLink.concat(httpLink);
 
   final client = GraphQLClient(link: link, cache: GraphQLCache());
-  final authService = ref.read(authServiceProvider);
 
-  return TwentyConnector(client: client, authService: authService);
+  return TwentyConnector(client: client);
 }
 
 @Riverpod(keepAlive: true)
@@ -153,8 +126,8 @@ class Contacts extends _$Contacts {
       email: email,
       phone: phone,
     );
-    
-    // Aggiorniamo ottimisticamente lo stato inserendo il nuovo contatto in cima 
+
+    // Aggiorniamo ottimisticamente lo stato inserendo il nuovo contatto in cima
     // alla lista attuale. In questo modo l'UI si aggiorna all'istante!
     final currentState = state.value;
     if (currentState != null) {
@@ -163,7 +136,7 @@ class Contacts extends _$Contacts {
       // Se era vuoto o in errore, forziamo il reload dal backend
       ref.invalidateSelf();
     }
-    
+
     return newContact;
   }
 
@@ -189,14 +162,14 @@ class Contacts extends _$Contacts {
       companyId: companyId,
       clearCompany: clearCompany,
     );
-    
+
     // Optimistic update: replace the old contact with the updated one
     final currentState = state.value;
     if (currentState != null) {
       final index = currentState.indexWhere((c) => c.id == id);
       if (index != -1) {
         final newList = [...currentState];
-        // We preserve some fields like avatarUrl and company that the update 
+        // We preserve some fields like avatarUrl and company that the update
         // mutation might not return fully, by merging with the old contact.
         // Wait, updatePerson returns the updated fields. Let's merge.
         final oldContact = newList[index];
@@ -211,11 +184,11 @@ class Contacts extends _$Contacts {
         state = AsyncValue.data(newList);
       }
     }
-    
+
     // Also invalidate the contactDetailProvider for this specific contact
     // so the detail screen gets the fresh data next time it's accessed or currently viewed.
     ref.invalidate(contactDetailProvider(id));
-    
+
     return updatedContact;
   }
 
@@ -442,17 +415,6 @@ class TaskContacts extends _$TaskContacts {
 
 @Riverpod(keepAlive: true)
 Future<String> currentUserName(CurrentUserNameRef ref) async {
-  final storage = FlutterSecureStorage(
-    aOptions: const AndroidOptions(encryptedSharedPreferences: true),
-  );
-  final authMethod = await storage.read(key: 'auth_method');
-  if (authMethod == 'email') {
-    final firstName = await storage.read(key: 'user_first_name') ?? '';
-    final lastName = await storage.read(key: 'user_last_name') ?? '';
-    if (firstName.isEmpty && lastName.isEmpty) return '';
-    return '$firstName $lastName'.trim();
-  }
-
   final repo = await ref.watch(crmRepositoryProvider.future);
   return repo.getCurrentUserName();
 }
@@ -569,15 +531,15 @@ class Tasks extends _$Tasks {
       dueAt: dueAt,
       contactId: contactId,
     );
-    
-    // Aggiorniamo ottimisticamente lo stato inserendo il nuovo task in cima 
+
+    // Aggiorniamo ottimisticamente lo stato inserendo il nuovo task in cima
     final currentState = state.value;
     if (currentState != null) {
       state = AsyncValue.data([newTask, ...currentState]);
     } else {
       ref.invalidateSelf();
     }
-    
+
     await NotificationService().scheduleTaskReminder(newTask);
 
     return newTask;

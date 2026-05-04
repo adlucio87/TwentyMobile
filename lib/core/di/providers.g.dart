@@ -40,6 +40,40 @@ final storageServiceProvider = Provider<StorageService>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef StorageServiceRef = ProviderRef<StorageService>;
+String _$authServiceHash() => r'd2f64b0f6413b3d7afdb9237e268df47c790b9e1';
+
+/// See also [authService].
+@ProviderFor(authService)
+final authServiceProvider = Provider<AuthService>.internal(
+  authService,
+  name: r'authServiceProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$authServiceHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef AuthServiceRef = ProviderRef<AuthService>;
+String _$authMethodHash() => r'2400fccfa612d542c4cf29cf39650a90fa6bae47';
+
+/// See also [authMethod].
+@ProviderFor(authMethod)
+final authMethodProvider = FutureProvider<String>.internal(
+  authMethod,
+  name: r'authMethodProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$authMethodHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef AuthMethodRef = FutureProviderRef<String>;
 String _$isDemoModeHash() => r'c1aef0d9ced4c3ccb4049b1cd151c3851fcd8e85';
 
 /// See also [isDemoMode].
@@ -57,7 +91,7 @@ final isDemoModeProvider = FutureProvider<bool>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef IsDemoModeRef = FutureProviderRef<bool>;
-String _$crmRepositoryHash() => r'79becb479b3eb2cd2061282801710ac980410308';
+String _$crmRepositoryHash() => r'a2b65c85364dd841db83b381b1d5111425b307f3';
 
 /// See also [crmRepository].
 @ProviderFor(crmRepository)
@@ -74,7 +108,7 @@ final crmRepositoryProvider = FutureProvider<CRMRepository>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef CrmRepositoryRef = FutureProviderRef<CRMRepository>;
-String _$currentUserNameHash() => r'b26064b448fd5a1c46309b0de276c3936ffe639d';
+String _$currentUserNameHash() => r'171161f12ce32915e039659d1a4737236ac1f8f7';
 
 /// See also [currentUserName].
 @ProviderFor(currentUserName)
@@ -922,7 +956,7 @@ class _TaskContactsProviderElement
   String get id => (origin as TaskContactsProvider).id;
 }
 
-String _$companiesHash() => r'35829951659966391dcc2fcf466003f3b0c4913e';
+String _$companiesHash() => r'ab8d4bb51236f8623ad68e7520c8adf38f10bdbf';
 
 /// See also [Companies].
 @ProviderFor(Companies)

@@ -9,11 +9,73 @@ import 'package:pocketcrm/shared/widgets/phone_input_field.dart';
 import 'package:pocketcrm/core/data/country_codes.dart';
 import 'package:pocketcrm/domain/repositories/crm_repository.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
+import 'package:pocketcrm/core/auth/auth_service.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class TwentyConnector implements CRMRepository {
   final GraphQLClient client;
+  final AuthService? authService;
 
-  TwentyConnector({required this.client});
+  TwentyConnector({required this.client, this.authService});
+
+  Future<QueryResult> _queryWithRefresh(QueryOptions options) async {
+    QueryResult result = await client.query(options);
+
+    if (result.hasException && _isUnauthenticated(result.exception!)) {
+      final isRefreshed = await _tryRefresh();
+      if (isRefreshed) {
+        result = await client.query(options);
+      }
+    }
+    return result;
+  }
+
+  Future<QueryResult> _mutateWithRefresh(MutationOptions options) async {
+    QueryResult result = await client.mutate(options);
+
+    if (result.hasException && _isUnauthenticated(result.exception!)) {
+      final isRefreshed = await _tryRefresh();
+      if (isRefreshed) {
+        result = await client.mutate(options);
+      }
+    }
+    return result;
+  }
+
+  bool _isUnauthenticated(OperationException exception) {
+    if (exception.graphqlErrors.any((e) => e.extensions?['code'] == 'UNAUTHENTICATED' || e.message.contains('UNAUTHENTICATED'))) {
+      return true;
+    }
+    final linkException = exception.linkException;
+    if (linkException is ServerException && linkException.parsedResponse?.response['status'] == 401) {
+      return true;
+    }
+    if (exception.toString().contains('401') || exception.toString().contains('UNAUTHENTICATED')) {
+      return true;
+    }
+    return false;
+  }
+
+  Future<bool> _tryRefresh() async {
+    if (authService == null) return false;
+
+    const storage = FlutterSecureStorage(
+      aOptions: AndroidOptions(encryptedSharedPreferences: true),
+    );
+    final authMethod = await storage.read(key: 'auth_method') ?? 'api_key';
+
+    if (authMethod != 'email') return false; // Non fare refresh per le API key
+
+    final isSuccess = await authService!.refreshAccessToken();
+    if (isSuccess) {
+      // Need to wait slightly for the client to pick up the new token from storage
+      // Wait, in TwentyConnector the client is instantiated once with the token.
+      // If we refresh the token in storage, the old client still has the old token in its headers.
+      // We need the AuthLink to dynamically read the token.
+      return true;
+    }
+    return false;
+  }
 
   void _handleResultException(QueryResult result) {
     if (!result.hasException) return;
@@ -157,7 +219,7 @@ class TwentyConnector implements CRMRepository {
       }
     ''';
     final QueryOptions options = QueryOptions(document: parseString(query));
-    final QueryResult result = await client.query(options);
+    final QueryResult result = await _queryWithRefresh(options);
 
     final edges = result.data?['workspaceMembers']?['edges'] as List?;
     if (edges == null || edges.isEmpty) return '';
@@ -218,7 +280,7 @@ class TwentyConnector implements CRMRepository {
       fetchPolicy: FetchPolicy.networkOnly,
     );
 
-    final QueryResult result = await client.query(options);
+    final QueryResult result = await _queryWithRefresh(options);
     _handleResultException(result);
 
     final data = result.data?['people'];
@@ -264,7 +326,7 @@ class TwentyConnector implements CRMRepository {
       variables: {'id': id},
     );
 
-    final QueryResult result = await client.query(options);
+    final QueryResult result = await _queryWithRefresh(options);
     _handleResultException(result);
 
     final edges = result.data?['people']?['edges'] as List?;
@@ -304,7 +366,7 @@ class TwentyConnector implements CRMRepository {
       fetchPolicy: FetchPolicy.networkOnly,
     );
 
-    final QueryResult result = await client.query(options);
+    final QueryResult result = await _queryWithRefresh(options);
     _handleResultException(result);
 
     final edges = result.data?['people']?['edges'] as List?;
@@ -348,7 +410,7 @@ class TwentyConnector implements CRMRepository {
       fetchPolicy: FetchPolicy.networkOnly,
     );
 
-    final QueryResult result = await client.query(options);
+    final QueryResult result = await _queryWithRefresh(options);
     _handleResultException(result);
 
     final edges = result.data?['taskTargets']?['edges'] as List?;
@@ -406,7 +468,7 @@ class TwentyConnector implements CRMRepository {
       variables: {'input': input},
     );
 
-    final QueryResult result = await client.mutate(options);
+    final QueryResult result = await _mutateWithRefresh(options);
     _handleResultException(result);
 
     return Contact.fromTwenty(
@@ -471,7 +533,7 @@ class TwentyConnector implements CRMRepository {
       variables: {'id': id, 'input': input},
     );
 
-    final QueryResult result = await client.mutate(options);
+    final QueryResult result = await _mutateWithRefresh(options);
     _handleResultException(result);
 
     return Contact.fromTwenty(
@@ -492,7 +554,7 @@ class TwentyConnector implements CRMRepository {
       variables: {'id': id},
     );
 
-    final QueryResult result = await client.mutate(options);
+    final QueryResult result = await _mutateWithRefresh(options);
     _handleResultException(result);
   }
 
@@ -522,7 +584,7 @@ class TwentyConnector implements CRMRepository {
       variables: {'input': input},
     );
 
-    final QueryResult result = await client.mutate(options);
+    final QueryResult result = await _mutateWithRefresh(options);
     _handleResultException(result);
 
     final data = result.data?['createCompany'];
@@ -562,7 +624,7 @@ class TwentyConnector implements CRMRepository {
       variables: {'id': id, 'input': input},
     );
 
-    final QueryResult result = await client.mutate(options);
+    final QueryResult result = await _mutateWithRefresh(options);
     _handleResultException(result);
 
     return Company.fromTwenty(
@@ -583,7 +645,7 @@ class TwentyConnector implements CRMRepository {
       variables: {'id': id},
     );
 
-    final QueryResult result = await client.mutate(options);
+    final QueryResult result = await _mutateWithRefresh(options);
     _handleResultException(result);
   }
 
@@ -627,7 +689,7 @@ class TwentyConnector implements CRMRepository {
       fetchPolicy: FetchPolicy.networkOnly,
     );
 
-    final QueryResult result = await client.query(options);
+    final QueryResult result = await _queryWithRefresh(options);
     _handleResultException(result);
 
     final edges = result.data?['companies']?['edges'] as List?;
@@ -662,7 +724,7 @@ class TwentyConnector implements CRMRepository {
       fetchPolicy: FetchPolicy.networkOnly,
     );
 
-    final QueryResult result = await client.query(options);
+    final QueryResult result = await _queryWithRefresh(options);
     _handleResultException(result);
 
     final edges = result.data?['companies']?['edges'] as List?;
@@ -692,7 +754,7 @@ class TwentyConnector implements CRMRepository {
       fetchPolicy: FetchPolicy.networkOnly,
     );
 
-    final QueryResult result = await client.query(options);
+    final QueryResult result = await _queryWithRefresh(options);
     _handleResultException(result);
 
     final edges = result.data?['noteTargets']?['edges'] as List?;
@@ -730,7 +792,7 @@ class TwentyConnector implements CRMRepository {
       fetchPolicy: FetchPolicy.networkOnly,
     );
 
-    final QueryResult result = await client.query(options);
+    final QueryResult result = await _queryWithRefresh(options);
     _handleResultException(result);
 
     final edges = result.data?['noteTargets']?['edges'] as List?;
@@ -777,7 +839,7 @@ class TwentyConnector implements CRMRepository {
       variables: {'input': input},
     );
 
-    final QueryResult result = await client.mutate(options);
+    final QueryResult result = await _mutateWithRefresh(options);
     _handleResultException(result);
 
     final data = result.data?['createNote'];
@@ -793,7 +855,7 @@ class TwentyConnector implements CRMRepository {
       document: parseString(targetMutation),
       variables: {'input': targetInput},
     );
-    final targetResult = await client.mutate(targetOptions);
+    final targetResult = await _mutateWithRefresh(targetOptions);
     if (targetResult.hasException) {
       print(
         'Warning: Failed to link note to contact: ${targetResult.exception}',
@@ -833,7 +895,7 @@ class TwentyConnector implements CRMRepository {
       variables: {'id': id, 'input': input},
     );
 
-    final QueryResult result = await client.mutate(options);
+    final QueryResult result = await _mutateWithRefresh(options);
     _handleResultException(result);
 
     return Note.fromTwenty(result.data?['updateNote'] as Map<String, dynamic>);
@@ -852,7 +914,7 @@ class TwentyConnector implements CRMRepository {
       variables: {'id': id},
     );
 
-    final QueryResult result = await client.mutate(options);
+    final QueryResult result = await _mutateWithRefresh(options);
     _handleResultException(result);
   }
 
@@ -883,7 +945,7 @@ class TwentyConnector implements CRMRepository {
       fetchPolicy: FetchPolicy.networkOnly,
     );
 
-    final result = await client.query(options);
+    final result = await _queryWithRefresh(options);
 
     if (result.hasException) {
       throw Exception(result.exception.toString());
@@ -926,7 +988,7 @@ class TwentyConnector implements CRMRepository {
       fetchPolicy: FetchPolicy.networkOnly,
     );
 
-    final result = await client.query(options);
+    final result = await _queryWithRefresh(options);
 
     if (result.hasException) {
       throw Exception(result.exception.toString());
@@ -973,7 +1035,7 @@ class TwentyConnector implements CRMRepository {
       fetchPolicy: FetchPolicy.networkOnly,
     );
 
-    final result = await client.query(options);
+    final result = await _queryWithRefresh(options);
 
     if (result.hasException) {
       throw Exception(result.exception.toString());
@@ -1013,7 +1075,7 @@ class TwentyConnector implements CRMRepository {
       fetchPolicy: FetchPolicy.networkOnly,
     );
 
-    final result = await client.query(options);
+    final result = await _queryWithRefresh(options);
     _handleResultException(result);
 
     final edges = result.data?['people']?['edges'] as List?;
@@ -1051,7 +1113,7 @@ class TwentyConnector implements CRMRepository {
       fetchPolicy: FetchPolicy.networkOnly,
     );
 
-    final QueryResult result = await client.query(options);
+    final QueryResult result = await _queryWithRefresh(options);
     _handleResultException(result);
 
     final edges = result.data?['tasks']?['edges'] as List?;
@@ -1097,7 +1159,7 @@ class TwentyConnector implements CRMRepository {
       variables: {'input': input},
     );
 
-    final QueryResult result = await client.mutate(options);
+    final QueryResult result = await _mutateWithRefresh(options);
     _handleResultException(result);
 
     if (contactId != null) {
@@ -1113,7 +1175,7 @@ class TwentyConnector implements CRMRepository {
           document: parseString(targetMutation),
           variables: {'input': targetInput},
         );
-        final targetResult = await client.mutate(targetOptions);
+        final targetResult = await _mutateWithRefresh(targetOptions);
         if (targetResult.hasException) {
           print(
             'Warning: Failed to link task to contact: ${targetResult.exception}',
@@ -1172,7 +1234,7 @@ class TwentyConnector implements CRMRepository {
       variables: {'id': id, 'input': input},
     );
 
-    final QueryResult result = await client.mutate(options);
+    final QueryResult result = await _mutateWithRefresh(options);
     _handleResultException(result);
 
     final data = result.data?['updateTask'];
@@ -1193,7 +1255,7 @@ class TwentyConnector implements CRMRepository {
       variables: {'id': id},
     );
 
-    final QueryResult result = await client.mutate(options);
+    final QueryResult result = await _mutateWithRefresh(options);
     if (result.hasException) throw Exception(result.exception.toString());
   }
 }

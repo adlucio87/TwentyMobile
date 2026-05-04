@@ -147,7 +147,7 @@ class _InstanceSetupScreenState extends ConsumerState<InstanceSetupScreen> {
                             );
                             await storage.delete(key: 'is_demo_mode');
                             if (mounted) {
-                              context.push('/onboarding/token');
+                              context.push('/onboarding/method');
                               await _trackServerConnection(url, isDemo: false);
                             }
                           } finally {
