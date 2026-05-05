@@ -58,8 +58,17 @@ class _InstanceSetupScreenState extends ConsumerState<InstanceSetupScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Configure CRM')),
-      body: Padding(
-        padding: const EdgeInsets.all(24.0),
+      body: SafeArea(
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return SingleChildScrollView(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight: constraints.maxHeight,
+                ),
+                child: IntrinsicHeight(
+                  child: Padding(
+                    padding: const EdgeInsets.all(24.0),
         child: Form(
           key: _formKey,
           child: Column(
@@ -171,6 +180,12 @@ class _InstanceSetupScreenState extends ConsumerState<InstanceSetupScreen> {
               const SizedBox(height: 24),
             ],
           ),
+        ),
+                  ),
+                ),
+              ),
+            );
+          },
         ),
       ),
     );

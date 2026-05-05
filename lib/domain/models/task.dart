@@ -13,6 +13,7 @@ class Task with _$Task {
     DateTime? dueAt,
     String? contactId,
     String? contactName,
+    String? assigneeId,
     DateTime? createdAt,
   }) = _Task;
 
@@ -66,6 +67,7 @@ class Task with _$Task {
       dueAt: json['dueAt'] != null ? DateTime.parse(json['dueAt']) : null,
       contactId: contactId,
       contactName: contactName,
+      assigneeId: json['assigneeId'],
       createdAt: json['createdAt'] != null
           ? DateTime.parse(json['createdAt'])
           : null,

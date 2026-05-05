@@ -5,6 +5,7 @@ import 'package:pocketcrm/domain/models/company.dart';
 import 'package:pocketcrm/domain/models/contact.dart';
 import 'package:pocketcrm/domain/models/note.dart';
 import 'package:pocketcrm/domain/models/task.dart';
+import 'package:pocketcrm/domain/models/workspace_member.dart';
 import 'package:pocketcrm/shared/widgets/phone_input_field.dart';
 import 'package:pocketcrm/core/data/country_codes.dart';
 import 'package:pocketcrm/domain/repositories/crm_repository.dart';
@@ -16,8 +17,45 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 class TwentyConnector implements CRMRepository {
   final GraphQLClient client;
   final AuthService? authService;
+  String? _currentMemberId;
 
   TwentyConnector({required this.client, this.authService});
+
+  /// Returns the current workspace member's ID, caching it for the session.
+  /// Returns null for API key auth (show all tasks) — only filters for email auth.
+  Future<String?> _getCurrentMemberId() async {
+    if (_currentMemberId != null) return _currentMemberId;
+
+    // Only filter by assignee for email/password auth.
+    // API key users see all tasks.
+    const storage = FlutterSecureStorage(
+      aOptions: AndroidOptions(encryptedSharedPreferences: true),
+    );
+    final authMethod = await storage.read(key: 'auth_method') ?? 'api_key';
+    if (authMethod != 'email') return null;
+
+    const String query = r'''
+      query Me {
+        workspaceMembers(first: 1) {
+          edges {
+            node {
+              id
+            }
+          }
+        }
+      }
+    ''';
+    final options = QueryOptions(
+      document: parseString(query),
+      fetchPolicy: FetchPolicy.networkOnly,
+    );
+    final result = await _queryWithRefresh(options);
+    final edges = result.data?['workspaceMembers']?['edges'] as List?;
+    if (edges != null && edges.isNotEmpty) {
+      _currentMemberId = edges.first['node']?['id'] as String?;
+    }
+    return _currentMemberId;
+  }
 
   Future<QueryResult> _queryWithRefresh(QueryOptions options) async {
     QueryResult result = await client.query(options);
@@ -217,6 +255,36 @@ class TwentyConnector implements CRMRepository {
     }
 
     return true;
+  }
+
+  @override
+  Future<List<WorkspaceMember>> getWorkspaceMembers() async {
+    const String query = r'''
+      query GetWorkspaceMembers {
+        workspaceMembers(first: 100) {
+          edges {
+            node {
+              id
+              name {
+                firstName
+                lastName
+              }
+            }
+          }
+        }
+      }
+    ''';
+    final options = QueryOptions(
+      document: parseString(query),
+      fetchPolicy: FetchPolicy.networkOnly,
+    );
+    final result = await _queryWithRefresh(options);
+    _handleResultException(result);
+    final edges = result.data?['workspaceMembers']?['edges'] as List?;
+    if (edges == null) return [];
+    return edges
+        .map((e) => WorkspaceMember.fromTwenty(e['node'] as Map<String, dynamic>))
+        .toList();
   }
 
   @override
@@ -936,6 +1004,13 @@ class TwentyConnector implements CRMRepository {
   Future<List<Task>> getOverdueTasks() async {
     final now = DateTime.now();
     final startOfToday = DateTime(now.year, now.month, now.day);
+    final memberId = await _getCurrentMemberId();
+
+    final conditions = [
+      '{ dueAt: { lt: "${startOfToday.toIso8601String()}" } }',
+      '{ status: { neq: DONE } }',
+      if (memberId != null) '{ assigneeId: { eq: "$memberId" } }',
+    ];
 
     final String query =
         '''
@@ -943,8 +1018,7 @@ class TwentyConnector implements CRMRepository {
         tasks(
           filter: {
             and: [
-              { dueAt: { lt: "${startOfToday.toIso8601String()}" } }
-              { status: { neq: DONE } }
+              ${conditions.join('\n              ')}
             ]
           }
           orderBy: { dueAt: AscNullsLast }
@@ -978,6 +1052,14 @@ class TwentyConnector implements CRMRepository {
     final now = DateTime.now();
     final startOfToday = DateTime(now.year, now.month, now.day);
     final endOfToday = startOfToday.add(const Duration(days: 1));
+    final memberId = await _getCurrentMemberId();
+
+    final conditions = [
+      '{ dueAt: { gte: "${startOfToday.toIso8601String()}" } }',
+      '{ dueAt: { lt: "${endOfToday.toIso8601String()}" } }',
+      '{ status: { neq: DONE } }',
+      if (memberId != null) '{ assigneeId: { eq: "$memberId" } }',
+    ];
 
     final String query =
         '''
@@ -985,9 +1067,7 @@ class TwentyConnector implements CRMRepository {
         tasks(
           filter: {
             and: [
-              { dueAt: { gte: "${startOfToday.toIso8601String()}" } }
-              { dueAt: { lt: "${endOfToday.toIso8601String()}" } }
-              { status: { neq: DONE } }
+              ${conditions.join('\n              ')}
             ]
           }
           orderBy: { dueAt: AscNullsLast }
@@ -1025,6 +1105,14 @@ class TwentyConnector implements CRMRepository {
       now.day,
     ).add(const Duration(days: 1));
     final endOfTomorrow = startOfTomorrow.add(const Duration(days: 1));
+    final memberId = await _getCurrentMemberId();
+
+    final conditions = [
+      '{ dueAt: { gte: "${startOfTomorrow.toIso8601String()}" } }',
+      '{ dueAt: { lt: "${endOfTomorrow.toIso8601String()}" } }',
+      '{ status: { neq: DONE } }',
+      if (memberId != null) '{ assigneeId: { eq: "$memberId" } }',
+    ];
 
     final String query =
         '''
@@ -1032,9 +1120,7 @@ class TwentyConnector implements CRMRepository {
         tasks(
           filter: {
             and: [
-              { dueAt: { gte: "${startOfTomorrow.toIso8601String()}" } }
-              { dueAt: { lt: "${endOfTomorrow.toIso8601String()}" } }
-              { status: { neq: DONE } }
+              ${conditions.join('\n              ')}
             ]
           }
           orderBy: { dueAt: AscNullsLast }
@@ -1114,11 +1200,21 @@ class TwentyConnector implements CRMRepository {
       }
     ''';
 
-    Map<String, dynamic>? filter;
+    final memberId = await _getCurrentMemberId();
+
+    final List<Map<String, dynamic>> conditions = [];
     if (completed != null) {
-      filter = {
-        'status': {'eq': completed ? 'DONE' : 'TODO'},
-      };
+      conditions.add({'status': {'eq': completed ? 'DONE' : 'TODO'}});
+    }
+    if (memberId != null) {
+      conditions.add({'assigneeId': {'eq': memberId}});
+    }
+
+    Map<String, dynamic>? filter;
+    if (conditions.isNotEmpty) {
+      filter = conditions.length == 1
+          ? conditions.first
+          : {'and': conditions};
     }
 
     final QueryOptions options = QueryOptions(
@@ -1144,14 +1240,21 @@ class TwentyConnector implements CRMRepository {
     String? body,
     DateTime? dueAt,
     String? contactId,
+    String? assigneeId,
   }) async {
     const String mutation = r'''
       mutation CreateTask($input: TaskCreateInput!) {
-        createTask(data: $input) { id title status bodyV2 { blocknote } dueAt createdAt }
+        createTask(data: $input) { id title status bodyV2 { blocknote } dueAt createdAt assigneeId }
       }
     ''';
 
     final input = <String, dynamic>{'title': title};
+    
+    // Assign automatically if not provided explicitly, but only for email auth (currentMemberId exists)
+    final targetAssigneeId = assigneeId ?? await _getCurrentMemberId();
+    if (targetAssigneeId != null) {
+      input['assigneeId'] = targetAssigneeId;
+    }
     if (body != null) {
       final blockNodeJson = jsonEncode([
         {
@@ -1210,15 +1313,17 @@ class TwentyConnector implements CRMRepository {
     DateTime? dueAt,
     bool clearDueDate = false,
     bool? completed,
+    String? assigneeId,
   }) async {
     const String mutation = r'''
       mutation UpdateTask($id: UUID!, $input: TaskUpdateInput!) {
-        updateTask(id: $id, data: $input) { id title status bodyV2 { blocknote } dueAt createdAt }
+        updateTask(id: $id, data: $input) { id title status bodyV2 { blocknote } dueAt createdAt assigneeId }
       }
     ''';
 
     final input = <String, dynamic>{};
     if (title != null) input['title'] = title;
+    if (assigneeId != null) input['assigneeId'] = assigneeId;
     if (completed != null) {
       input['status'] = completed ? 'DONE' : 'TODO';
     }

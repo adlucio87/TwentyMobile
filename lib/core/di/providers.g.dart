@@ -91,7 +91,7 @@ final isDemoModeProvider = FutureProvider<bool>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef IsDemoModeRef = FutureProviderRef<bool>;
-String _$crmRepositoryHash() => r'a2b65c85364dd841db83b381b1d5111425b307f3';
+String _$crmRepositoryHash() => r'dc17fe3f7a551ec62a50f3e9dc4a13c9a78d5775';
 
 /// See also [crmRepository].
 @ProviderFor(crmRepository)
@@ -108,6 +108,23 @@ final crmRepositoryProvider = FutureProvider<CRMRepository>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef CrmRepositoryRef = FutureProviderRef<CRMRepository>;
+String _$workspaceMembersHash() => r'cc7dc84f33a58d4b332bd42b1d41665d6ee8ade0';
+
+/// See also [workspaceMembers].
+@ProviderFor(workspaceMembers)
+final workspaceMembersProvider = FutureProvider<List<WorkspaceMember>>.internal(
+  workspaceMembers,
+  name: r'workspaceMembersProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$workspaceMembersHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef WorkspaceMembersRef = FutureProviderRef<List<WorkspaceMember>>;
 String _$currentUserNameHash() => r'171161f12ce32915e039659d1a4737236ac1f8f7';
 
 /// See also [currentUserName].
@@ -988,7 +1005,7 @@ final taskFilterProvider =
     );
 
 typedef _$TaskFilter = AutoDisposeNotifier<bool>;
-String _$tasksHash() => r'2aa61d65a7b9183bd95ac39a03a7eea9db8922c5';
+String _$tasksHash() => r'7965d886a86afd8c3d5f3305963edc7bfdfbb817';
 
 /// See also [Tasks].
 @ProviderFor(Tasks)

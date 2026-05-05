@@ -134,8 +134,13 @@ class _ScanCardScreenState extends ConsumerState<ScanCardScreen> {
   }
 
   Future<void> _pickFromGallery() async {
+    // NESSUNA richiesta permesso prima
+    // image_picker 1.1.0+ gestisce tutto internamente
     final picker = ImagePicker();
-    final image = await picker.pickImage(source: ImageSource.gallery);
+    final image = await picker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 90,
+    );
     if (image != null) await _processAndNavigate(image);
   }
 

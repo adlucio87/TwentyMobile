@@ -41,8 +41,17 @@ class _ApiTokenScreenState extends ConsumerState<ApiTokenScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('API Token')),
-      body: Padding(
-        padding: const EdgeInsets.all(24.0),
+      body: SafeArea(
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return SingleChildScrollView(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight: constraints.maxHeight,
+                ),
+                child: IntrinsicHeight(
+                  child: Padding(
+                    padding: const EdgeInsets.all(24.0),
         child: Form(
           key: _formKey,
           child: Column(
@@ -88,6 +97,12 @@ class _ApiTokenScreenState extends ConsumerState<ApiTokenScreen> {
             ],
           ),
         ),
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
       ),
     );
   }
@@ -117,6 +132,8 @@ class _ApiTokenScreenState extends ConsumerState<ApiTokenScreen> {
       // Salva il token e aggiorna authState → il router si occuperà del redirect
       await ref.read(authStateProvider.notifier).login(token);
       ref.invalidate(crmRepositoryProvider);
+      ref.invalidate(authMethodProvider);
+      ref.invalidate(currentUserNameProvider);
 
       if (mounted) context.go('/onboarding/notifications');
     } catch (e, stackTrace) {

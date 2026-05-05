@@ -307,6 +307,7 @@ class AddTaskSheetState extends ConsumerState<AddTaskSheet> {
   final _titleController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   String? _selectedContactId;
+  String? _selectedAssigneeId;
   DateTime? _selectedDueDate;
   
   bool _notifyReminder = true;
@@ -316,6 +317,8 @@ class AddTaskSheetState extends ConsumerState<AddTaskSheet> {
   @override
   Widget build(BuildContext context) {
     final contactsAsync = ref.watch(contactsProvider);
+    final authMethodAsync = ref.watch(authMethodProvider);
+    final workspaceMembersAsync = ref.watch(workspaceMembersProvider);
     return Padding(
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,
@@ -379,6 +382,50 @@ class AddTaskSheetState extends ConsumerState<AddTaskSheet> {
                 ),
                 loading: () => const CircularProgressIndicator(),
                 error: (err, stack) => Text('Contacts error: $err'),
+              ),
+              authMethodAsync.when(
+                data: (method) {
+                  if (method == 'api_key') {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        const SizedBox(height: 16),
+                        workspaceMembersAsync.when(
+                          data: (members) {
+                            if (members.isEmpty) return const SizedBox.shrink();
+                            return DropdownButtonFormField<String>(
+                              decoration: const InputDecoration(
+                                labelText: 'Assign to',
+                                hintText: 'Select team member',
+                              ),
+                              value: _selectedAssigneeId,
+                              items: [
+                                const DropdownMenuItem(
+                                  value: null,
+                                  child: Text('Unassigned'),
+                                ),
+                                ...members.map((m) => DropdownMenuItem(
+                                  value: m.id,
+                                  child: Text('${m.firstName} ${m.lastName}'.trim()),
+                                )),
+                              ],
+                              onChanged: (val) {
+                                setState(() {
+                                  _selectedAssigneeId = val;
+                                });
+                              },
+                            );
+                          },
+                          loading: () => const CircularProgressIndicator(),
+                          error: (err, stack) => Text('Members error: $err'),
+                        ),
+                      ],
+                    );
+                  }
+                  return const SizedBox.shrink();
+                },
+                loading: () => const SizedBox.shrink(),
+                error: (_, __) => const SizedBox.shrink(),
               ),
               const SizedBox(height: 16),
               DueDatePicker(
@@ -447,8 +494,9 @@ class AddTaskSheetState extends ConsumerState<AddTaskSheet> {
                                 .read(tasksProvider.notifier)
                                 .addTask(
                                 _titleController.text.trim(),
-                                contactId: _selectedContactId,
-                                dueAt: _selectedDueDate,
+                              contactId: _selectedContactId,
+                              assigneeId: _selectedAssigneeId,
+                              dueAt: _selectedDueDate,
                               );
                                 
                             final prefs = await SharedPreferences.getInstance();
@@ -508,6 +556,7 @@ class EditTaskSheetState extends ConsumerState<EditTaskSheet> {
   late final TextEditingController _bodyController;
   final _formKey = GlobalKey<FormState>();
   DateTime? _selectedDueDate;
+  String? _selectedAssigneeId;
   
   bool _notifyReminder = true;
   bool _isLoading = false;
@@ -519,6 +568,7 @@ class EditTaskSheetState extends ConsumerState<EditTaskSheet> {
     _titleController = TextEditingController(text: widget.task.title);
     _bodyController = TextEditingController(text: _extractPlainText(widget.task.body));
     _selectedDueDate = widget.task.dueAt?.toLocal();
+    _selectedAssigneeId = widget.task.assigneeId;
     _loadNotificationPreference();
   }
 
@@ -569,6 +619,8 @@ class EditTaskSheetState extends ConsumerState<EditTaskSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final authMethodAsync = ref.watch(authMethodProvider);
+    final workspaceMembersAsync = ref.watch(workspaceMembersProvider);
     return Padding(
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,
@@ -638,6 +690,50 @@ class EditTaskSheetState extends ConsumerState<EditTaskSheet> {
                 maxLines: 3,
                 minLines: 1,
                 enabled: !_isLoading,
+              ),
+              authMethodAsync.when(
+                data: (method) {
+                  if (method == 'api_key') {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        const SizedBox(height: 16),
+                        workspaceMembersAsync.when(
+                          data: (members) {
+                            if (members.isEmpty) return const SizedBox.shrink();
+                            return DropdownButtonFormField<String>(
+                              decoration: const InputDecoration(
+                                labelText: 'Assign to',
+                                hintText: 'Select team member',
+                              ),
+                              value: _selectedAssigneeId,
+                              items: [
+                                const DropdownMenuItem(
+                                  value: null,
+                                  child: Text('Unassigned'),
+                                ),
+                                ...members.map((m) => DropdownMenuItem(
+                                  value: m.id,
+                                  child: Text('${m.firstName} ${m.lastName}'.trim()),
+                                )),
+                              ],
+                              onChanged: (val) {
+                                setState(() {
+                                  _selectedAssigneeId = val;
+                                });
+                              },
+                            );
+                          },
+                          loading: () => const CircularProgressIndicator(),
+                          error: (err, stack) => Text('Members error: $err'),
+                        ),
+                      ],
+                    );
+                  }
+                  return const SizedBox.shrink();
+                },
+                loading: () => const SizedBox.shrink(),
+                error: (_, __) => const SizedBox.shrink(),
               ),
               const SizedBox(height: 16),
               DueDatePicker(
@@ -711,6 +807,7 @@ class EditTaskSheetState extends ConsumerState<EditTaskSheet> {
                                   body: _bodyController.text.trim(),
                                   dueAt: _selectedDueDate,
                                   clearDueDate: _selectedDueDate == null,
+                                  assigneeId: _selectedAssigneeId,
                                 );
 
                             final prefs = await SharedPreferences.getInstance();

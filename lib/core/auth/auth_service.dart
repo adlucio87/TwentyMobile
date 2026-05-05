@@ -1,6 +1,6 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
-
+import 'package:pocketcrm/core/network/custom_http_client.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:pocketcrm/data/graphql/auth_mutations.dart';
@@ -17,30 +17,104 @@ class AuthService {
   ) async {
     final client = _createUnauthenticatedClient(instanceUrl);
 
-    final options = MutationOptions(
-      document: gql(signInWithPasswordMutation),
+    // Step 1: Get a temporary login token from credentials
+    final loginOptions = MutationOptions(
+      document: gql(getLoginTokenFromCredentialsMutation),
       variables: {
         'email': email,
         'password': password,
+        'origin': instanceUrl,
       },
     );
 
-    final result = await client.mutate(options);
+    final loginResult = await client.mutate(loginOptions);
 
-    if (result.hasException) {
-      throw Exception(result.exception.toString());
+    if (loginResult.hasException) {
+      final exStr = loginResult.exception.toString().toLowerCase();
+      if (exStr.contains('unauthenticated') ||
+          exStr.contains('wrong credentials') ||
+          exStr.contains('invalid credentials') ||
+          exStr.contains('wrong password') ||
+          exStr.contains('wrong-credentials') ||
+          exStr.contains('invalid password') ||
+          exStr.contains('incorrect password')) {
+        throw Exception('Invalid email or password.');
+      }
+      if (exStr.contains('user not found') ||
+          exStr.contains('no account')) {
+        throw Exception('No account found with this email.');
+      }
+      if (exStr.contains('password login is disabled') ||
+          exStr.contains('password-login-disabled')) {
+        throw Exception(
+          'Password login is disabled on this Twenty instance.',
+        );
+      }
+      throw Exception(loginResult.exception.toString());
     }
 
-    final data = result.data?['signInWithPassword'];
-    if (data == null) {
+    final loginData = loginResult.data?['getLoginTokenFromCredentials'];
+    if (loginData == null) {
       throw Exception('Invalid response from server');
     }
 
-    final accessToken = data['tokens']['accessToken']['token'] as String;
-    final refreshToken = data['tokens']['refreshToken']['token'] as String;
-    final expiresAt = data['tokens']['accessToken']['expiresAt'] as String;
-    final userFirstName = data['user']['firstName'] as String? ?? '';
-    final userLastName = data['user']['lastName'] as String? ?? '';
+    final loginToken = loginData['loginToken']['token'] as String;
+
+    // Step 2: Exchange login token for access + refresh tokens
+    final tokenOptions = MutationOptions(
+      document: gql(getAuthTokensFromLoginTokenMutation),
+      variables: {
+        'loginToken': loginToken,
+        'origin': instanceUrl,
+      },
+    );
+
+    final tokenResult = await client.mutate(tokenOptions);
+
+    if (tokenResult.hasException) {
+      throw Exception(tokenResult.exception.toString());
+    }
+
+    final tokenData = tokenResult.data?['getAuthTokensFromLoginToken'];
+    if (tokenData == null) {
+      throw Exception('Failed to exchange login token for access tokens');
+    }
+
+    final tokens = tokenData['tokens'];
+    final accessToken = tokens['accessOrWorkspaceAgnosticToken']['token'] as String;
+    final refreshToken = tokens['refreshToken']['token'] as String;
+    final expiresAt = tokens['accessOrWorkspaceAgnosticToken']['expiresAt'] as String;
+
+    // Now fetch user info with the new access token
+    final authedClient = _createAuthenticatedClient(instanceUrl, accessToken);
+    String userFirstName = '';
+    String userLastName = '';
+    try {
+      const meQuery = r'''
+        query Me {
+          workspaceMembers(first: 1) {
+            edges {
+              node {
+                name { firstName lastName }
+              }
+            }
+          }
+        }
+      ''';
+      final meResult = await authedClient.query(
+        QueryOptions(document: gql(meQuery)),
+      );
+      final edges = meResult.data?['workspaceMembers']?['edges'] as List?;
+      if (edges != null && edges.isNotEmpty) {
+        final name = edges.first['node']?['name'];
+        if (name != null) {
+          userFirstName = name['firstName'] as String? ?? '';
+          userLastName = name['lastName'] as String? ?? '';
+        }
+      }
+    } catch (_) {
+      // Non-critical: user name fetch failed, continue anyway
+    }
 
     await _storage.write(key: 'api_token', value: accessToken);
     await _storage.write(key: 'refresh_token', value: refreshToken);
@@ -70,9 +144,9 @@ class AuthService {
     final client = _createUnauthenticatedClient(instanceUrl);
 
     final options = MutationOptions(
-      document: gql(refreshTokenMutation),
+      document: gql(renewTokenMutation),
       variables: {
-        'refreshToken': refreshToken,
+        'appToken': refreshToken,
       },
     );
 
@@ -89,9 +163,10 @@ class AuthService {
       return false;
     }
 
-    final newAccessToken = data['tokens']['accessToken']['token'] as String;
-    final newRefreshToken = data['tokens']['refreshToken']['token'] as String;
-    final expiresAt = data['tokens']['accessToken']['expiresAt'] as String;
+    final tokens = data['tokens'];
+    final newAccessToken = tokens['accessOrWorkspaceAgnosticToken']['token'] as String;
+    final newRefreshToken = tokens['refreshToken']['token'] as String;
+    final expiresAt = tokens['accessOrWorkspaceAgnosticToken']['expiresAt'] as String;
 
     await _storage.write(key: 'api_token', value: newAccessToken);
     await _storage.write(key: 'refresh_token', value: newRefreshToken);
@@ -130,7 +205,28 @@ class AuthService {
   }
 
   GraphQLClient _createUnauthenticatedClient(String baseUrl) {
-    final link = HttpLink('$baseUrl/graphql');
+    final customHttpClient = TimeoutHttpClient(
+      timeoutDuration: const Duration(seconds: 30),
+    );
+    final link = HttpLink(
+      '$baseUrl/metadata',
+      httpClient: customHttpClient,
+    );
+    return GraphQLClient(
+      link: link,
+      cache: GraphQLCache(),
+    );
+  }
+
+  GraphQLClient _createAuthenticatedClient(String baseUrl, String token) {
+    final customHttpClient = TimeoutHttpClient(
+      timeoutDuration: const Duration(seconds: 30),
+    );
+    final link = HttpLink(
+      '$baseUrl/graphql',
+      defaultHeaders: {'Authorization': 'Bearer $token'},
+      httpClient: customHttpClient,
+    );
     return GraphQLClient(
       link: link,
       cache: GraphQLCache(),

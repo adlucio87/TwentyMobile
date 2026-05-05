@@ -57,6 +57,8 @@ class _EmailLoginScreenState extends ConsumerState<EmailLoginScreen> {
       // AuthState Provider and Router handle the navigation once the tokens are saved.
       // But we invalidate crmRepository to re-init
       ref.invalidate(crmRepositoryProvider);
+      ref.invalidate(authMethodProvider);
+      ref.invalidate(currentUserNameProvider);
 
       if (mounted) {
         context.go('/onboarding/notifications');
@@ -67,13 +69,13 @@ class _EmailLoginScreenState extends ConsumerState<EmailLoginScreen> {
       if (mounted) {
         String message = e.toString();
         if (message.contains('UNAUTHENTICATED')) {
-          message = 'Email o password non corretti. Riprova.';
+          message = 'Incorrect email or password. Please try again.';
         } else if (message.contains('Not Found') || message.contains('user not found')) {
-          message = 'Nessun account trovato con questa email.';
+          message = 'No account found with this email.';
         } else if (message.contains('SocketException') || message.contains('Failed host lookup')) {
-          message = 'Impossibile raggiungere il server. Verifica l\'URL.';
+          message = 'Unable to reach the server. Check the URL.';
         } else if (message.contains('password login is disabled')) {
-           message = 'Il login con password non è abilitato su questa istanza Twenty.';
+           message = 'Password login is not enabled on this Twenty instance.';
         } else if (message.startsWith('Exception: ')) {
           message = message.substring(11);
         }
@@ -100,101 +102,116 @@ class _EmailLoginScreenState extends ConsumerState<EmailLoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Accedi con Email')),
-      body: Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              TextFormField(
-                controller: _emailController,
-                keyboardType: TextInputType.emailAddress,
-                decoration: const InputDecoration(
-                  labelText: 'Email',
-                  hintText: 'Inserisci la tua email',
-                  prefixIcon: Icon(Icons.email),
+      appBar: AppBar(title: const Text('Login with Email')),
+      body: SafeArea(
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return SingleChildScrollView(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight: constraints.maxHeight,
                 ),
-                validator: (val) {
-                  if (val == null || val.isEmpty) return 'L\'email è obbligatoria';
-                  if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(val)) {
-                    return 'Inserisci un\'email valida';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _passwordController,
-                obscureText: _obscureText,
-                decoration: InputDecoration(
-                  labelText: 'Password',
-                  hintText: 'Inserisci la tua password',
-                  prefixIcon: const Icon(Icons.lock),
-                  suffixIcon: IconButton(
-                    icon: Icon(
-                      _obscureText ? Icons.visibility : Icons.visibility_off,
+                child: IntrinsicHeight(
+                  child: Padding(
+                    padding: const EdgeInsets.all(24.0),
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                      TextFormField(
+                        controller: _emailController,
+                        keyboardType: TextInputType.emailAddress,
+                        decoration: const InputDecoration(
+                          labelText: 'Email',
+                          hintText: 'Enter your email',
+                          prefixIcon: Icon(Icons.email),
+                        ),
+                        validator: (val) {
+                          if (val == null || val.isEmpty) return 'Email is required';
+                          if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(val)) {
+                            return 'Enter a valid email';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      TextFormField(
+                        controller: _passwordController,
+                        obscureText: _obscureText,
+                        decoration: InputDecoration(
+                          labelText: 'Password',
+                          hintText: 'Enter your password',
+                          prefixIcon: const Icon(Icons.lock),
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              _obscureText ? Icons.visibility : Icons.visibility_off,
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                _obscureText = !_obscureText;
+                              });
+                            },
+                          ),
+                        ),
+                        validator: (val) {
+                          if (val == null || val.isEmpty) return 'Password is required';
+                          if (val.length < 6) return 'Password must be at least 6 characters';
+                          return null;
+                        },
+                      ),
+                      if (_error != null) ...[
+                        const SizedBox(height: 16),
+                        Text(
+                          _error!,
+                          style: TextStyle(color: Theme.of(context).colorScheme.error),
+                        ),
+                      ],
+                      const SizedBox(height: 16),
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: TextButton(
+                          onPressed: _openForgotPassword,
+                          child: const Text('Forgot password?'),
+                        ),
+                      ),
+                      const Spacer(),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: _isLoading ? null : _login,
+                          child: _isLoading
+                              ? const SizedBox(
+                                  height: 20,
+                                  width: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: Colors.white,
+                                  ),
+                                )
+                              : const Text('Login'),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      TextButton(
+                        onPressed: () {
+                          if (context.canPop()) {
+                            context.pop();
+                          } else {
+                            context.go('/onboarding/method');
+                          }
+                        },
+                        child: const Text('Go back'),
+                      ),
+                      const SizedBox(height: 24),
+                    ],
+                  ),
                     ),
-                    onPressed: () {
-                      setState(() {
-                        _obscureText = !_obscureText;
-                      });
-                    },
                   ),
                 ),
-                validator: (val) {
-                  if (val == null || val.isEmpty) return 'La password è obbligatoria';
-                  if (val.length < 6) return 'La password deve avere almeno 6 caratteri';
-                  return null;
-                },
               ),
-              if (_error != null) ...[
-                const SizedBox(height: 16),
-                Text(
-                  _error!,
-                  style: TextStyle(color: Theme.of(context).colorScheme.error),
-                ),
-              ],
-              const SizedBox(height: 16),
-              Align(
-                alignment: Alignment.centerRight,
-                child: TextButton(
-                  onPressed: _openForgotPassword,
-                  child: const Text('Hai dimenticato la password?'),
-                ),
-              ),
-              const Spacer(),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: _isLoading ? null : _login,
-                  child: _isLoading
-                      ? const SizedBox(
-                          height: 20,
-                          width: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: Colors.white,
-                          ),
-                        )
-                      : const Text('Accedi'),
-                ),
-              ),
-              const SizedBox(height: 16),
-              TextButton(
-                onPressed: () {
-                  if (context.canPop()) {
-                    context.pop();
-                  } else {
-                    context.go('/onboarding/method');
-                  }
-                },
-                child: const Text('Torna indietro'),
-              ),
-              const SizedBox(height: 24),
-            ],
-          ),
+            );
+          },
         ),
       ),
     );

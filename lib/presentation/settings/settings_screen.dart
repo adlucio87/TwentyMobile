@@ -108,7 +108,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: Text(
-                              isEmail ? 'Account personale' : 'API Key Admin',
+                              isEmail ? 'Personal Account' : 'API Key Admin',
                               style: Theme.of(context).textTheme.labelSmall?.copyWith(
                                 color: isEmail ? Colors.green : Theme.of(context).colorScheme.primary,
                                 fontWeight: FontWeight.bold,
@@ -129,11 +129,16 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       ],
                       const SizedBox(height: 16),
                       OutlinedButton.icon(
-                        onPressed: () {
-                          context.push('/onboarding/method');
+                        onPressed: () async {
+                          // Clear the current credentials to avoid router redirecting back to home
+                          await ref.read(authServiceProvider).logout();
+                          await ref.read(authStateProvider.notifier).logout();
+                          if (context.mounted) {
+                            context.go('/onboarding/method');
+                          }
                         },
                         icon: const Icon(Icons.swap_horiz),
-                        label: const Text('Cambia metodo di accesso'),
+                        label: const Text('Change login method'),
                         style: OutlinedButton.styleFrom(
                           minimumSize: const Size.fromHeight(40),
                         ),

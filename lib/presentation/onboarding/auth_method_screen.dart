@@ -9,19 +9,19 @@ class AuthMethodScreen extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Autenticazione')),
+      appBar: AppBar(title: const Text('Authentication')),
       body: Padding(
         padding: const EdgeInsets.all(24.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
-              'Come vuoi accedere?',
+              'How do you want to connect?',
               style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             Text(
-              'Scegli il metodo di accesso alla tua istanza Twenty CRM',
+              'Choose how you want to access your Twenty CRM instance',
               style: theme.textTheme.bodyLarge?.copyWith(
                 color: theme.colorScheme.onSurface.withValues(alpha: (0.6)),
               ),
@@ -29,18 +29,18 @@ class AuthMethodScreen extends StatelessWidget {
             const SizedBox(height: 32),
             _buildMethodCard(
               context,
-              title: 'Accedi con il tuo account',
-              description: 'Usa email e password. Vedrai solo i dati assegnati a te.',
+              title: 'Login with your account',
+              description: 'Use your email and password. You will only see data assigned to you.',
               icon: Icons.person,
-              badgeText: 'Consigliato',
+              badgeText: 'Recommended',
               badgeColor: Colors.green,
               onTap: () => context.push('/onboarding/email'),
             ),
             const SizedBox(height: 16),
             _buildMethodCard(
               context,
-              title: 'Accedi con API Key',
-              description: 'Accesso completo al workspace. Per amministratori e owner.',
+              title: 'Login with API Key',
+              description: 'Full workspace access. For administrators and owners.',
               icon: Icons.key,
               badgeText: 'Admin',
               badgeColor: theme.colorScheme.primary,

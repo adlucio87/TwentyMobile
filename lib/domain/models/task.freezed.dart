@@ -28,6 +28,7 @@ mixin _$Task {
   DateTime? get dueAt => throw _privateConstructorUsedError;
   String? get contactId => throw _privateConstructorUsedError;
   String? get contactName => throw _privateConstructorUsedError;
+  String? get assigneeId => throw _privateConstructorUsedError;
   DateTime? get createdAt => throw _privateConstructorUsedError;
 
   /// Serializes this Task to a JSON map.
@@ -52,6 +53,7 @@ abstract class $TaskCopyWith<$Res> {
     DateTime? dueAt,
     String? contactId,
     String? contactName,
+    String? assigneeId,
     DateTime? createdAt,
   });
 }
@@ -78,6 +80,7 @@ class _$TaskCopyWithImpl<$Res, $Val extends Task>
     Object? dueAt = freezed,
     Object? contactId = freezed,
     Object? contactName = freezed,
+    Object? assigneeId = freezed,
     Object? createdAt = freezed,
   }) {
     return _then(
@@ -110,6 +113,10 @@ class _$TaskCopyWithImpl<$Res, $Val extends Task>
                 ? _value.contactName
                 : contactName // ignore: cast_nullable_to_non_nullable
                       as String?,
+            assigneeId: freezed == assigneeId
+                ? _value.assigneeId
+                : assigneeId // ignore: cast_nullable_to_non_nullable
+                      as String?,
             createdAt: freezed == createdAt
                 ? _value.createdAt
                 : createdAt // ignore: cast_nullable_to_non_nullable
@@ -136,6 +143,7 @@ abstract class _$$TaskImplCopyWith<$Res> implements $TaskCopyWith<$Res> {
     DateTime? dueAt,
     String? contactId,
     String? contactName,
+    String? assigneeId,
     DateTime? createdAt,
   });
 }
@@ -159,6 +167,7 @@ class __$$TaskImplCopyWithImpl<$Res>
     Object? dueAt = freezed,
     Object? contactId = freezed,
     Object? contactName = freezed,
+    Object? assigneeId = freezed,
     Object? createdAt = freezed,
   }) {
     return _then(
@@ -191,6 +200,10 @@ class __$$TaskImplCopyWithImpl<$Res>
             ? _value.contactName
             : contactName // ignore: cast_nullable_to_non_nullable
                   as String?,
+        assigneeId: freezed == assigneeId
+            ? _value.assigneeId
+            : assigneeId // ignore: cast_nullable_to_non_nullable
+                  as String?,
         createdAt: freezed == createdAt
             ? _value.createdAt
             : createdAt // ignore: cast_nullable_to_non_nullable
@@ -211,6 +224,7 @@ class _$TaskImpl implements _Task {
     this.dueAt,
     this.contactId,
     this.contactName,
+    this.assigneeId,
     this.createdAt,
   });
 
@@ -232,11 +246,13 @@ class _$TaskImpl implements _Task {
   @override
   final String? contactName;
   @override
+  final String? assigneeId;
+  @override
   final DateTime? createdAt;
 
   @override
   String toString() {
-    return 'Task(id: $id, title: $title, body: $body, completed: $completed, dueAt: $dueAt, contactId: $contactId, contactName: $contactName, createdAt: $createdAt)';
+    return 'Task(id: $id, title: $title, body: $body, completed: $completed, dueAt: $dueAt, contactId: $contactId, contactName: $contactName, assigneeId: $assigneeId, createdAt: $createdAt)';
   }
 
   @override
@@ -254,6 +270,8 @@ class _$TaskImpl implements _Task {
                 other.contactId == contactId) &&
             (identical(other.contactName, contactName) ||
                 other.contactName == contactName) &&
+            (identical(other.assigneeId, assigneeId) ||
+                other.assigneeId == assigneeId) &&
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt));
   }
@@ -269,6 +287,7 @@ class _$TaskImpl implements _Task {
     dueAt,
     contactId,
     contactName,
+    assigneeId,
     createdAt,
   );
 
@@ -295,6 +314,7 @@ abstract class _Task implements Task {
     final DateTime? dueAt,
     final String? contactId,
     final String? contactName,
+    final String? assigneeId,
     final DateTime? createdAt,
   }) = _$TaskImpl;
 
@@ -314,6 +334,8 @@ abstract class _Task implements Task {
   String? get contactId;
   @override
   String? get contactName;
+  @override
+  String? get assigneeId;
   @override
   DateTime? get createdAt;
 

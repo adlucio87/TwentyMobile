@@ -8,6 +8,7 @@ import 'package:pocketcrm/domain/models/company.dart';
 import 'package:pocketcrm/domain/models/contact.dart';
 import 'package:pocketcrm/domain/models/note.dart';
 import 'package:pocketcrm/domain/models/task.dart';
+import 'package:pocketcrm/domain/models/workspace_member.dart';
 import 'package:pocketcrm/core/auth/auth_service.dart';
 import 'package:pocketcrm/domain/repositories/crm_repository.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -66,11 +67,6 @@ Future<CRMRepository> crmRepository(CrmRepositoryRef ref) async {
     timeoutDuration: const Duration(seconds: 30),
   );
 
-  final link = HttpLink(
-    '$baseUrl/graphql', // Twenty CRM graphql endpoint
-    defaultHeaders: {'Authorization': 'Bearer $apiToken'},
-    httpClient: customHttpClient,
-  );
   final authLink = AuthLink(
     getToken: () async {
       // Fetch the latest token from storage
@@ -81,6 +77,7 @@ Future<CRMRepository> crmRepository(CrmRepositoryRef ref) async {
 
   final httpLink = HttpLink(
     '$baseUrl/graphql', // Twenty CRM graphql endpoint
+    httpClient: customHttpClient,
   );
 
   final link = authLink.concat(httpLink);
@@ -89,6 +86,12 @@ Future<CRMRepository> crmRepository(CrmRepositoryRef ref) async {
   final authService = ref.read(authServiceProvider);
 
   return TwentyConnector(client: client, authService: authService);
+}
+
+@Riverpod(keepAlive: true)
+Future<List<WorkspaceMember>> workspaceMembers(WorkspaceMembersRef ref) async {
+  final repo = await ref.watch(crmRepositoryProvider.future);
+  return repo.getWorkspaceMembers();
 }
 
 @Riverpod(keepAlive: true)
@@ -591,6 +594,7 @@ class Tasks extends _$Tasks {
     String title, {
     DateTime? dueAt,
     String? contactId,
+    String? assigneeId,
   }) async {
     final isDemo = await ref.read(isDemoModeProvider.future);
     if (isDemo) throw Exception('Demo mode: Modification is not allowed.');
@@ -600,6 +604,7 @@ class Tasks extends _$Tasks {
       title: title,
       dueAt: dueAt,
       contactId: contactId,
+      assigneeId: assigneeId,
     );
 
     // Aggiorniamo ottimisticamente lo stato inserendo il nuovo task in cima
@@ -622,6 +627,7 @@ class Tasks extends _$Tasks {
     DateTime? dueAt,
     bool clearDueDate = false,
     bool? completed,
+    String? assigneeId,
   }) async {
     final isDemo = await ref.read(isDemoModeProvider.future);
     if (isDemo) throw Exception('Demo mode: Modification is not allowed.');
@@ -634,6 +640,7 @@ class Tasks extends _$Tasks {
       dueAt: dueAt,
       clearDueDate: clearDueDate,
       completed: completed,
+      assigneeId: assigneeId,
     );
 
     final currentState = state.value;

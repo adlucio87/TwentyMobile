@@ -1,11 +1,39 @@
-const String signInWithPasswordMutation = r'''
-mutation SignIn($email: String!, $password: String!) {
-  signInWithPassword(
-    email: $email
-    password: $password
+// Twenty CRM uses a two-step auth flow:
+// 1. `getLoginTokenFromCredentials` → returns a temporary loginToken
+// 2. `getAuthTokensFromLoginToken` → exchanges loginToken for access + refresh tokens
+//
+// Both mutations live on the /metadata endpoint, NOT /graphql.
+
+const String getLoginTokenFromCredentialsMutation = r'''
+mutation GetLoginTokenFromCredentials(
+  $email: String!,
+  $password: String!,
+  $origin: String!
+) {
+  getLoginTokenFromCredentials(
+    email: $email,
+    password: $password,
+    origin: $origin
+  ) {
+    loginToken {
+      token
+      expiresAt
+    }
+  }
+}
+''';
+
+const String getAuthTokensFromLoginTokenMutation = r'''
+mutation GetAuthTokensFromLoginToken(
+  $loginToken: String!,
+  $origin: String!
+) {
+  getAuthTokensFromLoginToken(
+    loginToken: $loginToken,
+    origin: $origin
   ) {
     tokens {
-      accessToken {
+      accessOrWorkspaceAgnosticToken {
         token
         expiresAt
       }
@@ -14,25 +42,15 @@ mutation SignIn($email: String!, $password: String!) {
         expiresAt
       }
     }
-    user {
-      id
-      firstName
-      lastName
-      email
-      defaultWorkspace {
-        id
-        displayName
-      }
-    }
   }
 }
 ''';
 
-const String refreshTokenMutation = r'''
-mutation RefreshToken($refreshToken: String!) {
-  renewToken(appToken: $refreshToken) {
+const String renewTokenMutation = r'''
+mutation RenewToken($appToken: String!) {
+  renewToken(appToken: $appToken) {
     tokens {
-      accessToken {
+      accessOrWorkspaceAgnosticToken {
         token
         expiresAt
       }

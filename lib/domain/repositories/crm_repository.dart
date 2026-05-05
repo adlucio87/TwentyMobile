@@ -2,6 +2,7 @@ import 'package:pocketcrm/domain/models/company.dart';
 import 'package:pocketcrm/domain/models/contact.dart';
 import 'package:pocketcrm/domain/models/note.dart';
 import 'package:pocketcrm/domain/models/task.dart';
+import 'package:pocketcrm/domain/models/workspace_member.dart';
 
 abstract class CRMRepository {
   // Auth
@@ -38,6 +39,7 @@ abstract class CRMRepository {
   Future<Company> getCompanyById(String id);
   Future<Company> createCompany({required String name, String? domainName});
   Future<Company> updateCompany(String id, {String? name, String? domainName});
+  Future<List<WorkspaceMember>> getWorkspaceMembers();
   Future<void> deleteCompany(String id);
 
   // Notes
@@ -58,6 +60,7 @@ abstract class CRMRepository {
     String? body,
     DateTime? dueAt,
     String? contactId,
+    String? assigneeId,
   });
   Future<Task> updateTask(String id, {
     String? title,
@@ -65,6 +68,7 @@ abstract class CRMRepository {
     DateTime? dueAt,
     bool clearDueDate = false,
     bool? completed,
+    String? assigneeId,
   });
   Future<void> deleteTask(String id);
 

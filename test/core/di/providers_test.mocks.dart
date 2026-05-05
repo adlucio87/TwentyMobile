@@ -11,6 +11,7 @@ import 'package:pocketcrm/domain/models/company.dart' as _i3;
 import 'package:pocketcrm/domain/models/contact.dart' as _i2;
 import 'package:pocketcrm/domain/models/note.dart' as _i4;
 import 'package:pocketcrm/domain/models/task.dart' as _i5;
+import 'package:pocketcrm/domain/models/workspace_member.dart' as _i9;
 import 'package:pocketcrm/domain/repositories/crm_repository.dart' as _i6;
 
 // ignore_for_file: type=lint
@@ -347,6 +348,20 @@ class MockCRMRepository extends _i1.Mock implements _i6.CRMRepository {
           as _i7.Future<_i3.Company>);
 
   @override
+  _i7.Future<List<_i9.WorkspaceMember>> getWorkspaceMembers() =>
+      (super.noSuchMethod(
+            Invocation.method(#getWorkspaceMembers, []),
+            returnValue: _i7.Future<List<_i9.WorkspaceMember>>.value(
+              <_i9.WorkspaceMember>[],
+            ),
+            returnValueForMissingStub:
+                _i7.Future<List<_i9.WorkspaceMember>>.value(
+                  <_i9.WorkspaceMember>[],
+                ),
+          )
+          as _i7.Future<List<_i9.WorkspaceMember>>);
+
+  @override
   _i7.Future<void> deleteCompany(String? id) =>
       (super.noSuchMethod(
             Invocation.method(#deleteCompany, [id]),
@@ -502,6 +517,7 @@ class MockCRMRepository extends _i1.Mock implements _i6.CRMRepository {
     String? body,
     DateTime? dueAt,
     String? contactId,
+    String? assigneeId,
   }) =>
       (super.noSuchMethod(
             Invocation.method(#createTask, [], {
@@ -509,6 +525,7 @@ class MockCRMRepository extends _i1.Mock implements _i6.CRMRepository {
               #body: body,
               #dueAt: dueAt,
               #contactId: contactId,
+              #assigneeId: assigneeId,
             }),
             returnValue: _i7.Future<_i5.Task>.value(
               _FakeTask_3(
@@ -518,6 +535,7 @@ class MockCRMRepository extends _i1.Mock implements _i6.CRMRepository {
                   #body: body,
                   #dueAt: dueAt,
                   #contactId: contactId,
+                  #assigneeId: assigneeId,
                 }),
               ),
             ),
@@ -529,6 +547,7 @@ class MockCRMRepository extends _i1.Mock implements _i6.CRMRepository {
                   #body: body,
                   #dueAt: dueAt,
                   #contactId: contactId,
+                  #assigneeId: assigneeId,
                 }),
               ),
             ),
@@ -543,6 +562,7 @@ class MockCRMRepository extends _i1.Mock implements _i6.CRMRepository {
     DateTime? dueAt,
     bool? clearDueDate = false,
     bool? completed,
+    String? assigneeId,
   }) =>
       (super.noSuchMethod(
             Invocation.method(
@@ -554,6 +574,7 @@ class MockCRMRepository extends _i1.Mock implements _i6.CRMRepository {
                 #dueAt: dueAt,
                 #clearDueDate: clearDueDate,
                 #completed: completed,
+                #assigneeId: assigneeId,
               },
             ),
             returnValue: _i7.Future<_i5.Task>.value(
@@ -568,6 +589,7 @@ class MockCRMRepository extends _i1.Mock implements _i6.CRMRepository {
                     #dueAt: dueAt,
                     #clearDueDate: clearDueDate,
                     #completed: completed,
+                    #assigneeId: assigneeId,
                   },
                 ),
               ),
@@ -584,6 +606,7 @@ class MockCRMRepository extends _i1.Mock implements _i6.CRMRepository {
                     #dueAt: dueAt,
                     #clearDueDate: clearDueDate,
                     #completed: completed,
+                    #assigneeId: assigneeId,
                   },
                 ),
               ),
