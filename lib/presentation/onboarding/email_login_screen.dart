@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:pocketcrm/core/auth/two_factor_exception.dart';
 import 'package:pocketcrm/core/di/auth_state.dart';
+import 'package:pocketcrm/presentation/onboarding/otp_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:pocketcrm/core/di/providers.dart';
 
@@ -63,6 +65,20 @@ class _EmailLoginScreenState extends ConsumerState<EmailLoginScreen> {
       if (mounted) {
         context.go('/onboarding/notifications');
       }
+    } on TwoFactorRequiredException catch (e) {
+      // 2FA required — navigate to OTP screen with the loginToken
+      if (mounted) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => OtpScreen(
+              instanceUrl: e.instanceUrl,
+              loginToken: e.loginToken,
+            ),
+          ),
+        );
+      }
+      return; // Don't show error
     } catch (e, stackTrace) {
       debugPrint('LOGIN ERROR: $e');
       Sentry.captureException(e, stackTrace: stackTrace);

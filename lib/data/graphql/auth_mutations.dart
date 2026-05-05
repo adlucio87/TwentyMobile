@@ -62,3 +62,29 @@ mutation RenewToken($appToken: String!) {
   }
 }
 ''';
+
+const String getAuthTokensFromOTPMutation = r'''
+mutation GetAuthTokensFromOTP(
+  $loginToken: String!,
+  $otp: String!,
+  $origin: String!
+) {
+  getAuthTokensFromOTP(
+    loginToken: $loginToken,
+    otp: $otp,
+    origin: $origin
+  ) {
+    tokens {
+      accessOrWorkspaceAgnosticToken {
+        token
+        expiresAt
+      }
+      refreshToken {
+        token
+        expiresAt
+      }
+    }
+  }
+}
+''';
+

@@ -1,5 +1,6 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:pocketcrm/core/auth/two_factor_exception.dart';
 import 'package:pocketcrm/core/network/custom_http_client.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
@@ -72,6 +73,21 @@ class AuthService {
     final tokenResult = await client.mutate(tokenOptions);
 
     if (tokenResult.hasException) {
+      // Check if 2FA is required
+      final exception = tokenResult.exception;
+      if (exception != null) {
+        final graphqlErrors = exception.graphqlErrors;
+        final requires2FA = graphqlErrors.any((e) =>
+          e.extensions?['subCode'] == 'TWO_FACTOR_AUTHENTICATION_VERIFICATION_REQUIRED' ||
+          e.message.contains('TWO_FACTOR_AUTHENTICATION_VERIFICATION_REQUIRED'),
+        );
+        if (requires2FA) {
+          throw TwoFactorRequiredException(
+            loginToken: loginToken,
+            instanceUrl: instanceUrl,
+          );
+        }
+      }
       throw Exception(tokenResult.exception.toString());
     }
 
@@ -114,6 +130,85 @@ class AuthService {
       }
     } catch (_) {
       // Non-critical: user name fetch failed, continue anyway
+    }
+
+    await _storage.write(key: 'api_token', value: accessToken);
+    await _storage.write(key: 'refresh_token', value: refreshToken);
+    await _storage.write(key: 'token_expires_at', value: expiresAt);
+    await _storage.write(key: 'auth_method', value: 'email');
+    await _storage.write(key: 'user_first_name', value: userFirstName);
+    await _storage.write(key: 'user_last_name', value: userLastName);
+
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('token_expires_at', expiresAt);
+  }
+
+  /// Complete 2FA login by sending the OTP code alongside the loginToken.
+  Future<void> loginWithOTP({
+    required String instanceUrl,
+    required String loginToken,
+    required String otp,
+  }) async {
+    final client = _createUnauthenticatedClient(instanceUrl);
+
+    final otpOptions = MutationOptions(
+      document: gql(getAuthTokensFromOTPMutation),
+      variables: {
+        'loginToken': loginToken,
+        'otp': otp,
+        'origin': instanceUrl,
+      },
+    );
+
+    final otpResult = await client.mutate(otpOptions);
+
+    if (otpResult.hasException) {
+      final exStr = otpResult.exception.toString().toLowerCase();
+      if (exStr.contains('invalid') || exStr.contains('wrong') || exStr.contains('incorrect')) {
+        throw Exception('Invalid verification code. Please try again.');
+      }
+      throw Exception(otpResult.exception.toString());
+    }
+
+    final otpData = otpResult.data?['getAuthTokensFromOTP'];
+    if (otpData == null) {
+      throw Exception('Failed to verify OTP code');
+    }
+
+    final tokens = otpData['tokens'];
+    final accessToken = tokens['accessOrWorkspaceAgnosticToken']['token'] as String;
+    final refreshToken = tokens['refreshToken']['token'] as String;
+    final expiresAt = tokens['accessOrWorkspaceAgnosticToken']['expiresAt'] as String;
+
+    // Fetch user info
+    final authedClient = _createAuthenticatedClient(instanceUrl, accessToken);
+    String userFirstName = '';
+    String userLastName = '';
+    try {
+      const meQuery = r'''
+        query Me {
+          workspaceMembers(first: 1) {
+            edges {
+              node {
+                name { firstName lastName }
+              }
+            }
+          }
+        }
+      ''';
+      final meResult = await authedClient.query(
+        QueryOptions(document: gql(meQuery)),
+      );
+      final edges = meResult.data?['workspaceMembers']?['edges'] as List?;
+      if (edges != null && edges.isNotEmpty) {
+        final name = edges.first['node']?['name'];
+        if (name != null) {
+          userFirstName = name['firstName'] as String? ?? '';
+          userLastName = name['lastName'] as String? ?? '';
+        }
+      }
+    } catch (_) {
+      // Non-critical: user name fetch failed
     }
 
     await _storage.write(key: 'api_token', value: accessToken);
