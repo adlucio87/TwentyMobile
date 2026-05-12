@@ -85,7 +85,20 @@ Future<CRMRepository> crmRepository(CrmRepositoryRef ref) async {
   final client = GraphQLClient(link: link, cache: GraphQLCache());
   final authService = ref.read(authServiceProvider);
 
-  return TwentyConnector(client: client, authService: authService);
+  return TwentyConnector(
+    client: client,
+    authService: authService,
+    onTokenRefreshed: () {
+      // AuthService writes tokens directly to FlutterSecureStorage,
+      // bypassing StorageService's in-memory cache. We must clear
+      // the cache so AuthLink reads the fresh token.
+      storage.invalidateCache(keys: [
+        'api_token',
+        'refresh_token',
+        'token_expires_at',
+      ]);
+    },
+  );
 }
 
 @Riverpod(keepAlive: true)

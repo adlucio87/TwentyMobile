@@ -14,6 +14,7 @@ _$TaskImpl _$$TaskImplFromJson(Map<String, dynamic> json) => _$TaskImpl(
   dueAt: json['dueAt'] == null ? null : DateTime.parse(json['dueAt'] as String),
   contactId: json['contactId'] as String?,
   contactName: json['contactName'] as String?,
+  targetType: json['targetType'] as String?,
   assigneeId: json['assigneeId'] as String?,
   createdAt: json['createdAt'] == null
       ? null
@@ -29,6 +30,7 @@ Map<String, dynamic> _$$TaskImplToJson(_$TaskImpl instance) =>
       'dueAt': instance.dueAt?.toIso8601String(),
       'contactId': instance.contactId,
       'contactName': instance.contactName,
+      'targetType': instance.targetType,
       'assigneeId': instance.assigneeId,
       'createdAt': instance.createdAt?.toIso8601String(),
     };

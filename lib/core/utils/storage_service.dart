@@ -188,6 +188,25 @@ class StorageService {
     }
   }
 
+  // ---------------------------------------------------------------------------
+  // CACHE INVALIDATION
+  // ---------------------------------------------------------------------------
+
+  /// Clears specific keys from the in-memory cache so the next read()
+  /// will fetch fresh values from secure storage.
+  /// Use this after external writes (e.g. AuthService token refresh).
+  void invalidateCache({List<String>? keys}) {
+    if (keys != null) {
+      for (final key in keys) {
+        _cache.remove(key);
+      }
+      _log('invalidateCache() -> cleared ${keys.length} keys: $keys');
+    } else {
+      _cache.clear();
+      _log('invalidateCache() -> cleared ALL cache');
+    }
+  }
+
   /// Stampa tutto il contenuto di Hive (solo debug)
   void debugDumpHive() {
     if (!kDebugMode) return;

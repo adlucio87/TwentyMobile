@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:ui' show VoidCallback;
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:gql/language.dart' show parseString;
 import 'package:pocketcrm/domain/models/company.dart';
@@ -17,9 +18,13 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 class TwentyConnector implements CRMRepository {
   final GraphQLClient client;
   final AuthService? authService;
+  final VoidCallback? onTokenRefreshed;
   String? _currentMemberId;
 
-  TwentyConnector({required this.client, this.authService});
+  /// Mutex for token refresh — prevents concurrent refresh attempts
+  Future<bool>? _refreshFuture;
+
+  TwentyConnector({required this.client, this.authService, this.onTokenRefreshed});
 
   /// Returns the current workspace member's ID, caching it for the session.
   /// Returns null for API key auth (show all tasks) — only filters for email auth.
@@ -58,6 +63,11 @@ class TwentyConnector implements CRMRepository {
   }
 
   Future<QueryResult> _queryWithRefresh(QueryOptions options) async {
+    // Proactively refresh if we know the token is expired
+    if (authService != null && await authService!.isTokenExpired()) {
+      await _tryRefresh();
+    }
+
     QueryResult result = await client.query(options);
 
     if (result.hasException && _isUnauthenticated(result.exception!)) {
@@ -70,6 +80,11 @@ class TwentyConnector implements CRMRepository {
   }
 
   Future<QueryResult> _mutateWithRefresh(MutationOptions options) async {
+    // Proactively refresh if we know the token is expired
+    if (authService != null && await authService!.isTokenExpired()) {
+      await _tryRefresh();
+    }
+
     QueryResult result = await client.mutate(options);
 
     if (result.hasException && _isUnauthenticated(result.exception!)) {
@@ -82,38 +97,69 @@ class TwentyConnector implements CRMRepository {
   }
 
   bool _isUnauthenticated(OperationException exception) {
-    if (exception.graphqlErrors.any((e) => e.extensions?['code'] == 'UNAUTHENTICATED' || e.message.contains('UNAUTHENTICATED'))) {
+    // Check GraphQL error codes and messages
+    if (exception.graphqlErrors.any((e) {
+      final code = e.extensions?['code']?.toString().toUpperCase() ?? '';
+      final msg = e.message.toLowerCase();
+      return code == 'UNAUTHENTICATED' ||
+          msg.contains('unauthenticated') ||
+          msg.contains('token has expired') ||
+          msg.contains('token expired') ||
+          msg.contains('expired token') ||
+          msg.contains('jwt expired') ||
+          msg.contains('invalid token');
+    })) {
       return true;
     }
+    // Check link-level exceptions (HTTP 401)
     final linkException = exception.linkException;
     if (linkException is ServerException && linkException.parsedResponse?.response['status'] == 401) {
       return true;
     }
-    if (exception.toString().contains('401') || exception.toString().contains('UNAUTHENTICATED')) {
+    // Fallback: check raw exception string
+    final exStr = exception.toString().toLowerCase();
+    if (exStr.contains('401') || 
+        exStr.contains('unauthenticated') ||
+        exStr.contains('token has expired') ||
+        exStr.contains('token expired') ||
+        exStr.contains('jwt expired')) {
       return true;
     }
     return false;
   }
 
+  /// Attempts to refresh the auth token. Uses a mutex so only one refresh
+  /// runs at a time — concurrent callers wait for the same result.
   Future<bool> _tryRefresh() async {
     if (authService == null) return false;
 
+    // If a refresh is already in progress, wait for that one's result
+    if (_refreshFuture != null) {
+      return _refreshFuture!;
+    }
+
+    _refreshFuture = _doRefresh();
+    try {
+      return await _refreshFuture!;
+    } finally {
+      _refreshFuture = null;
+    }
+  }
+
+  Future<bool> _doRefresh() async {
     const storage = FlutterSecureStorage(
       aOptions: AndroidOptions(encryptedSharedPreferences: true),
     );
     final authMethod = await storage.read(key: 'auth_method') ?? 'api_key';
 
-    if (authMethod != 'email') return false; // Non fare refresh per le API key
+    if (authMethod != 'email') return false; // API keys don't need refresh
 
     final isSuccess = await authService!.refreshAccessToken();
     if (isSuccess) {
-      // Need to wait slightly for the client to pick up the new token from storage
-      // Wait, in TwentyConnector the client is instantiated once with the token.
-      // If we refresh the token in storage, the old client still has the old token in its headers.
-      // We need the AuthLink to dynamically read the token.
-      return true;
+      // Notify caller to invalidate any caches (e.g. StorageService in-memory cache)
+      onTokenRefreshed?.call();
     }
-    return false;
+    return isSuccess;
   }
 
   void _handleResultException(QueryResult result) {
@@ -130,6 +176,11 @@ class TwentyConnector implements CRMRepository {
         hint: Hint.withMap({'operation': result.context.toString()}),
       );
     } catch (_) {}
+
+    // Check if this is an auth error that survived the refresh attempt
+    if (_isUnauthenticated(exception)) {
+      throw Exception('Token has expired.');
+    }
 
     if (linkException != null) {
       final errorStr = linkException.toString();
@@ -1023,7 +1074,14 @@ class TwentyConnector implements CRMRepository {
           }
           orderBy: { dueAt: AscNullsLast }
         ) {
-          edges { node { id title status dueAt } }
+          edges { node { 
+            id title status dueAt 
+            taskTargets { edges { node {
+              targetPersonId targetPerson { id name { firstName lastName } }
+              targetCompanyId targetCompany { id name }
+              targetOpportunityId targetOpportunity { id name }
+            } } }
+          } }
         }
       }
     ''';
@@ -1072,7 +1130,14 @@ class TwentyConnector implements CRMRepository {
           }
           orderBy: { dueAt: AscNullsLast }
         ) {
-          edges { node { id title status dueAt } }
+          edges { node { 
+            id title status dueAt 
+            taskTargets { edges { node {
+              targetPersonId targetPerson { id name { firstName lastName } }
+              targetCompanyId targetCompany { id name }
+              targetOpportunityId targetOpportunity { id name }
+            } } }
+          } }
         }
       }
     ''';
@@ -1125,7 +1190,14 @@ class TwentyConnector implements CRMRepository {
           }
           orderBy: { dueAt: AscNullsLast }
         ) {
-          edges { node { id title status dueAt } }
+          edges { node { 
+            id title status dueAt 
+            taskTargets { edges { node {
+              targetPersonId targetPerson { id name { firstName lastName } }
+              targetCompanyId targetCompany { id name }
+              targetOpportunityId targetOpportunity { id name }
+            } } }
+          } }
         }
       }
     ''';
@@ -1194,6 +1266,11 @@ class TwentyConnector implements CRMRepository {
           edges {
             node {
               id title bodyV2 { blocknote } status dueAt createdAt
+              taskTargets { edges { node {
+                targetPersonId targetPerson { id name { firstName lastName } }
+                targetCompanyId targetCompany { id name }
+                targetOpportunityId targetOpportunity { id name }
+              } } }
             }
           }
         }

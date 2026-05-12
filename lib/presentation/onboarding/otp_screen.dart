@@ -114,7 +114,14 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
         title: const Text('Two-Factor Authentication'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () {
+            ref.read(authServiceProvider).clearPending2FA();
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              context.go('/onboarding/method');
+            }
+          },
         ),
       ),
       body: SafeArea(

@@ -16,6 +16,8 @@ import 'package:pocketcrm/presentation/shared/dialog_helper.dart';
 import 'package:pocketcrm/presentation/home/today_provider.dart';
 import 'package:pocketcrm/core/utils/demo_utils.dart';
 import 'package:pocketcrm/shared/widgets/constrained_content.dart';
+import 'package:pocketcrm/shared/widgets/task_card.dart';
+import 'package:pocketcrm/presentation/shared/error_state_widget.dart';
 
 class TasksScreen extends ConsumerStatefulWidget {
   const TasksScreen({super.key});
@@ -133,138 +135,33 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
                       builder: (context) => EditTaskSheet(task: task),
                     );
                   },
-                  child: Card(
-                    child: ListTile(
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                      leading: Transform.scale(
-                        scale: 1.2,
-                        child: Checkbox(
-                          value: task.completed,
-                          onChanged: (val) async {
-                            if (!await DemoUtils.checkDemoAction(context, ref)) return;
-                            if (val != null) {
-                              ref
-                                  .read(tasksProvider.notifier)
-                                  .updateTask(task.id, completed: val);
-
-                              if (context.mounted) {
-                                SnackbarHelper.showSuccess(
-                                  context,
-                                  val ? 'Task completed' : 'Task restored',
-                                );
-                              }
-                            }
-                          },
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                  child: TaskCard(
+                    task: task,
+                    onTap: () {
+                      showModalBottomSheet(
+                        context: context,
+                        isScrollControlled: true,
+                        shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
                         ),
-                      ),
-                      title: AnimatedDefaultTextStyle(
-                        duration: const Duration(milliseconds: 300),
-                        style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                          decoration: task.completed == true
-                              ? TextDecoration.lineThrough
-                              : null,
-                          color: task.completed == true
-                              ? Theme.of(context).textTheme.bodySmall?.color
-                              : Theme.of(context).textTheme.titleMedium?.color,
-                        ),
-                        child: Text(task.title),
-                      ),
-                      subtitle: Padding(
-                        padding: const EdgeInsets.only(top: 4.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Builder(
-                              builder: (context) {
-                                if (task.dueAt == null) {
-                                  return Text('No deadline', style: Theme.of(context).textTheme.bodySmall);
-                                }
+                        builder: (context) => EditTaskSheet(task: task),
+                      );
+                    },
+                    onToggleCompletion: (val) async {
+                      if (!await DemoUtils.checkDemoAction(context, ref)) return;
+                      if (val != null) {
+                        ref
+                            .read(tasksProvider.notifier)
+                            .updateTask(task.id, completed: val);
 
-                                Color? dateColor = Theme.of(context).textTheme.bodySmall?.color;
-                                FontWeight? dateWeight = FontWeight.w400;
-
-                                final now = DateTime.now();
-                                final today = DateTime(now.year, now.month, now.day);
-                                final dueDate = task.dueAt!.toLocal();
-                                final dueDay = DateTime(dueDate.year, dueDate.month, dueDate.day);
-                                final hasTime = dueDate.hour != 0 || dueDate.minute != 0;
-
-                                if (task.completed != true) {
-                                  final difference = dueDay.difference(today).inDays;
-
-                                  if (difference < 0 || (difference == 0 && hasTime && dueDate.isBefore(now))) {
-                                    dateColor = Theme.of(context).colorScheme.error; // Overdue or today past
-                                    dateWeight = FontWeight.w600;
-                                  } else if (difference == 0 && !hasTime) {
-                                     dateColor = Theme.of(context).colorScheme.error; // Today, overdue today
-                                     dateWeight = FontWeight.w600;
-                                  } else if (difference <= 3) {
-                                    dateColor = Colors.orange.shade700; // Next 3 days
-                                  }
-                                }
-
-                                String dateStr;
-                                final diffDays = dueDay.difference(today).inDays;
-                                if (diffDays == 0) dateStr = 'Today';
-                                else if (diffDays == 1) dateStr = 'Tomorrow';
-                                else dateStr = '${dueDate.day.toString().padLeft(2, '0')}/${dueDate.month.toString().padLeft(2, '0')}';
-
-                                final timeStr = hasTime ? ' · ${dueDate.hour.toString().padLeft(2, '0')}:${dueDate.minute.toString().padLeft(2, '0')}' : '';
-
-                                return FutureBuilder<SharedPreferences>(
-                                  future: SharedPreferences.getInstance(),
-                                  builder: (context, snapshot) {
-                                    bool hasNotification = false;
-                                    if (snapshot.hasData) {
-                                      hasNotification = snapshot.data!.getBool('task_notif_${task.id}') ?? true;
-                                    }
-
-                                    return Row(
-                                      children: [
-                                        Icon(Icons.calendar_today, size: 14, color: task.completed == true ? Theme.of(context).textTheme.bodySmall?.color : dateColor),
-                                        const SizedBox(width: 4),
-                                        Text(
-                                          '$dateStr$timeStr',
-                                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                            color: task.completed == true ? Theme.of(context).textTheme.bodySmall?.color : dateColor,
-                                            fontWeight: task.completed == true ? FontWeight.w400 : dateWeight,
-                                          ),
-                                        ),
-                                        if (hasTime && hasNotification) ...[
-                                          const SizedBox(width: 4),
-                                          Icon(
-                                            Icons.notifications_active,
-                                            size: 12,
-                                            color: task.completed == true ? Theme.of(context).textTheme.bodySmall?.color : dateColor,
-                                          ),
-                                        ],
-                                      ],
-                                    );
-                                  }
-                                );
-                              }
-                            ),
-                            const SizedBox(height: 6),
-                            LinkedContactsWidget(
-                              entityId: task.id,
-                              type: LinkedContactType.task,
-                              isCompact: true,
-                            ),
-                          ],
-                        ),
-                      ),
-                      onTap: () {
-                        showModalBottomSheet(
-                          context: context,
-                          isScrollControlled: true,
-                          shape: const RoundedRectangleBorder(
-                            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-                          ),
-                          builder: (context) => EditTaskSheet(task: task),
-                        );
-                      },
-                    ),
+                        if (context.mounted) {
+                          SnackbarHelper.showSuccess(
+                            context,
+                            val ? 'Task completed' : 'Task restored',
+                          );
+                        }
+                      }
+                    },
                   ),
                 );
               },
@@ -272,7 +169,13 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
           );
         },
         loading: () => const ListSkeleton(),
-        error: (err, stack) => Center(child: Text('Error: $err')),
+        error: (err, stack) => ErrorStateWidget(
+          title: 'Loading error',
+          message: err.toString().replaceAll('Exception: ', ''),
+          onRetry: () {
+            ref.invalidate(tasksProvider);
+          },
+        ),
       )),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
@@ -557,6 +460,7 @@ class EditTaskSheetState extends ConsumerState<EditTaskSheet> {
   final _formKey = GlobalKey<FormState>();
   DateTime? _selectedDueDate;
   String? _selectedAssigneeId;
+  String? _selectedContactId;
   
   bool _notifyReminder = true;
   bool _isLoading = false;
@@ -569,6 +473,7 @@ class EditTaskSheetState extends ConsumerState<EditTaskSheet> {
     _bodyController = TextEditingController(text: _extractPlainText(widget.task.body));
     _selectedDueDate = widget.task.dueAt?.toLocal();
     _selectedAssigneeId = widget.task.assigneeId;
+    _selectedContactId = widget.task.contactId;
     _loadNotificationPreference();
   }
 
@@ -691,6 +596,36 @@ class EditTaskSheetState extends ConsumerState<EditTaskSheet> {
                 minLines: 1,
                 enabled: !_isLoading,
               ),
+              if (widget.task.contactName != null) ...[
+                const SizedBox(height: 16),
+                Text('Linked to', style: Theme.of(context).textTheme.bodySmall),
+                const SizedBox(height: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Theme.of(context).dividerColor),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        widget.task.targetType == 'opportunity' ? Icons.monetization_on_outlined : 
+                        widget.task.targetType == 'company' ? Icons.business : Icons.person_outline,
+                        size: 20,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          widget.task.contactName!,
+                          style: const TextStyle(fontWeight: FontWeight.w500),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
               authMethodAsync.when(
                 data: (method) {
                   if (method == 'api_key') {

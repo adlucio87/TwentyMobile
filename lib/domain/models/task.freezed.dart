@@ -28,6 +28,7 @@ mixin _$Task {
   DateTime? get dueAt => throw _privateConstructorUsedError;
   String? get contactId => throw _privateConstructorUsedError;
   String? get contactName => throw _privateConstructorUsedError;
+  String? get targetType => throw _privateConstructorUsedError;
   String? get assigneeId => throw _privateConstructorUsedError;
   DateTime? get createdAt => throw _privateConstructorUsedError;
 
@@ -53,6 +54,7 @@ abstract class $TaskCopyWith<$Res> {
     DateTime? dueAt,
     String? contactId,
     String? contactName,
+    String? targetType,
     String? assigneeId,
     DateTime? createdAt,
   });
@@ -80,6 +82,7 @@ class _$TaskCopyWithImpl<$Res, $Val extends Task>
     Object? dueAt = freezed,
     Object? contactId = freezed,
     Object? contactName = freezed,
+    Object? targetType = freezed,
     Object? assigneeId = freezed,
     Object? createdAt = freezed,
   }) {
@@ -113,6 +116,10 @@ class _$TaskCopyWithImpl<$Res, $Val extends Task>
                 ? _value.contactName
                 : contactName // ignore: cast_nullable_to_non_nullable
                       as String?,
+            targetType: freezed == targetType
+                ? _value.targetType
+                : targetType // ignore: cast_nullable_to_non_nullable
+                      as String?,
             assigneeId: freezed == assigneeId
                 ? _value.assigneeId
                 : assigneeId // ignore: cast_nullable_to_non_nullable
@@ -143,6 +150,7 @@ abstract class _$$TaskImplCopyWith<$Res> implements $TaskCopyWith<$Res> {
     DateTime? dueAt,
     String? contactId,
     String? contactName,
+    String? targetType,
     String? assigneeId,
     DateTime? createdAt,
   });
@@ -167,6 +175,7 @@ class __$$TaskImplCopyWithImpl<$Res>
     Object? dueAt = freezed,
     Object? contactId = freezed,
     Object? contactName = freezed,
+    Object? targetType = freezed,
     Object? assigneeId = freezed,
     Object? createdAt = freezed,
   }) {
@@ -200,6 +209,10 @@ class __$$TaskImplCopyWithImpl<$Res>
             ? _value.contactName
             : contactName // ignore: cast_nullable_to_non_nullable
                   as String?,
+        targetType: freezed == targetType
+            ? _value.targetType
+            : targetType // ignore: cast_nullable_to_non_nullable
+                  as String?,
         assigneeId: freezed == assigneeId
             ? _value.assigneeId
             : assigneeId // ignore: cast_nullable_to_non_nullable
@@ -224,6 +237,7 @@ class _$TaskImpl implements _Task {
     this.dueAt,
     this.contactId,
     this.contactName,
+    this.targetType,
     this.assigneeId,
     this.createdAt,
   });
@@ -246,13 +260,15 @@ class _$TaskImpl implements _Task {
   @override
   final String? contactName;
   @override
+  final String? targetType;
+  @override
   final String? assigneeId;
   @override
   final DateTime? createdAt;
 
   @override
   String toString() {
-    return 'Task(id: $id, title: $title, body: $body, completed: $completed, dueAt: $dueAt, contactId: $contactId, contactName: $contactName, assigneeId: $assigneeId, createdAt: $createdAt)';
+    return 'Task(id: $id, title: $title, body: $body, completed: $completed, dueAt: $dueAt, contactId: $contactId, contactName: $contactName, targetType: $targetType, assigneeId: $assigneeId, createdAt: $createdAt)';
   }
 
   @override
@@ -270,6 +286,8 @@ class _$TaskImpl implements _Task {
                 other.contactId == contactId) &&
             (identical(other.contactName, contactName) ||
                 other.contactName == contactName) &&
+            (identical(other.targetType, targetType) ||
+                other.targetType == targetType) &&
             (identical(other.assigneeId, assigneeId) ||
                 other.assigneeId == assigneeId) &&
             (identical(other.createdAt, createdAt) ||
@@ -287,6 +305,7 @@ class _$TaskImpl implements _Task {
     dueAt,
     contactId,
     contactName,
+    targetType,
     assigneeId,
     createdAt,
   );
@@ -314,6 +333,7 @@ abstract class _Task implements Task {
     final DateTime? dueAt,
     final String? contactId,
     final String? contactName,
+    final String? targetType,
     final String? assigneeId,
     final DateTime? createdAt,
   }) = _$TaskImpl;
@@ -334,6 +354,8 @@ abstract class _Task implements Task {
   String? get contactId;
   @override
   String? get contactName;
+  @override
+  String? get targetType;
   @override
   String? get assigneeId;
   @override

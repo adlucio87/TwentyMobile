@@ -29,6 +29,8 @@ class TodayNotifier extends _$TodayNotifier {
     final List<Task> todayTasks = [];
     final List<Task> tomorrowTasks = [];
     final List<Contact> recentContacts = [];
+    int authErrors = 0;
+    String? lastAuthError;
 
     try {
       print('>>> [1/4] TEST: Fetching overdueTasks...');
@@ -37,6 +39,7 @@ class TodayNotifier extends _$TodayNotifier {
       print('>>> [1/4] SUCCESS: overdueTasks');
     } catch (e) {
       print('>>> [1/4] ERROR: overdueTasks failed: $e');
+      if (_isTokenError(e)) { authErrors++; lastAuthError = e.toString(); }
     }
 
     try {
@@ -46,6 +49,7 @@ class TodayNotifier extends _$TodayNotifier {
       print('>>> [2/4] SUCCESS: todayTasks');
     } catch (e) {
       print('>>> [2/4] ERROR: todayTasks failed: $e');
+      if (_isTokenError(e)) { authErrors++; lastAuthError = e.toString(); }
     }
 
     try {
@@ -55,6 +59,7 @@ class TodayNotifier extends _$TodayNotifier {
       print('>>> [3/4] SUCCESS: tomorrowTasks');
     } catch (e) {
       print('>>> [3/4] ERROR: tomorrowTasks failed: $e');
+      if (_isTokenError(e)) { authErrors++; lastAuthError = e.toString(); }
     }
 
     try {
@@ -64,6 +69,12 @@ class TodayNotifier extends _$TodayNotifier {
       print('>>> [4/4] SUCCESS: recentContacts');
     } catch (e) {
       print('>>> [4/4] ERROR: recentContacts failed: $e');
+      if (_isTokenError(e)) { authErrors++; lastAuthError = e.toString(); }
+    }
+
+    // If ALL calls failed due to auth, propagate the error so the UI can show it
+    if (authErrors == 4 && lastAuthError != null) {
+      throw Exception(lastAuthError);
     }
 
     return TodayData(
@@ -72,6 +83,14 @@ class TodayNotifier extends _$TodayNotifier {
       tomorrowTasks: tomorrowTasks,
       recentContacts: recentContacts,
     );
+  }
+
+  bool _isTokenError(Object e) {
+    final msg = e.toString().toLowerCase();
+    return msg.contains('token has expired') ||
+        msg.contains('token expired') ||
+        msg.contains('unauthenticated') ||
+        msg.contains('session expired');
   }
 
   Future<void> completeTask(String taskId) async {

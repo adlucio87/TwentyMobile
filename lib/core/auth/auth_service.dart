@@ -9,6 +9,10 @@ import 'package:pocketcrm/data/graphql/auth_mutations.dart';
 class AuthService {
   final FlutterSecureStorage _storage;
 
+  /// Mutex for refresh — prevents concurrent refresh attempts from
+  /// different callers (lifecycle handler, connector, router).
+  Future<bool>? _refreshFuture;
+
   AuthService(this._storage);
 
   Future<void> loginWithCredentials(
@@ -136,6 +140,8 @@ class AuthService {
     await _storage.write(key: 'refresh_token', value: refreshToken);
     await _storage.write(key: 'token_expires_at', value: expiresAt);
     await _storage.write(key: 'auth_method', value: 'email');
+    await _storage.write(key: 'auth_email', value: email);
+    await _storage.write(key: 'auth_password', value: password);
     await _storage.write(key: 'user_first_name', value: userFirstName);
     await _storage.write(key: 'user_last_name', value: userLastName);
 
@@ -217,6 +223,7 @@ class AuthService {
     await _storage.write(key: 'auth_method', value: 'email');
     await _storage.write(key: 'user_first_name', value: userFirstName);
     await _storage.write(key: 'user_last_name', value: userLastName);
+    await _storage.delete(key: 'pending_2fa_login_token');
 
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('token_expires_at', expiresAt);
@@ -228,6 +235,19 @@ class AuthService {
   }
 
   Future<bool> refreshAccessToken() async {
+    // If a refresh is already in progress, wait for that one's result
+    if (_refreshFuture != null) {
+      return _refreshFuture!;
+    }
+    _refreshFuture = _doRefreshAccessToken();
+    try {
+      return await _refreshFuture!;
+    } finally {
+      _refreshFuture = null;
+    }
+  }
+
+  Future<bool> _doRefreshAccessToken() async {
     final instanceUrl = await _storage.read(key: 'instance_url');
     final refreshToken = await _storage.read(key: 'refresh_token');
 
@@ -247,16 +267,29 @@ class AuthService {
 
     final result = await client.mutate(options);
 
-    if (result.hasException) {
-      await logout();
-      return false;
+    bool fallbackRequired = result.hasException || result.data?['renewToken'] == null;
+
+    if (fallbackRequired) {
+      final email = await _storage.read(key: 'auth_email');
+      final password = await _storage.read(key: 'auth_password');
+      if (email != null && password != null) {
+        try {
+          await loginWithCredentials(instanceUrl, email, password);
+          return true;
+        } on TwoFactorRequiredException catch (e) {
+          await _storage.write(key: 'pending_2fa_login_token', value: e.loginToken);
+          return false;
+        } catch (_) {
+          await logout();
+          return false;
+        }
+      } else {
+        await logout();
+        return false;
+      }
     }
 
     final data = result.data?['renewToken'];
-    if (data == null) {
-      await logout();
-      return false;
-    }
 
     final tokens = data['tokens'];
     final newAccessToken = tokens['accessOrWorkspaceAgnosticToken']['token'] as String;
@@ -286,14 +319,21 @@ class AuthService {
     return DateTime.now().toUtc().add(const Duration(minutes: 5)).isAfter(expiresAt);
   }
 
+  Future<void> clearPending2FA() async {
+    await _storage.delete(key: 'pending_2fa_login_token');
+  }
+
   Future<void> logout() async {
     await _storage.delete(key: 'api_token');
     await _storage.delete(key: 'refresh_token');
     await _storage.delete(key: 'token_expires_at');
     await _storage.delete(key: 'auth_method');
+    await _storage.delete(key: 'auth_email');
+    await _storage.delete(key: 'auth_password');
     await _storage.delete(key: 'user_first_name');
     await _storage.delete(key: 'user_last_name');
     await _storage.delete(key: 'is_demo_mode');
+    await _storage.delete(key: 'pending_2fa_login_token');
 
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('token_expires_at');

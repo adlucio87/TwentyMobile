@@ -9,6 +9,7 @@ import 'package:pocketcrm/core/di/providers.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:pocketcrm/core/notifications/notification_service.dart';
+import 'package:pocketcrm/core/auth/app_lifecycle_handler.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:pocketcrm/core/config/app_config.dart';
@@ -79,11 +80,35 @@ Future<void> main() async {
   );
 }
 
-class PocketCRMApp extends ConsumerWidget {
+class PocketCRMApp extends ConsumerStatefulWidget {
   const PocketCRMApp({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<PocketCRMApp> createState() => _PocketCRMAppState();
+}
+
+class _PocketCRMAppState extends ConsumerState<PocketCRMApp> {
+  AppLifecycleHandler? _lifecycleHandler;
+
+  @override
+  void initState() {
+    super.initState();
+    // Defer lifecycle handler registration to after the first frame,
+    // so that all providers are available.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _lifecycleHandler = AppLifecycleHandler(ref);
+      _lifecycleHandler!.register();
+    });
+  }
+
+  @override
+  void dispose() {
+    _lifecycleHandler?.unregister();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final router = ref.watch(appRouterProvider);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {

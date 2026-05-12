@@ -13,6 +13,7 @@ class Task with _$Task {
     DateTime? dueAt,
     String? contactId,
     String? contactName,
+    String? targetType,
     String? assigneeId,
     DateTime? createdAt,
   }) = _Task;
@@ -38,6 +39,7 @@ class Task with _$Task {
 
     String? contactId;
     String? contactName;
+    String? targetType;
 
     final taskTargets = json['taskTargets'];
     if (taskTargets != null && taskTargets['edges'] != null) {
@@ -45,14 +47,38 @@ class Task with _$Task {
       if (edges.isNotEmpty) {
         final node = edges.first['node'];
         if (node != null) {
-          contactId = node['personId'];
-          final person = node['person'];
-          if (person != null && person['name'] != null) {
-            final name = person['name'];
-            final firstName = name['firstName'] ?? '';
-            final lastName = name['lastName'] ?? '';
-            if (firstName.isNotEmpty || lastName.isNotEmpty) {
-              contactName = '$firstName $lastName'.trim();
+          if (node['targetPerson'] != null) {
+            targetType = 'person';
+            contactId = node['targetPersonId'] ?? node['targetPerson']['id'];
+            final person = node['targetPerson'];
+            if (person['name'] != null) {
+              final name = person['name'];
+              final firstName = name['firstName'] ?? '';
+              final lastName = name['lastName'] ?? '';
+              if (firstName.isNotEmpty || lastName.isNotEmpty) {
+                contactName = '$firstName $lastName'.trim();
+              }
+            }
+          } else if (node['targetCompany'] != null) {
+            targetType = 'company';
+            contactId = node['targetCompanyId'] ?? node['targetCompany']['id'];
+            contactName = node['targetCompany']['name'];
+          } else if (node['targetOpportunity'] != null) {
+            targetType = 'opportunity';
+            contactId = node['targetOpportunityId'] ?? node['targetOpportunity']['id'];
+            contactName = node['targetOpportunity']['name'];
+          } else if (node['person'] != null) {
+            targetType = 'person';
+            // Fallback for older queries
+            contactId = node['personId'] ?? node['person']['id'];
+            final person = node['person'];
+            if (person['name'] != null) {
+              final name = person['name'];
+              final firstName = name['firstName'] ?? '';
+              final lastName = name['lastName'] ?? '';
+              if (firstName.isNotEmpty || lastName.isNotEmpty) {
+                contactName = '$firstName $lastName'.trim();
+              }
             }
           }
         }
@@ -67,6 +93,7 @@ class Task with _$Task {
       dueAt: json['dueAt'] != null ? DateTime.parse(json['dueAt']) : null,
       contactId: contactId,
       contactName: contactName,
+      targetType: targetType,
       assigneeId: json['assigneeId'],
       createdAt: json['createdAt'] != null
           ? DateTime.parse(json['createdAt'])
