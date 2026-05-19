@@ -23,8 +23,6 @@ class TodayNotifier extends _$TodayNotifier {
     final startOfTomorrow = endOfToday;
     final endOfTomorrow = startOfTomorrow.add(const Duration(days: 1));
 
-    // Isoliamo ogni chiamata con un try/catch per capire ESATTAMENTE
-    // quale query fa arrabbiare il complexity limiter di Twenty.
     final List<Task> overdueTasks = [];
     final List<Task> todayTasks = [];
     final List<Task> tomorrowTasks = [];
@@ -32,45 +30,31 @@ class TodayNotifier extends _$TodayNotifier {
     int authErrors = 0;
     String? lastAuthError;
 
-    try {
-      print('>>> [1/4] TEST: Fetching overdueTasks...');
-      final res = await repo.getOverdueTasks();
-      overdueTasks.addAll(res);
-      print('>>> [1/4] SUCCESS: overdueTasks');
-    } catch (e) {
-      print('>>> [1/4] ERROR: overdueTasks failed: $e');
-      if (_isTokenError(e)) { authErrors++; lastAuthError = e.toString(); }
+    void handleError(Object e) {
+      if (_isTokenError(e)) {
+        authErrors++;
+        lastAuthError = e.toString();
+      }
     }
 
-    try {
-      print('>>> [2/4] TEST: Fetching todayTasks...');
-      final res = await repo.getTodayTasks();
-      todayTasks.addAll(res);
-      print('>>> [2/4] SUCCESS: todayTasks');
-    } catch (e) {
-      print('>>> [2/4] ERROR: todayTasks failed: $e');
-      if (_isTokenError(e)) { authErrors++; lastAuthError = e.toString(); }
-    }
-
-    try {
-      print('>>> [3/4] TEST: Fetching tomorrowTasks...');
-      final res = await repo.getTomorrowTasks();
-      tomorrowTasks.addAll(res);
-      print('>>> [3/4] SUCCESS: tomorrowTasks');
-    } catch (e) {
-      print('>>> [3/4] ERROR: tomorrowTasks failed: $e');
-      if (_isTokenError(e)) { authErrors++; lastAuthError = e.toString(); }
-    }
-
-    try {
-      print('>>> [4/4] TEST: Fetching recentContacts...');
-      final res = await repo.getRecentContacts(limit: 5);
-      recentContacts.addAll(res);
-      print('>>> [4/4] SUCCESS: recentContacts');
-    } catch (e) {
-      print('>>> [4/4] ERROR: recentContacts failed: $e');
-      if (_isTokenError(e)) { authErrors++; lastAuthError = e.toString(); }
-    }
+    await Future.wait([
+      repo.getOverdueTasks().then(overdueTasks.addAll).catchError((e) {
+        print('>>> [1/4] ERROR: overdueTasks failed: $e');
+        handleError(e);
+      }),
+      repo.getTodayTasks().then(todayTasks.addAll).catchError((e) {
+        print('>>> [2/4] ERROR: todayTasks failed: $e');
+        handleError(e);
+      }),
+      repo.getTomorrowTasks().then(tomorrowTasks.addAll).catchError((e) {
+        print('>>> [3/4] ERROR: tomorrowTasks failed: $e');
+        handleError(e);
+      }),
+      repo.getRecentContacts(limit: 5).then(recentContacts.addAll).catchError((e) {
+        print('>>> [4/4] ERROR: recentContacts failed: $e');
+        handleError(e);
+      }),
+    ]);
 
     // If ALL calls failed due to auth, propagate the error so the UI can show it
     if (authErrors == 4 && lastAuthError != null) {

@@ -1071,6 +1071,7 @@ class TwentyConnector implements CRMRepository {
         '''
       query GetOverdueTasks {
         tasks(
+          first: 20
           filter: {
             and: [
               ${conditions.join('\n              ')}
@@ -1127,6 +1128,7 @@ class TwentyConnector implements CRMRepository {
         '''
       query GetTodayTasks {
         tasks(
+          first: 20
           filter: {
             and: [
               ${conditions.join('\n              ')}
@@ -1187,6 +1189,7 @@ class TwentyConnector implements CRMRepository {
         '''
       query GetTomorrowTasks {
         tasks(
+          first: 20
           filter: {
             and: [
               ${conditions.join('\n              ')}
