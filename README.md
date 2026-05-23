@@ -32,10 +32,35 @@ TwentyMobile is a native mobile application developed with **Flutter** that serv
   - **Task Assignment:** Support for assigning tasks to specific workspace members (automatic for email login, manual via dropdown for admins).
   - Scheduling with due dates.
   - Advanced notification system (local push notifications) to remind about upcoming or overdue tasks.
+- **Manual Workflows:**
+  - Fast execution of manual workflows directly from Contact and Company detail views via a quick action (⚡ *bolt icon*) in the AppBar.
+  - Multi-step interactive flow (**Bottom Sheet**) including active workflow selection, real-time loading (shimmer effect), and empty state.
+  - **Dynamic Input Forms:** Automatically renders input fields based on workflow schema constraints, with support for types such as `TEXT`, `NUMBER`, `SELECT` (dropdown), and `BOOLEAN` (switch).
+  - Premium **Slide-to-Execute** confirmation button with anti-fat-finger threshold, linear haptic feedback progress, and shake feedback animation on errors.
 - **UI/UX & Localization:**
   - Configuration and onboarding interface entirely in **English**.
   - Robust adaptive layouts for software keyboard handling (preventing unintended rebuilds and text selections).
   - Automatic cache invalidation on user change to ensure the integrity of displayed data.
+
+## ⚡ Workflow Integration & Requirements
+
+PocketCRM supports running Twenty CRM manual workflows directly from the contact or company detail views. To use this feature successfully, please review the requirements and limitations below:
+
+### 🔑 Authentication Requirement
+* **Email & Password Login Required:** To execute workflows, you **must log in using your admin Email and Password** (which generates a JWT token).
+* **API Key Limitation:** Using a Twenty API Key (even with full Admin permissions) will result in a `FORBIDDEN` (403) resource error from the Twenty GraphQL endpoint when attempting to trigger a workflow. This is an upstream limitation of the Twenty API.
+
+### 📋 Supported Workflows & Triggers
+* **Trigger Type:** Only workflows with a **Manual** trigger type set to `ACTIVE` will be displayed.
+* **Entity-Specific Filtering:** 
+  * Workflows configured for the `Company` entity (or with `availability.objectNameSingular` set to `company`) will appear on the **Company Details** screen.
+  * Workflows configured for the `Person`/`People` entity (or with `availability.objectNameSingular` set to `person`/`contact`) will appear on the **Contact Details** screen.
+  * Workflows configured as `GLOBAL` (no specific entity target) will be available on both detail screens.
+
+### ⚠️ Interactive Form/Input Steps Limitation
+* **Non-Interactive Workflows Only:** Workflows should be designed to execute fully automated backend actions (e.g., sending HTTP requests, updating database records, sending Slack notifications).
+* **Interactive Steps Do Not Work:** Workflows that contain standard **web-based Form / interactive steps** (where Twenty expects a user to fill in text or press a button inside the Twenty web app during execution) **will hang in the `running` state** indefinitely when triggered via the API.
+* **PocketCRM Warning:** PocketCRM automatically detects workflows containing web-based form steps and displays a warning badge: `⚠ Contains form step (may require web app)`.
 
 ## 🏛 Architecture and Project Structure
 
@@ -47,7 +72,7 @@ The structure inside `lib/` is organized by feature:
 ```text
 lib/
 ├── core/                           # Global dependency injection (Riverpod), Router, Theme, Utils, Notifications
-├── domain/                         # Core data models (Contact, Company, Note, Task), Repository interfaces
+├── domain/                         # Core data models (Contact, Company, Note, Task, Workflow), Repository interfaces
 ├── data/                           # GraphQL implementation (TwentyConnector), local storage Hive/SecureStorage
 ├── presentation/                   # UI Layer (Feature-First)
 │   ├── onboarding/                 # Initial setup and Demo access
@@ -57,7 +82,8 @@ lib/
 │   ├── companies/                  # Company module
 │   ├── scan/                       # Business card scanner
 │   ├── notes/                      # Text notes module
-│   └── tasks/                      # Tasks module
+│   ├── tasks/                      # Tasks module
+│   └── workflows/                  # Manual Workflows module (lists, dynamic forms, slide-to-confirm)
 └── shared/                         # Aesthetic widgets and cross-feature components (e.g., Demo block)
 ```
 

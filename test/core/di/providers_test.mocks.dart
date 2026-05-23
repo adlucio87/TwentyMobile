@@ -11,6 +11,8 @@ import 'package:pocketcrm/domain/models/company.dart' as _i3;
 import 'package:pocketcrm/domain/models/contact.dart' as _i2;
 import 'package:pocketcrm/domain/models/note.dart' as _i4;
 import 'package:pocketcrm/domain/models/task.dart' as _i5;
+import 'package:pocketcrm/domain/models/workflow.dart' as _i10;
+import 'package:pocketcrm/domain/models/workflow_run.dart' as _i11;
 import 'package:pocketcrm/domain/models/workspace_member.dart' as _i9;
 import 'package:pocketcrm/domain/repositories/crm_repository.dart' as _i6;
 
@@ -633,4 +635,60 @@ class MockCRMRepository extends _i1.Mock implements _i6.CRMRepository {
             ),
           )
           as _i7.Future<List<_i2.Contact>>);
+
+  @override
+  _i7.Future<List<_i10.Workflow>> getManualWorkflows({
+    required String? objectType,
+  }) =>
+      (super.noSuchMethod(
+            Invocation.method(#getManualWorkflows, [], {
+              #objectType: objectType,
+            }),
+            returnValue: _i7.Future<List<_i10.Workflow>>.value(
+              <_i10.Workflow>[],
+            ),
+            returnValueForMissingStub: _i7.Future<List<_i10.Workflow>>.value(
+              <_i10.Workflow>[],
+            ),
+          )
+          as _i7.Future<List<_i10.Workflow>>);
+
+  @override
+  _i7.Future<({String? error, bool success, String? workflowRunId})>
+  triggerWorkflow({
+    required String? workflowId,
+    required String? recordId,
+    Map<String, dynamic>? payload,
+  }) =>
+      (super.noSuchMethod(
+            Invocation.method(#triggerWorkflow, [], {
+              #workflowId: workflowId,
+              #recordId: recordId,
+              #payload: payload,
+            }),
+            returnValue:
+                _i7.Future<
+                  ({String? error, bool success, String? workflowRunId})
+                >.value((error: null, success: false, workflowRunId: null)),
+            returnValueForMissingStub:
+                _i7.Future<
+                  ({String? error, bool success, String? workflowRunId})
+                >.value((error: null, success: false, workflowRunId: null)),
+          )
+          as _i7.Future<
+            ({String? error, bool success, String? workflowRunId})
+          >);
+
+  @override
+  _i7.Future<List<_i11.WorkflowRun>> getWorkflowRuns() =>
+      (super.noSuchMethod(
+            Invocation.method(#getWorkflowRuns, []),
+            returnValue: _i7.Future<List<_i11.WorkflowRun>>.value(
+              <_i11.WorkflowRun>[],
+            ),
+            returnValueForMissingStub: _i7.Future<List<_i11.WorkflowRun>>.value(
+              <_i11.WorkflowRun>[],
+            ),
+          )
+          as _i7.Future<List<_i11.WorkflowRun>>);
 }

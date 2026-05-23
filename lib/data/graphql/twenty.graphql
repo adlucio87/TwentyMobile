@@ -112,3 +112,33 @@ mutation UpdateTask($id: UUID!, $input: TaskUpdateInput!) {
 mutation CreateTaskTarget($input: TaskTargetCreateInput!) {
   createTaskTarget(data: $input) { id }
 }
+
+# Workflow manuali
+query GetManualWorkflows {
+  workflows(
+    filter: { statuses: { containsAny: [ACTIVE] } }
+  ) {
+    edges {
+      node {
+        id
+        name
+        versions(filter: { status: { eq: ACTIVE } }) {
+          edges {
+            node {
+              id
+              trigger
+              steps
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+# Esecuzione workflow
+mutation RunWorkflowVersion($input: RunWorkflowVersionInput!) {
+  runWorkflowVersion(input: $input) {
+    workflowRunId
+  }
+}

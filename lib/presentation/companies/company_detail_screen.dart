@@ -13,6 +13,7 @@ import 'package:pocketcrm/core/utils/demo_utils.dart';
 import 'package:pocketcrm/presentation/shared/dialog_helper.dart';
 import 'package:pocketcrm/presentation/companies/companies_screen.dart';
 import 'package:pocketcrm/shared/widgets/constrained_content.dart';
+import 'package:pocketcrm/presentation/workflows/workflow_action_button.dart';
 
 class CompanyDetailScreen extends ConsumerStatefulWidget {
   final String id;
@@ -32,6 +33,11 @@ class _CompanyDetailScreenState extends ConsumerState<CompanyDetailScreen> {
       appBar: AppBar(
         title: const Text('Company Details'),
         actions: [
+          if (detailAsync.hasValue)
+            WorkflowActionButton(
+              objectType: 'company',
+              recordId: widget.id,
+            ),
           if (detailAsync.hasValue)
             IconButton(
               icon: const Icon(Icons.edit),

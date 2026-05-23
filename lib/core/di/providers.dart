@@ -8,6 +8,8 @@ import 'package:pocketcrm/domain/models/company.dart';
 import 'package:pocketcrm/domain/models/contact.dart';
 import 'package:pocketcrm/domain/models/note.dart';
 import 'package:pocketcrm/domain/models/task.dart';
+import 'package:pocketcrm/domain/models/workflow.dart';
+import 'package:pocketcrm/domain/models/workflow_run.dart';
 import 'package:pocketcrm/domain/models/workspace_member.dart';
 import 'package:pocketcrm/core/auth/auth_service.dart';
 import 'package:pocketcrm/domain/repositories/crm_repository.dart';
@@ -713,5 +715,37 @@ class Tasks extends _$Tasks {
       }
       rethrow;
     }
+  }
+}
+
+// ──────────────────────────────────────────────────────────────────────────────
+// Workflow providers
+// ──────────────────────────────────────────────────────────────────────────────
+
+@riverpod
+class ManualWorkflows extends _$ManualWorkflows {
+  @override
+  FutureOr<List<Workflow>> build(String objectType) async {
+    final repo = await ref.watch(crmRepositoryProvider.future);
+    return repo.getManualWorkflows(objectType: objectType);
+  }
+
+  /// Force refresh of the workflows list.
+  Future<void> refresh() async {
+    ref.invalidateSelf();
+  }
+}
+
+@riverpod
+class WorkflowRunsList extends _$WorkflowRunsList {
+  @override
+  FutureOr<List<WorkflowRun>> build() async {
+    final repo = await ref.watch(crmRepositoryProvider.future);
+    return repo.getWorkflowRuns();
+  }
+
+  /// Force refresh of the workflow runs list.
+  Future<void> refresh() async {
+    ref.invalidateSelf();
   }
 }

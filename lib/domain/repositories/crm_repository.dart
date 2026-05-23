@@ -2,6 +2,8 @@ import 'package:pocketcrm/domain/models/company.dart';
 import 'package:pocketcrm/domain/models/contact.dart';
 import 'package:pocketcrm/domain/models/note.dart';
 import 'package:pocketcrm/domain/models/task.dart';
+import 'package:pocketcrm/domain/models/workflow.dart';
+import 'package:pocketcrm/domain/models/workflow_run.dart';
 import 'package:pocketcrm/domain/models/workspace_member.dart';
 
 abstract class CRMRepository {
@@ -74,4 +76,13 @@ abstract class CRMRepository {
 
   // Today screen queries
   Future<List<Contact>> getRecentContacts({int limit = 5});
+
+  // Workflows
+  Future<List<Workflow>> getManualWorkflows({required String objectType});
+  Future<({bool success, String? workflowRunId, String? error})> triggerWorkflow({
+    required String workflowId,
+    required String recordId,
+    Map<String, dynamic>? payload,
+  });
+  Future<List<WorkflowRun>> getWorkflowRuns();
 }

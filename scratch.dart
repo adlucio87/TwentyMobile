@@ -1,15 +1,9 @@
-import 'dart:async';
-void main() async {
-  try {
-    await Future.delayed(Duration(seconds: 10)).timeout(Duration(seconds: 5));
-  } catch (e) {
-    print("Future timeout: $e");
-  }
+import 'dart:io';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
-  try {
-    final stream = StreamController<int>().stream;
-    await stream.timeout(Duration(seconds: 5)).first;
-  } catch (e) {
-    print("Stream timeout: $e");
-  }
+void main() async {
+  // Let's read the api token and instance url from storage or env, or do a schema search
+  // Actually, we can read the local schema.json using a simple python script to parse fields of WorkflowRun!
+  print("Script created");
 }

@@ -147,7 +147,7 @@ class __$$ScanStateImplCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _$ScanStateImpl implements _ScanState {
+class _$ScanStateImpl with DiagnosticableTreeMixin implements _ScanState {
   _$ScanStateImpl({
     this.status = ScanStatus.idle,
     this.parsedData,
@@ -166,8 +166,19 @@ class _$ScanStateImpl implements _ScanState {
   final String? errorMessage;
 
   @override
-  String toString() {
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
     return 'ScanState(status: $status, parsedData: $parsedData, rawText: $rawText, errorMessage: $errorMessage)';
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties
+      ..add(DiagnosticsProperty('type', 'ScanState'))
+      ..add(DiagnosticsProperty('status', status))
+      ..add(DiagnosticsProperty('parsedData', parsedData))
+      ..add(DiagnosticsProperty('rawText', rawText))
+      ..add(DiagnosticsProperty('errorMessage', errorMessage));
   }
 
   @override

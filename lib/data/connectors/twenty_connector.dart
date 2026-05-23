@@ -6,6 +6,8 @@ import 'package:pocketcrm/domain/models/company.dart';
 import 'package:pocketcrm/domain/models/contact.dart';
 import 'package:pocketcrm/domain/models/note.dart';
 import 'package:pocketcrm/domain/models/task.dart';
+import 'package:pocketcrm/domain/models/workflow.dart';
+import 'package:pocketcrm/domain/models/workflow_run.dart';
 import 'package:pocketcrm/domain/models/workspace_member.dart';
 import 'package:pocketcrm/shared/widgets/phone_input_field.dart';
 import 'package:pocketcrm/core/data/country_codes.dart';
@@ -1460,5 +1462,297 @@ class TwentyConnector implements CRMRepository {
 
     final QueryResult result = await _mutateWithRefresh(options);
     if (result.hasException) throw Exception(result.exception.toString());
+  }
+
+  // ──────────────────────────────────────────────────────────────────────────
+  // Workflows
+  // ──────────────────────────────────────────────────────────────────────────
+
+  @override
+  Future<List<Workflow>> getManualWorkflows({required String objectType}) async {
+    const String query = r'''
+      query GetManualWorkflows {
+        workflows(
+          filter: {
+            statuses: { containsAny: [ACTIVE] }
+          }
+        ) {
+          edges {
+            node {
+              id
+              name
+              versions(filter: { status: { eq: ACTIVE } }) {
+                edges {
+                  node {
+                    id
+                    trigger
+                    steps
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    ''';
+
+    final QueryOptions options = QueryOptions(
+      document: parseString(query),
+      fetchPolicy: FetchPolicy.networkOnly,
+    );
+
+    final QueryResult result = await _queryWithRefresh(options);
+
+    // Workflows may require admin permissions — return empty list gracefully
+    if (result.hasException) {
+      final errorMsg = result.exception?.graphqlErrors.firstOrNull?.message ?? '';
+      if (errorMsg.toLowerCase().contains('permission')) {
+        print('Warning: No permission to access workflows. Returning empty list.');
+        return [];
+      }
+      _handleResultException(result);
+    }
+
+    final rawWorkflows = result.data?['workflows'];
+    print('[Workflow Debug] raw workflows type: ${rawWorkflows.runtimeType}');
+    print('[Workflow Debug] raw workflows: $rawWorkflows');
+
+    List? edges;
+    if (rawWorkflows is Map<String, dynamic>) {
+      final rawEdges = rawWorkflows['edges'];
+      if (rawEdges is List) {
+        edges = rawEdges;
+      }
+    } else if (rawWorkflows is List) {
+      edges = rawWorkflows;
+    }
+
+    if (edges == null) return [];
+    final workflows = <Workflow>[];
+
+    for (final edge in edges) {
+      try {
+        Map<String, dynamic>? node;
+        if (edge is Map<String, dynamic> && edge.containsKey('node')) {
+          node = edge['node'] as Map<String, dynamic>?;
+        } else if (edge is Map<String, dynamic>) {
+          node = edge;
+        }
+        if (node == null) { print('[Workflow Debug] Skipped: node is null'); continue; }
+
+        print('[Workflow Debug] Processing workflow: ${node['name']} (${node['id']})');
+
+        // Check if this workflow has an active version with a MANUAL trigger
+        final versionsRaw = node['versions'];
+        print('[Workflow Debug] versions type: ${versionsRaw.runtimeType}, value: $versionsRaw');
+        List? versions;
+        if (versionsRaw is Map<String, dynamic>) {
+          final edgesRaw = versionsRaw['edges'];
+          if (edgesRaw is List) {
+            versions = edgesRaw;
+          }
+        } else if (versionsRaw is List) {
+          versions = versionsRaw;
+        }
+        if (versions == null || versions.isEmpty) { print('[Workflow Debug] Skipped: no versions found'); continue; }
+
+        final firstVersion = versions.first;
+        print('[Workflow Debug] firstVersion type: ${firstVersion.runtimeType}');
+        final Map<String, dynamic>? versionNode;
+        if (firstVersion is Map<String, dynamic> && firstVersion.containsKey('node')) {
+          versionNode = firstVersion['node'] as Map<String, dynamic>?;
+        } else if (firstVersion is Map<String, dynamic>) {
+          versionNode = firstVersion;
+        } else {
+          print('[Workflow Debug] Skipped: firstVersion not a Map');
+          continue;
+        }
+        if (versionNode == null) { print('[Workflow Debug] Skipped: versionNode is null'); continue; }
+
+        // trigger can be a Map or a JSON string
+        dynamic triggerRaw = versionNode['trigger'];
+        print('[Workflow Debug] trigger type: ${triggerRaw.runtimeType}, value: $triggerRaw');
+        Map<String, dynamic>? trigger;
+        if (triggerRaw is Map<String, dynamic>) {
+          trigger = triggerRaw;
+        }
+        if (trigger == null) { print('[Workflow Debug] Skipped: trigger is not a Map'); continue; }
+
+        // Only include workflows with MANUAL trigger type
+        final triggerType = (trigger['type'] as String? ?? '').toUpperCase();
+        print('[Workflow Debug] triggerType: $triggerType');
+        if (triggerType != 'MANUAL') { print('[Workflow Debug] Skipped: triggerType is not MANUAL'); continue; }
+
+        // Check if the trigger's objectType matches the requested one
+        final settings = trigger['settings'] as Map<String, dynamic>?;
+        print('[Workflow Debug] settings: $settings');
+        var triggerObjectType = '';
+        if (settings != null) {
+          final availability = settings['availability'] as Map<String, dynamic>?;
+          triggerObjectType = settings['objectType'] as String? ?? '';
+          if (triggerObjectType.isEmpty && availability != null) {
+            triggerObjectType = availability['objectNameSingular'] as String? ?? '';
+          }
+        }
+
+        print('[Workflow Debug] triggerObjectType: "$triggerObjectType" vs requested: "$objectType"');
+
+        final normTrigger = triggerObjectType.toLowerCase();
+        final normRequested = objectType.toLowerCase();
+        bool isMatch = normTrigger == normRequested;
+        
+        // Treat 'person' and 'contact' as interchangeable
+        if ((normTrigger == 'person' || normTrigger == 'contact') &&
+            (normRequested == 'person' || normRequested == 'contact')) {
+          isMatch = true;
+        }
+
+        if (!isMatch) {
+          print('[Workflow Debug] Skipped: objectType mismatch ("$triggerObjectType" vs "$objectType")');
+          continue;
+        }
+
+
+        print('[Workflow Debug] ✅ Workflow passed all filters, adding: ${node['name']}');
+        workflows.add(Workflow.fromTwenty(node));
+      } catch (e, stack) {
+        print('[Workflow Debug] Error parsing workflow edge: $e');
+        print('[Workflow Debug] Edge data: $edge');
+        print('[Workflow Debug] Stack: $stack');
+        continue;
+      }
+    }
+
+    return workflows;
+  }
+
+  @override
+  Future<({bool success, String? workflowRunId, String? error})>
+      triggerWorkflow({
+    required String workflowId,
+    required String recordId,
+    Map<String, dynamic>? payload,
+  }) async {
+    const String mutation = r'''
+      mutation RunWorkflowVersion($input: RunWorkflowVersionInput!) {
+        runWorkflowVersion(input: $input) {
+          workflowRunId
+        }
+      }
+    ''';
+
+    final input = <String, dynamic>{
+      'workflowVersionId': workflowId,
+      'payload': <String, dynamic>{
+        'recordId': recordId,
+        if (payload != null) ...payload,
+      },
+    };
+
+    print('[Workflow Debug] triggerWorkflow input: $input');
+
+    final MutationOptions options = MutationOptions(
+      document: parseString(mutation),
+      variables: {'input': input},
+    );
+
+    try {
+      final QueryResult result = await _mutateWithRefresh(options);
+
+      if (result.hasException) {
+        print('[Workflow Debug] Exception: ${result.exception}');
+        final errorMsg = result.exception?.graphqlErrors.isNotEmpty == true
+            ? result.exception!.graphqlErrors.first.message
+            : result.exception?.linkException?.toString() ??
+                'Unknown error occurred';
+        final userError = errorMsg.toLowerCase().contains('forbidden')
+            ? 'Forbidden: Workflow execution may require email/password login instead of API key.'
+            : errorMsg;
+        return (success: false, workflowRunId: null, error: userError);
+      }
+
+      print('[Workflow Debug] Result data: ${result.data}');
+      final data = result.data?['runWorkflowVersion'];
+      final runId = data?['workflowRunId'] as String?;
+
+      return (success: true, workflowRunId: runId, error: null);
+    } catch (e) {
+      return (
+        success: false,
+        workflowRunId: null,
+        error: e.toString().replaceAll('Exception: ', ''),
+      );
+    }
+  }
+
+  @override
+  Future<List<WorkflowRun>> getWorkflowRuns() async {
+    const String query = r'''
+      query GetWorkflowRuns {
+        workflowRuns(
+          orderBy: { createdAt: DescNullsLast }
+        ) {
+          edges {
+            node {
+              id
+              status
+              createdAt
+              workflowVersion {
+                id
+                workflow {
+                  id
+                  name
+                }
+              }
+            }
+          }
+        }
+      }
+    ''';
+
+    final QueryOptions options = QueryOptions(
+      document: parseString(query),
+      fetchPolicy: FetchPolicy.networkOnly,
+    );
+
+    try {
+      final QueryResult result = await _queryWithRefresh(options);
+      
+      if (result.hasException) {
+        print('Error fetching workflow runs: ${result.exception}');
+        return [];
+      }
+
+      final rawRuns = result.data?['workflowRuns'];
+      List? edges;
+      if (rawRuns is Map<String, dynamic>) {
+        edges = rawRuns['edges'] as List?;
+      } else if (rawRuns is List) {
+        edges = rawRuns;
+      }
+
+      if (edges == null) return [];
+
+      final runs = <WorkflowRun>[];
+      for (final edge in edges) {
+        try {
+          Map<String, dynamic>? node;
+          if (edge is Map<String, dynamic> && edge.containsKey('node')) {
+            node = edge['node'] as Map<String, dynamic>?;
+          } else if (edge is Map<String, dynamic>) {
+            node = edge;
+          }
+          if (node != null) {
+            runs.add(WorkflowRun.fromJson(node));
+          }
+        } catch (e) {
+          print('Error parsing workflow run: $e');
+        }
+      }
+      return runs;
+    } catch (e) {
+      print('Exception in getWorkflowRuns: $e');
+      return [];
+    }
   }
 }

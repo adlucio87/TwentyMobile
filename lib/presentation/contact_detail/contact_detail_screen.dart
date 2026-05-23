@@ -18,6 +18,7 @@ import 'package:pocketcrm/presentation/shared/dialog_helper.dart';
 import 'package:pocketcrm/domain/services/contact_share_service.dart';
 import 'package:pocketcrm/core/utils/platform_utils.dart';
 import 'package:pocketcrm/presentation/contact_detail/voice_note_sheet.dart';
+import 'package:pocketcrm/presentation/workflows/workflow_action_button.dart';
 import 'package:pocketcrm/core/utils/demo_utils.dart';
 import 'package:pocketcrm/core/utils/color_utils.dart';
 import 'package:pocketcrm/presentation/shared/error_state_widget.dart';
@@ -43,6 +44,11 @@ class _ContactDetailScreenState extends ConsumerState<ContactDetailScreen> {
       appBar: AppBar(
         title: const Text('Contact Details'),
         actions: [
+          if (detailAsync.hasValue)
+            WorkflowActionButton(
+              objectType: 'person',
+              recordId: widget.id,
+            ),
           if (detailAsync.hasValue)
             Builder(
               builder: (btnContext) => IconButton(

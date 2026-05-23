@@ -91,7 +91,7 @@ final isDemoModeProvider = FutureProvider<bool>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef IsDemoModeRef = FutureProviderRef<bool>;
-String _$crmRepositoryHash() => r'dc17fe3f7a551ec62a50f3e9dc4a13c9a78d5775';
+String _$crmRepositoryHash() => r'fbc23efa48847c93a2697a3c0d503a716a591f93';
 
 /// See also [crmRepository].
 @ProviderFor(crmRepository)
@@ -1021,5 +1021,161 @@ final tasksProvider =
     );
 
 typedef _$Tasks = AutoDisposeAsyncNotifier<List<Task>>;
+String _$manualWorkflowsHash() => r'cac9fa921b7fb490791802c7d1a7d3a85d0e12da';
+
+abstract class _$ManualWorkflows
+    extends BuildlessAutoDisposeAsyncNotifier<List<Workflow>> {
+  late final String objectType;
+
+  FutureOr<List<Workflow>> build(String objectType);
+}
+
+/// See also [ManualWorkflows].
+@ProviderFor(ManualWorkflows)
+const manualWorkflowsProvider = ManualWorkflowsFamily();
+
+/// See also [ManualWorkflows].
+class ManualWorkflowsFamily extends Family<AsyncValue<List<Workflow>>> {
+  /// See also [ManualWorkflows].
+  const ManualWorkflowsFamily();
+
+  /// See also [ManualWorkflows].
+  ManualWorkflowsProvider call(String objectType) {
+    return ManualWorkflowsProvider(objectType);
+  }
+
+  @override
+  ManualWorkflowsProvider getProviderOverride(
+    covariant ManualWorkflowsProvider provider,
+  ) {
+    return call(provider.objectType);
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'manualWorkflowsProvider';
+}
+
+/// See also [ManualWorkflows].
+class ManualWorkflowsProvider
+    extends
+        AutoDisposeAsyncNotifierProviderImpl<ManualWorkflows, List<Workflow>> {
+  /// See also [ManualWorkflows].
+  ManualWorkflowsProvider(String objectType)
+    : this._internal(
+        () => ManualWorkflows()..objectType = objectType,
+        from: manualWorkflowsProvider,
+        name: r'manualWorkflowsProvider',
+        debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+            ? null
+            : _$manualWorkflowsHash,
+        dependencies: ManualWorkflowsFamily._dependencies,
+        allTransitiveDependencies:
+            ManualWorkflowsFamily._allTransitiveDependencies,
+        objectType: objectType,
+      );
+
+  ManualWorkflowsProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.objectType,
+  }) : super.internal();
+
+  final String objectType;
+
+  @override
+  FutureOr<List<Workflow>> runNotifierBuild(
+    covariant ManualWorkflows notifier,
+  ) {
+    return notifier.build(objectType);
+  }
+
+  @override
+  Override overrideWith(ManualWorkflows Function() create) {
+    return ProviderOverride(
+      origin: this,
+      override: ManualWorkflowsProvider._internal(
+        () => create()..objectType = objectType,
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        objectType: objectType,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeAsyncNotifierProviderElement<ManualWorkflows, List<Workflow>>
+  createElement() {
+    return _ManualWorkflowsProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is ManualWorkflowsProvider && other.objectType == objectType;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, objectType.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin ManualWorkflowsRef
+    on AutoDisposeAsyncNotifierProviderRef<List<Workflow>> {
+  /// The parameter `objectType` of this provider.
+  String get objectType;
+}
+
+class _ManualWorkflowsProviderElement
+    extends
+        AutoDisposeAsyncNotifierProviderElement<ManualWorkflows, List<Workflow>>
+    with ManualWorkflowsRef {
+  _ManualWorkflowsProviderElement(super.provider);
+
+  @override
+  String get objectType => (origin as ManualWorkflowsProvider).objectType;
+}
+
+String _$workflowRunsListHash() => r'dfe13a605877150d9e96694cdd1aea3ad6b678c6';
+
+/// See also [WorkflowRunsList].
+@ProviderFor(WorkflowRunsList)
+final workflowRunsListProvider =
+    AutoDisposeAsyncNotifierProvider<
+      WorkflowRunsList,
+      List<WorkflowRun>
+    >.internal(
+      WorkflowRunsList.new,
+      name: r'workflowRunsListProvider',
+      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+          ? null
+          : _$workflowRunsListHash,
+      dependencies: null,
+      allTransitiveDependencies: null,
+    );
+
+typedef _$WorkflowRunsList = AutoDisposeAsyncNotifier<List<WorkflowRun>>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
