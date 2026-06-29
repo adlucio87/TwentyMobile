@@ -106,8 +106,7 @@ class _EditContactSheetState extends ConsumerState<EditContactSheet> {
                 keyboardType: TextInputType.emailAddress,
                 validator: (v) {
                   if (v != null && v.trim().isNotEmpty) {
-                    final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
-                    if (!emailRegex.hasMatch(v.trim())) {
+                    if (!v.contains('@') || !v.contains('.')) {
                       return 'Please enter a valid email address';
                     }
                   }

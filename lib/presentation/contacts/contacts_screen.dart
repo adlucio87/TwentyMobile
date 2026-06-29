@@ -260,7 +260,7 @@ class AddContactSheetState extends ConsumerState<AddContactSheet> {
 
   bool _isValidEmail(String email) {
     if (email.isEmpty) return true; // Optional
-    return RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email);
+    return email.contains('@') && email.contains('.');
   }
 
   bool _isValidPhone(String phone) {
