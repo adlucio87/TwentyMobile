@@ -83,17 +83,19 @@ class _EmailLoginScreenState extends ConsumerState<EmailLoginScreen> {
       debugPrint('LOGIN ERROR: $e');
       Sentry.captureException(e, stackTrace: stackTrace);
       if (mounted) {
-        String message = e.toString();
-        if (message.contains('UNAUTHENTICATED')) {
+        String message = 'An unexpected error occurred. Please try again.';
+        final errorString = e.toString();
+
+        if (errorString.contains('UNAUTHENTICATED')) {
           message = 'Incorrect email or password. Please try again.';
-        } else if (message.contains('Not Found') || message.contains('user not found')) {
+        } else if (errorString.contains('Not Found') || errorString.contains('user not found')) {
           message = 'No account found with this email.';
-        } else if (message.contains('SocketException') || message.contains('Failed host lookup')) {
+        } else if (errorString.contains('SocketException') || errorString.contains('Failed host lookup')) {
           message = 'Unable to reach the server. Check the URL.';
-        } else if (message.contains('password login is disabled')) {
+        } else if (errorString.contains('password login is disabled')) {
            message = 'Password login is not enabled on this Twenty instance.';
-        } else if (message.startsWith('Exception: ')) {
-          message = message.substring(11);
+        } else if (errorString.contains('FormatException') || errorString.contains('ResponseFormatException')) {
+          message = 'Invalid response from server. Please check your instance URL.';
         }
         setState(() => _error = message);
       }

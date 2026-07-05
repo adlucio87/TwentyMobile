@@ -91,10 +91,17 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
       if (mounted) {
         HapticFeedback.heavyImpact();
         _otpController.clear();
-        String message = e.toString();
-        if (message.startsWith('Exception: ')) {
-          message = message.substring(11);
+        String message = 'An unexpected error occurred. Please try again.';
+        final errorString = e.toString();
+
+        if (errorString.contains('UNAUTHENTICATED') || errorString.contains('invalid otp')) {
+          message = 'Invalid verification code. Please try again.';
+        } else if (errorString.contains('SocketException') || errorString.contains('Failed host lookup')) {
+          message = 'Unable to reach the server. Check your connection.';
+        } else if (errorString.contains('FormatException') || errorString.contains('ResponseFormatException')) {
+          message = 'Invalid response from server. Please check your instance URL.';
         }
+
         setState(() {
           _error = message;
           _isLoading = false;

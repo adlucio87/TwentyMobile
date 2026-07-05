@@ -140,9 +140,15 @@ class _ApiTokenScreenState extends ConsumerState<ApiTokenScreen> {
       debugPrint('CONNECTION ERROR: $e');
       Sentry.captureException(e, stackTrace: stackTrace);
       if (mounted) {
-        String message = e.toString();
-        if (message.startsWith('Exception: ')) {
-          message = message.substring(11);
+        String message = 'An unexpected error occurred. Please try again.';
+        final errorString = e.toString();
+
+        if (errorString.contains('UNAUTHENTICATED')) {
+          message = 'Invalid API token.';
+        } else if (errorString.contains('SocketException') || errorString.contains('Failed host lookup')) {
+          message = 'Unable to reach the server. Check the URL.';
+        } else if (errorString.contains('FormatException') || errorString.contains('ResponseFormatException')) {
+          message = 'Invalid response from server. Please check your instance URL.';
         }
         setState(() => _error = message);
       }
