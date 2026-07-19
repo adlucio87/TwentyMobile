@@ -18,6 +18,7 @@ _$CompanyImpl _$$CompanyImplFromJson(Map<String, dynamic> json) =>
       createdAt: json['createdAt'] == null
           ? null
           : DateTime.parse(json['createdAt'] as String),
+      customFields: json['customFields'] as Map<String, dynamic>? ?? const {},
     );
 
 Map<String, dynamic> _$$CompanyImplToJson(_$CompanyImpl instance) =>
@@ -30,4 +31,5 @@ Map<String, dynamic> _$$CompanyImplToJson(_$CompanyImpl instance) =>
       'logoUrl': instance.logoUrl,
       'employeesCount': instance.employeesCount,
       'createdAt': instance.createdAt?.toIso8601String(),
+      'customFields': instance.customFields,
     };

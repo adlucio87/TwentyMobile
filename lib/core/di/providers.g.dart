@@ -91,7 +91,7 @@ final isDemoModeProvider = FutureProvider<bool>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef IsDemoModeRef = FutureProviderRef<bool>;
-String _$crmRepositoryHash() => r'fbc23efa48847c93a2697a3c0d503a716a591f93';
+String _$crmRepositoryHash() => r'bde229ec212be8bf6d71e1dbaccf179709423da6';
 
 /// See also [crmRepository].
 @ProviderFor(crmRepository)

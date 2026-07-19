@@ -1,3 +1,4 @@
+import 'package:pocketcrm/core/di/metadata_provider.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:pocketcrm/core/utils/storage_service.dart';
@@ -58,28 +59,50 @@ Future<bool> isDemoMode(IsDemoModeRef ref) async {
 @Riverpod(keepAlive: true)
 Future<CRMRepository> crmRepository(CrmRepositoryRef ref) async {
   final storage = ref.watch(storageServiceProvider);
-  final baseUrl = await storage.read(key: 'instance_url');
-  final initialApiToken = await storage.read(key: 'api_token');
 
-  if (baseUrl == null || initialApiToken == null) {
-    throw Exception('Not connected');
+  final instanceUrl = await const FlutterSecureStorage(aOptions: AndroidOptions(encryptedSharedPreferences: true)).read(key: 'instance_url');
+  if (instanceUrl == null) {
+    throw Exception('Instance URL not found');
   }
+
+  // Costruiamo i customFields prelevando i metadata
+  Map<String, List<String>> customFieldsMap = {};
+  try {
+    final metadata = await ref.watch(workspaceMetadataProvider.future);
+    if (true) {
+      final personMetadata = metadata.where((e) => e.nameSingular == 'person').firstOrNull;
+      if (personMetadata != null) {
+        customFieldsMap['person'] = personMetadata.fields
+            .where((f) => f.isActive && !['RELATION', 'MULTI_SELECT', 'RICH_TEXT', 'LINKS', 'PHONES', 'EMAILS', 'ADDRESS'].contains(f.type))
+            .map((f) => f.name)
+            .toList();
+      }
+      final companyMetadata = metadata.where((e) => e.nameSingular == 'company').firstOrNull;
+      if (companyMetadata != null) {
+        customFieldsMap['company'] = companyMetadata.fields
+            .where((f) => f.isActive && !['RELATION', 'MULTI_SELECT', 'RICH_TEXT', 'LINKS', 'PHONES', 'EMAILS', 'ADDRESS'].contains(f.type))
+            .map((f) => f.name)
+            .toList();
+      }
+    }
+  } catch (_) {}
 
   final customHttpClient = TimeoutHttpClient(
     timeoutDuration: const Duration(seconds: 30),
   );
 
-  final authLink = AuthLink(
-    getToken: () async {
-      // Fetch the latest token from storage
-      final currentToken = await storage.read(key: 'api_token');
-      return currentToken != null ? 'Bearer $currentToken' : null;
-    },
+  final httpLink = HttpLink(
+    '$instanceUrl/graphql',
+    httpClient: customHttpClient,
   );
 
-  final httpLink = HttpLink(
-    '$baseUrl/graphql', // Twenty CRM graphql endpoint
-    httpClient: customHttpClient,
+  final authLink = AuthLink(
+    getToken: () async {
+      final token = await const FlutterSecureStorage(
+        aOptions: AndroidOptions(encryptedSharedPreferences: true),
+      ).read(key: 'api_token');
+      return token != null ? 'Bearer $token' : null;
+    },
   );
 
   final link = authLink.concat(httpLink);
@@ -94,6 +117,7 @@ Future<CRMRepository> crmRepository(CrmRepositoryRef ref) async {
   return TwentyConnector(
     client: client,
     authService: authService,
+    customFields: customFieldsMap,
     onTokenRefreshed: () {
       // AuthService writes tokens directly to FlutterSecureStorage,
       // bypassing StorageService's in-memory cache. We must clear

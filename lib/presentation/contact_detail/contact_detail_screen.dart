@@ -1,3 +1,4 @@
+import 'package:pocketcrm/shared/widgets/custom_fields_section.dart';
 //
 import 'dart:io' show Platform;
 import 'package:cached_network_image/cached_network_image.dart';
@@ -7,8 +8,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:pocketcrm/core/di/providers.dart';
 import 'package:pocketcrm/domain/models/contact.dart';
-import 'package:pocketcrm/domain/models/note.dart';
-import 'package:pocketcrm/shared/widgets/block_note_renderer.dart';
+
+
 import 'package:flutter_contacts/flutter_contacts.dart' as fc;
 import 'package:pocketcrm/presentation/contacts/edit_contact_sheet.dart';
 import 'package:pocketcrm/presentation/shared/note_card.dart';
@@ -365,6 +366,8 @@ class _ContactDetailScreenState extends ConsumerState<ContactDetailScreen> {
             icon: const Icon(Icons.save_alt),
             label: const Text('Save to Contacts'),
           ),
+          const SizedBox(height: 24),
+          CustomFieldsSection(customFields: contact.customFields),
           const SizedBox(height: 24),
           const Text(
             'Related Notes',

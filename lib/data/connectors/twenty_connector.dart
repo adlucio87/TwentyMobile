@@ -21,12 +21,13 @@ class TwentyConnector implements CRMRepository {
   final GraphQLClient client;
   final AuthService? authService;
   final VoidCallback? onTokenRefreshed;
+  final Map<String, List<String>> customFields;
   String? _currentMemberId;
 
   /// Mutex for token refresh — prevents concurrent refresh attempts
   Future<bool>? _refreshFuture;
 
-  TwentyConnector({required this.client, this.authService, this.onTokenRefreshed});
+  TwentyConnector({required this.client, this.authService, this.onTokenRefreshed, this.customFields = const {}});
 
   /// Returns the current workspace member's ID, caching it for the session.
   /// Returns null for API key auth (show all tasks) — only filters for email auth.
@@ -381,9 +382,12 @@ class TwentyConnector implements CRMRepository {
               emails { primaryEmail }
               phones { primaryPhoneNumber primaryPhoneCallingCode }
               avatarUrl
+
               company { id name }
               createdAt
               updatedAt
+              ${customFields['person']?.join('\n              ') ?? ''}
+
             }
           }
           pageInfo { hasNextPage endCursor }
@@ -451,9 +455,12 @@ class TwentyConnector implements CRMRepository {
               avatarUrl
               city
               jobTitle
+
               company { id name }
               createdAt
               updatedAt
+              ${customFields['person']?.join('\n              ') ?? ''}
+
             }
           }
         }
@@ -486,9 +493,12 @@ class TwentyConnector implements CRMRepository {
               emails { primaryEmail }
               phones { primaryPhoneNumber primaryPhoneCallingCode }
               avatarUrl
+
               company { id name }
               createdAt
               updatedAt
+              ${customFields['person']?.join('\n              ') ?? ''}
+
             }
           }
         }
@@ -798,8 +808,11 @@ class TwentyConnector implements CRMRepository {
               id
               name
               domainName { primaryLinkUrl }
+
               employees
               createdAt
+              ${customFields['company']?.join('\n              ') ?? ''}
+
             }
           }
         }
@@ -849,8 +862,11 @@ class TwentyConnector implements CRMRepository {
               id
               name
               domainName { primaryLinkUrl }
+
               employees
               createdAt
+              ${customFields['company']?.join('\n              ') ?? ''}
+
             }
           }
         }

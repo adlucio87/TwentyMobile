@@ -31,6 +31,7 @@ mixin _$Contact {
   String? get companyName => throw _privateConstructorUsedError;
   DateTime? get createdAt => throw _privateConstructorUsedError;
   DateTime? get updatedAt => throw _privateConstructorUsedError;
+  Map<String, dynamic> get customFields => throw _privateConstructorUsedError;
 
   /// Serializes this Contact to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -57,6 +58,7 @@ abstract class $ContactCopyWith<$Res> {
     String? companyName,
     DateTime? createdAt,
     DateTime? updatedAt,
+    Map<String, dynamic> customFields,
   });
 }
 
@@ -85,6 +87,7 @@ class _$ContactCopyWithImpl<$Res, $Val extends Contact>
     Object? companyName = freezed,
     Object? createdAt = freezed,
     Object? updatedAt = freezed,
+    Object? customFields = null,
   }) {
     return _then(
       _value.copyWith(
@@ -128,6 +131,10 @@ class _$ContactCopyWithImpl<$Res, $Val extends Contact>
                 ? _value.updatedAt
                 : updatedAt // ignore: cast_nullable_to_non_nullable
                       as DateTime?,
+            customFields: null == customFields
+                ? _value.customFields
+                : customFields // ignore: cast_nullable_to_non_nullable
+                      as Map<String, dynamic>,
           )
           as $Val,
     );
@@ -153,6 +160,7 @@ abstract class _$$ContactImplCopyWith<$Res> implements $ContactCopyWith<$Res> {
     String? companyName,
     DateTime? createdAt,
     DateTime? updatedAt,
+    Map<String, dynamic> customFields,
   });
 }
 
@@ -180,6 +188,7 @@ class __$$ContactImplCopyWithImpl<$Res>
     Object? companyName = freezed,
     Object? createdAt = freezed,
     Object? updatedAt = freezed,
+    Object? customFields = null,
   }) {
     return _then(
       _$ContactImpl(
@@ -223,6 +232,10 @@ class __$$ContactImplCopyWithImpl<$Res>
             ? _value.updatedAt
             : updatedAt // ignore: cast_nullable_to_non_nullable
                   as DateTime?,
+        customFields: null == customFields
+            ? _value._customFields
+            : customFields // ignore: cast_nullable_to_non_nullable
+                  as Map<String, dynamic>,
       ),
     );
   }
@@ -242,7 +255,8 @@ class _$ContactImpl implements _Contact {
     this.companyName,
     this.createdAt,
     this.updatedAt,
-  });
+    final Map<String, dynamic> customFields = const {},
+  }) : _customFields = customFields;
 
   factory _$ContactImpl.fromJson(Map<String, dynamic> json) =>
       _$$ContactImplFromJson(json);
@@ -267,10 +281,18 @@ class _$ContactImpl implements _Contact {
   final DateTime? createdAt;
   @override
   final DateTime? updatedAt;
+  final Map<String, dynamic> _customFields;
+  @override
+  @JsonKey()
+  Map<String, dynamic> get customFields {
+    if (_customFields is EqualUnmodifiableMapView) return _customFields;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableMapView(_customFields);
+  }
 
   @override
   String toString() {
-    return 'Contact(id: $id, firstName: $firstName, lastName: $lastName, email: $email, phone: $phone, avatarUrl: $avatarUrl, companyId: $companyId, companyName: $companyName, createdAt: $createdAt, updatedAt: $updatedAt)';
+    return 'Contact(id: $id, firstName: $firstName, lastName: $lastName, email: $email, phone: $phone, avatarUrl: $avatarUrl, companyId: $companyId, companyName: $companyName, createdAt: $createdAt, updatedAt: $updatedAt, customFields: $customFields)';
   }
 
   @override
@@ -294,7 +316,11 @@ class _$ContactImpl implements _Contact {
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt) &&
             (identical(other.updatedAt, updatedAt) ||
-                other.updatedAt == updatedAt));
+                other.updatedAt == updatedAt) &&
+            const DeepCollectionEquality().equals(
+              other._customFields,
+              _customFields,
+            ));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -311,6 +337,7 @@ class _$ContactImpl implements _Contact {
     companyName,
     createdAt,
     updatedAt,
+    const DeepCollectionEquality().hash(_customFields),
   );
 
   /// Create a copy of Contact
@@ -339,6 +366,7 @@ abstract class _Contact implements Contact {
     final String? companyName,
     final DateTime? createdAt,
     final DateTime? updatedAt,
+    final Map<String, dynamic> customFields,
   }) = _$ContactImpl;
 
   factory _Contact.fromJson(Map<String, dynamic> json) = _$ContactImpl.fromJson;
@@ -363,6 +391,8 @@ abstract class _Contact implements Contact {
   DateTime? get createdAt;
   @override
   DateTime? get updatedAt;
+  @override
+  Map<String, dynamic> get customFields;
 
   /// Create a copy of Contact
   /// with the given fields replaced by the non-null parameter values.
