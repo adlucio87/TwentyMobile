@@ -14,6 +14,7 @@ class Company with _$Company {
     String? logoUrl,
     int? employeesCount,
     DateTime? createdAt,
+    @Default({}) Map<String, dynamic> customFields,
   }) = _Company;
 
   factory Company.fromJson(Map<String, dynamic> json) =>
@@ -33,6 +34,17 @@ class Company with _$Company {
       domainName = Uri.tryParse(domainName)?.host ?? domainName;
     }
 
+    final knownKeys = {
+      'id', 'name', 'domainName', 'logoUrl', 'employees', 'industry', 'createdAt', '__typename'
+    };
+
+    final customFields = <String, dynamic>{};
+    json.forEach((key, value) {
+      if (!knownKeys.contains(key)) {
+        customFields[key] = value;
+      }
+    });
+
     return Company(
       id: json['id'],
       name: json['name'] is Map ? json['name']['text'] ?? '' : json['name'] ?? '',
@@ -43,6 +55,7 @@ class Company with _$Company {
       createdAt: json['createdAt'] != null
           ? DateTime.parse(json['createdAt'])
           : null,
+      customFields: customFields,
     );
   }
 }

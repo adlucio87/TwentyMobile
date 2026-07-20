@@ -1,3 +1,4 @@
+import 'package:pocketcrm/shared/widgets/custom_fields_section.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -185,6 +186,8 @@ class _CompanyDetailScreenState extends ConsumerState<CompanyDetailScreen> {
             entityId: company.id,
             type: LinkedContactType.company,
           ),
+          const SizedBox(height: 24),
+          CustomFieldsSection(customFields: company.customFields),
           const SizedBox(height: 24),
           const Text(
             'Related Notes',

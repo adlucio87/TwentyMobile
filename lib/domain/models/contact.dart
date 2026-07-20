@@ -16,6 +16,7 @@ class Contact with _$Contact {
     String? companyName,
     DateTime? createdAt,
     DateTime? updatedAt,
+    @Default({}) Map<String, dynamic> customFields,
   }) = _Contact;
 
   factory Contact.fromJson(Map<String, dynamic> json) =>
@@ -43,6 +44,17 @@ class Contact with _$Contact {
       }
     }
 
+    final knownKeys = {
+      'id', 'name', 'emails', 'phones', 'avatarUrl', 'company', 'createdAt', 'updatedAt', '__typename'
+    };
+
+    final customFields = <String, dynamic>{};
+    json.forEach((key, value) {
+      if (!knownKeys.contains(key)) {
+        customFields[key] = value;
+      }
+    });
+
     return Contact(
       id: json['id'],
       firstName: json['name']?['firstName'] ?? '',
@@ -55,6 +67,7 @@ class Contact with _$Contact {
       createdAt: json['createdAt'] != null
           ? DateTime.parse(json['createdAt'])
           : null,
+      customFields: customFields,
     );
   }
 }

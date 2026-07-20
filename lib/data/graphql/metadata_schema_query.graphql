@@ -1,0 +1,17 @@
+query GetWorkspaceMetadata {
+  objects {
+    id
+    nameSingular
+    namePlural
+    icon
+    labelSingular
+    labelPlural
+    fields {
+      id
+      name
+      type
+      label
+      isActive
+    }
+  }
+}

@@ -22,6 +22,7 @@ _$ContactImpl _$$ContactImplFromJson(Map<String, dynamic> json) =>
       updatedAt: json['updatedAt'] == null
           ? null
           : DateTime.parse(json['updatedAt'] as String),
+      customFields: json['customFields'] as Map<String, dynamic>? ?? const {},
     );
 
 Map<String, dynamic> _$$ContactImplToJson(_$ContactImpl instance) =>
@@ -36,4 +37,5 @@ Map<String, dynamic> _$$ContactImplToJson(_$ContactImpl instance) =>
       'companyName': instance.companyName,
       'createdAt': instance.createdAt?.toIso8601String(),
       'updatedAt': instance.updatedAt?.toIso8601String(),
+      'customFields': instance.customFields,
     };

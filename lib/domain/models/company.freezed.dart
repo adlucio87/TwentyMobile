@@ -29,6 +29,7 @@ mixin _$Company {
   String? get logoUrl => throw _privateConstructorUsedError;
   int? get employeesCount => throw _privateConstructorUsedError;
   DateTime? get createdAt => throw _privateConstructorUsedError;
+  Map<String, dynamic> get customFields => throw _privateConstructorUsedError;
 
   /// Serializes this Company to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -53,6 +54,7 @@ abstract class $CompanyCopyWith<$Res> {
     String? logoUrl,
     int? employeesCount,
     DateTime? createdAt,
+    Map<String, dynamic> customFields,
   });
 }
 
@@ -79,6 +81,7 @@ class _$CompanyCopyWithImpl<$Res, $Val extends Company>
     Object? logoUrl = freezed,
     Object? employeesCount = freezed,
     Object? createdAt = freezed,
+    Object? customFields = null,
   }) {
     return _then(
       _value.copyWith(
@@ -114,6 +117,10 @@ class _$CompanyCopyWithImpl<$Res, $Val extends Company>
                 ? _value.createdAt
                 : createdAt // ignore: cast_nullable_to_non_nullable
                       as DateTime?,
+            customFields: null == customFields
+                ? _value.customFields
+                : customFields // ignore: cast_nullable_to_non_nullable
+                      as Map<String, dynamic>,
           )
           as $Val,
     );
@@ -137,6 +144,7 @@ abstract class _$$CompanyImplCopyWith<$Res> implements $CompanyCopyWith<$Res> {
     String? logoUrl,
     int? employeesCount,
     DateTime? createdAt,
+    Map<String, dynamic> customFields,
   });
 }
 
@@ -162,6 +170,7 @@ class __$$CompanyImplCopyWithImpl<$Res>
     Object? logoUrl = freezed,
     Object? employeesCount = freezed,
     Object? createdAt = freezed,
+    Object? customFields = null,
   }) {
     return _then(
       _$CompanyImpl(
@@ -197,6 +206,10 @@ class __$$CompanyImplCopyWithImpl<$Res>
             ? _value.createdAt
             : createdAt // ignore: cast_nullable_to_non_nullable
                   as DateTime?,
+        customFields: null == customFields
+            ? _value._customFields
+            : customFields // ignore: cast_nullable_to_non_nullable
+                  as Map<String, dynamic>,
       ),
     );
   }
@@ -214,7 +227,8 @@ class _$CompanyImpl implements _Company {
     this.logoUrl,
     this.employeesCount,
     this.createdAt,
-  });
+    final Map<String, dynamic> customFields = const {},
+  }) : _customFields = customFields;
 
   factory _$CompanyImpl.fromJson(Map<String, dynamic> json) =>
       _$$CompanyImplFromJson(json);
@@ -235,10 +249,18 @@ class _$CompanyImpl implements _Company {
   final int? employeesCount;
   @override
   final DateTime? createdAt;
+  final Map<String, dynamic> _customFields;
+  @override
+  @JsonKey()
+  Map<String, dynamic> get customFields {
+    if (_customFields is EqualUnmodifiableMapView) return _customFields;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableMapView(_customFields);
+  }
 
   @override
   String toString() {
-    return 'Company(id: $id, name: $name, domainName: $domainName, industry: $industry, website: $website, logoUrl: $logoUrl, employeesCount: $employeesCount, createdAt: $createdAt)';
+    return 'Company(id: $id, name: $name, domainName: $domainName, industry: $industry, website: $website, logoUrl: $logoUrl, employeesCount: $employeesCount, createdAt: $createdAt, customFields: $customFields)';
   }
 
   @override
@@ -257,7 +279,11 @@ class _$CompanyImpl implements _Company {
             (identical(other.employeesCount, employeesCount) ||
                 other.employeesCount == employeesCount) &&
             (identical(other.createdAt, createdAt) ||
-                other.createdAt == createdAt));
+                other.createdAt == createdAt) &&
+            const DeepCollectionEquality().equals(
+              other._customFields,
+              _customFields,
+            ));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -272,6 +298,7 @@ class _$CompanyImpl implements _Company {
     logoUrl,
     employeesCount,
     createdAt,
+    const DeepCollectionEquality().hash(_customFields),
   );
 
   /// Create a copy of Company
@@ -298,6 +325,7 @@ abstract class _Company implements Company {
     final String? logoUrl,
     final int? employeesCount,
     final DateTime? createdAt,
+    final Map<String, dynamic> customFields,
   }) = _$CompanyImpl;
 
   factory _Company.fromJson(Map<String, dynamic> json) = _$CompanyImpl.fromJson;
@@ -318,6 +346,8 @@ abstract class _Company implements Company {
   int? get employeesCount;
   @override
   DateTime? get createdAt;
+  @override
+  Map<String, dynamic> get customFields;
 
   /// Create a copy of Company
   /// with the given fields replaced by the non-null parameter values.
