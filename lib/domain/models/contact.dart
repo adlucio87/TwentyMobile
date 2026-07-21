@@ -45,12 +45,15 @@ class Contact with _$Contact {
     }
 
     final knownKeys = {
-      'id', 'name', 'emails', 'phones', 'avatarUrl', 'company', 'createdAt', 'updatedAt', '__typename'
+      'id', 'name', 'emails', 'phones', 'avatarUrl', 'company', 'createdAt', 'updatedAt', '__typename',
+      'searchVector', 'position', 'SearchVector', 'Position'
     };
 
     final customFields = <String, dynamic>{};
     json.forEach((key, value) {
-      if (!knownKeys.contains(key)) {
+      final safeKey = key.trim().toLowerCase();
+      final isKnown = knownKeys.any((k) => k.toLowerCase() == safeKey);
+      if (!isKnown) {
         customFields[key] = value;
       }
     });

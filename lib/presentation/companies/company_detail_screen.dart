@@ -1,4 +1,6 @@
-import 'package:pocketcrm/shared/widgets/custom_fields_section.dart';
+import 'package:pocketcrm/shared/widgets/custom_field_edit_dialog.dart';
+import 'package:pocketcrm/domain/models/metadata/field_metadata.dart';
+import 'package:pocketcrm/core/di/metadata_provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -24,8 +26,25 @@ class CompanyDetailScreen extends ConsumerStatefulWidget {
   ConsumerState<CompanyDetailScreen> createState() =>
       _CompanyDetailScreenState();
 }
-
 class _CompanyDetailScreenState extends ConsumerState<CompanyDetailScreen> {
+  IconData _getIconForFieldType(String type) {
+    switch (type.toUpperCase()) {
+      case 'TEXT': return Icons.text_fields;
+      case 'NUMBER': return Icons.numbers;
+      case 'BOOLEAN': return Icons.check_box;
+      case 'DATE':
+      case 'DATE_TIME': return Icons.calendar_today;
+      case 'CURRENCY': return Icons.attach_money;
+      case 'SELECT':
+      case 'MULTI_SELECT': return Icons.list;
+      case 'EMAIL': return Icons.email;
+      case 'PHONE': return Icons.phone;
+      case 'URL':
+      case 'LINKS': return Icons.link;
+      default: return Icons.tune;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final detailAsync = ref.watch(companyDetailProvider(widget.id));
@@ -117,6 +136,27 @@ class _CompanyDetailScreenState extends ConsumerState<CompanyDetailScreen> {
   }
 
   Widget _buildDetail(BuildContext context, Company company) {
+    final metadataAsync = ref.watch(workspaceMetadataProvider);
+    List<FieldMetadata> companyFields = [];
+    if (metadataAsync.hasValue) {
+      final companyMetadata = metadataAsync.value!.where((e) => e.nameSingular.toLowerCase() == 'company').firstOrNull;
+      if (companyMetadata != null) {
+        const standardCompanyFields = {
+          'id', 'name', 'domainName', 'createdAt', 'updatedAt', 'deletedAt', 'createdBy', 
+          'updatedBy', 'employees', 'revenue', 'industry', 'linkedinLink', 'xLink', 
+          'annualRecurringRevenue', 'address', 'accountOwner', 'idealCustomerProfile', 'logoUrl',
+          'position', 'searchVector'
+        };
+        const excludedFieldTypes = {
+          'RELATION', 'MULTI_SELECT', 'RICH_TEXT', 'LINKS', 'PHONES', 'EMAILS', 'ADDRESS',
+        };
+        final stdLower = standardCompanyFields.map((s) => s.toLowerCase()).toSet();
+        companyFields = companyMetadata.fields
+            .where((f) => f.isActive && !stdLower.contains(f.name.toLowerCase()) && !f.name.toLowerCase().contains('search') && !f.name.toLowerCase().contains('position') && !excludedFieldTypes.contains(f.type))
+            .toList();
+      }
+    }
+
     return ConstrainedContent(
       child: SingleChildScrollView(
       padding: const EdgeInsets.all(16),
@@ -178,6 +218,54 @@ class _CompanyDetailScreenState extends ConsumerState<CompanyDetailScreen> {
                     leading: Icon(Icons.info_outline),
                     title: Text('No additional details'),
                   ),
+                if (metadataAsync.hasError)
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Text(
+                      'ERRORE METADATA: ${metadataAsync.error}',
+                      style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                if (companyFields.isNotEmpty) ...[
+                  const Divider(height: 1),
+                  ...companyFields.map((field) {
+                    final value = company.customFields[field.name];
+                    return ListTile(
+                      leading: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.tertiary.withOpacity(0.1),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          _getIconForFieldType(field.type),
+                          color: Theme.of(context).colorScheme.tertiary,
+                          size: 20,
+                        ),
+                      ),
+                      title: Text(value?.toString() ?? 'N/A'),
+                      subtitle: Text(field.label ?? field.name),
+                      onTap: () {
+                        showDialog(
+                          context: context,
+                          builder: (context) => CustomFieldEditDialog(
+                            entityId: company.id,
+                            entityType: 'company',
+                            fieldName: field.name,
+                            initialValue: value,
+                            metadata: field,
+                            onSave: (updatedFields) async {
+                              await ref.read(companiesProvider.notifier).updateCompany(
+                                company.id,
+                                customFields: updatedFields,
+                              );
+                            },
+                          ),
+                        );
+                      },
+                    );
+                  }),
+                ],
               ],
             ),
           ),
@@ -186,8 +274,6 @@ class _CompanyDetailScreenState extends ConsumerState<CompanyDetailScreen> {
             entityId: company.id,
             type: LinkedContactType.company,
           ),
-          const SizedBox(height: 24),
-          CustomFieldsSection(customFields: company.customFields),
           const SizedBox(height: 24),
           const Text(
             'Related Notes',

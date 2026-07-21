@@ -33,6 +33,7 @@ abstract class CRMRepository {
     String? phone,
     String? companyId,
     bool clearCompany = false,
+    Map<String, dynamic>? customFields,
   });
   Future<void> deleteContact(String id);
 
@@ -40,7 +41,7 @@ abstract class CRMRepository {
   Future<List<Company>> getCompanies({String? search, int page = 1});
   Future<Company> getCompanyById(String id);
   Future<Company> createCompany({required String name, String? domainName});
-  Future<Company> updateCompany(String id, {String? name, String? domainName});
+  Future<Company> updateCompany(String id, {String? name, String? domainName, Map<String, dynamic>? customFields});
   Future<List<WorkspaceMember>> getWorkspaceMembers();
   Future<void> deleteCompany(String id);
 

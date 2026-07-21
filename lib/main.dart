@@ -14,10 +14,15 @@ import 'package:pocketcrm/core/theme/theme_provider.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:pocketcrm/core/config/app_config.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 Future<void> main() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+
+  // Previene eccezioni non gestite quando il dispositivo è offline:
+  // i font cadranno sul fallback di sistema invece di crashare.
+  GoogleFonts.config.allowRuntimeFetching = false;
 
   await SentryFlutter.init(
     (options) {

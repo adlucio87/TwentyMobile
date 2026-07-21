@@ -35,21 +35,27 @@ class Company with _$Company {
     }
 
     final knownKeys = {
-      'id', 'name', 'domainName', 'logoUrl', 'employees', 'industry', 'createdAt', '__typename'
+      'id', 'name', 'domainName', 'logoUrl', 'avatarUrl', 'employees', 'industry', 'createdAt', '__typename',
+      'searchVector', 'position', 'SearchVector', 'Position'
     };
 
     final customFields = <String, dynamic>{};
     json.forEach((key, value) {
-      if (!knownKeys.contains(key)) {
+      final safeKey = key.trim().toLowerCase();
+      final isKnown = knownKeys.any((k) => k.toLowerCase() == safeKey);
+      if (!isKnown) {
         customFields[key] = value;
       }
     });
 
+    final cleanDomainName = domainName?.isNotEmpty == true ? domainName : null;
+    final derivedLogoUrl = cleanDomainName != null ? 'https://twenty-icons.com/$cleanDomainName/128' : null;
+
     return Company(
       id: json['id'],
       name: json['name'] is Map ? json['name']['text'] ?? '' : json['name'] ?? '',
-      domainName: domainName?.isNotEmpty == true ? domainName : null,
-      logoUrl: json['logoUrl'] as String?,
+      domainName: cleanDomainName,
+      logoUrl: (json['logoUrl'] ?? json['avatarUrl']) as String? ?? derivedLogoUrl,
       employeesCount: json['employees'] as int?,
       industry: json['industry'] as String?,
       createdAt: json['createdAt'] != null

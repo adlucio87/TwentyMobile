@@ -11,6 +11,7 @@ class FieldMetadata with _$FieldMetadata {
     required String type,
     String? label,
     @Default(true) bool isActive,
+    @Default(false) bool isCustom,
   }) = _FieldMetadata;
 
   factory FieldMetadata.fromJson(Map<String, dynamic> json) =>

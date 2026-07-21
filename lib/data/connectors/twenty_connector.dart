@@ -372,9 +372,9 @@ class TwentyConnector implements CRMRepository {
   @override
   Future<({List<Contact> contacts, String? endCursor, bool hasNextPage})>
   getContacts({String? search, int pageSize = 20, String? after}) async {
-    const String query = r'''
-      query GetPeople($filter: PersonFilterInput, $first: Int, $after: String) {
-        people(filter: $filter, first: $first, after: $after, orderBy: { createdAt: DescNullsLast }) {
+    final String query = '''
+      query GetPeople(\$filter: PersonFilterInput, \$first: Int, \$after: String) {
+        people(filter: \$filter, first: \$first, after: \$after, orderBy: { createdAt: DescNullsLast }) {
           edges {
             node {
               id
@@ -382,7 +382,6 @@ class TwentyConnector implements CRMRepository {
               emails { primaryEmail }
               phones { primaryPhoneNumber primaryPhoneCallingCode }
               avatarUrl
-
               company { id name }
               createdAt
               updatedAt
@@ -443,9 +442,9 @@ class TwentyConnector implements CRMRepository {
 
   @override
   Future<Contact> getContactById(String id) async {
-    const String query = r'''
-      query GetPersonById($id: UUID!) {
-        people(filter: { id: { eq: $id } }) {
+    final String query = '''
+      query GetPersonById(\$id: UUID!) {
+        people(filter: { id: { eq: \$id } }) {
           edges {
             node {
               id
@@ -470,6 +469,7 @@ class TwentyConnector implements CRMRepository {
     final QueryOptions options = QueryOptions(
       document: parseString(query),
       variables: {'id': id},
+      fetchPolicy: FetchPolicy.networkOnly,
     );
 
     final QueryResult result = await _queryWithRefresh(options);
@@ -483,9 +483,9 @@ class TwentyConnector implements CRMRepository {
 
   @override
   Future<List<Contact>> getContactsByCompany(String companyId) async {
-    const String query = r'''
-      query GetCompanyPeople($filter: PersonFilterInput) {
-        people(filter: $filter, orderBy: { createdAt: DescNullsLast }) {
+    final String query = '''
+      query GetCompanyPeople(\$filter: PersonFilterInput) {
+        people(filter: \$filter, orderBy: { createdAt: DescNullsLast }) {
           edges {
             node {
               id
@@ -634,6 +634,7 @@ class TwentyConnector implements CRMRepository {
     String? phone,
     String? companyId,
     bool clearCompany = false,
+    Map<String, dynamic>? customFields,
   }) async {
     const String mutation = r'''
       mutation UpdatePerson($id: UUID!, $input: PersonUpdateInput!) {
@@ -642,6 +643,7 @@ class TwentyConnector implements CRMRepository {
           name { firstName lastName }
           emails { primaryEmail }
           phones { primaryPhoneNumber primaryPhoneCallingCode }
+          avatarUrl
           company { id name }
         }
       }
@@ -675,6 +677,10 @@ class TwentyConnector implements CRMRepository {
       input['companyId'] = null;
     } else if (companyId != null) {
       input['companyId'] = companyId;
+    }
+
+    if (customFields != null && customFields.isNotEmpty) {
+      input.addAll(customFields);
     }
 
     final MutationOptions options = MutationOptions(
@@ -747,6 +753,7 @@ class TwentyConnector implements CRMRepository {
     String id, {
     String? name,
     String? domainName,
+    Map<String, dynamic>? customFields,
   }) async {
     const String mutation = r'''
       mutation UpdateCompany($id: UUID!, $input: CompanyUpdateInput!) {
@@ -766,6 +773,10 @@ class TwentyConnector implements CRMRepository {
       input['domainName'] = domainName.isEmpty
           ? null
           : {'primaryLinkUrl': domainName};
+    }
+
+    if (customFields != null && customFields.isNotEmpty) {
+      input.addAll(customFields);
     }
 
     final MutationOptions options = MutationOptions(
@@ -800,15 +811,14 @@ class TwentyConnector implements CRMRepository {
 
   @override
   Future<List<Company>> getCompanies({String? search, int page = 1}) async {
-    const String query = r'''
-      query GetCompanies($filter: CompanyFilterInput, $first: Int) {
-        companies(filter: $filter, first: $first, orderBy: { createdAt: DescNullsLast }) {
+    final String query = '''
+      query GetCompanies(\$filter: CompanyFilterInput, \$first: Int) {
+        companies(filter: \$filter, first: \$first, orderBy: { createdAt: DescNullsLast }) {
           edges {
             node {
               id
               name
               domainName { primaryLinkUrl }
-
               employees
               createdAt
               ${customFields['company']?.join('\n              ') ?? ''}
@@ -854,15 +864,14 @@ class TwentyConnector implements CRMRepository {
 
   @override
   Future<Company> getCompanyById(String id) async {
-    const String query = r'''
-      query GetCompanyById($id: UUID!) {
-        companies(filter: { id: { eq: $id } }) {
+    final String query = '''
+      query GetCompanyById(\$id: UUID!) {
+        companies(filter: { id: { eq: \$id } }) {
           edges {
             node {
               id
               name
               domainName { primaryLinkUrl }
-
               employees
               createdAt
               ${customFields['company']?.join('\n              ') ?? ''}
@@ -1257,7 +1266,7 @@ class TwentyConnector implements CRMRepository {
           edges { node {
             id
             name { firstName lastName }
-            avatarUrl
+            
             emails { primaryEmail }
             company { name }
             updatedAt

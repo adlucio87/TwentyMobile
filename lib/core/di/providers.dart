@@ -69,23 +69,66 @@ Future<CRMRepository> crmRepository(CrmRepositoryRef ref) async {
   Map<String, List<String>> customFieldsMap = {};
   try {
     final metadata = await ref.watch(workspaceMetadataProvider.future);
-    if (true) {
-      final personMetadata = metadata.where((e) => e.nameSingular == 'person').firstOrNull;
-      if (personMetadata != null) {
-        customFieldsMap['person'] = personMetadata.fields
-            .where((f) => f.isActive && !['RELATION', 'MULTI_SELECT', 'RICH_TEXT', 'LINKS', 'PHONES', 'EMAILS', 'ADDRESS'].contains(f.type))
-            .map((f) => f.name)
-            .toList();
+    const standardPersonFields = {
+      'id', 'name', 'emails', 'phones', 'avatarUrl', 'company', 'createdAt', 'updatedAt', 
+      'deletedAt', 'createdBy', 'updatedBy', 'intro', 'jobTitle', 'linkedinLink', 
+      'xLink', 'position', 'workLocation', 'performanceRating', 'searchVector'
+    };
+    const standardCompanyFields = {
+      'id', 'name', 'domainName', 'createdAt', 'updatedAt', 'deletedAt', 'createdBy', 
+      'updatedBy', 'employees', 'revenue', 'industry', 'linkedinLink', 'xLink', 
+      'annualRecurringRevenue', 'address', 'accountOwner', 'idealCustomerProfile', 'logoUrl',
+      'position', 'searchVector'
+    };
+
+    // Whitelist dei tipi scalari sicuri che non richiedono sub-campi
+    const scalarTypes = {
+      'TEXT', 'NUMBER', 'BOOLEAN', 'DATE', 'DATE_TIME', 'UUID', 'SELECT', 'RATING', 'URL', 'EMAIL', 'PHONE', 'MULTI_SELECT'
+    };
+
+    String? getGraphqlField(dynamic f) {
+      final t = (f.type as String).toUpperCase();
+      if (scalarTypes.contains(t)) {
+        return f.name as String;
       }
-      final companyMetadata = metadata.where((e) => e.nameSingular == 'company').firstOrNull;
-      if (companyMetadata != null) {
-        customFieldsMap['company'] = companyMetadata.fields
-            .where((f) => f.isActive && !['RELATION', 'MULTI_SELECT', 'RICH_TEXT', 'LINKS', 'PHONES', 'EMAILS', 'ADDRESS'].contains(f.type))
-            .map((f) => f.name)
-            .toList();
+      if (t == 'CURRENCY') {
+        return '${f.name} { amountMicros currencyCode }';
       }
+      if (t == 'FILE' || t == 'IMAGE' || t == 'AVATAR') {
+        return '${f.name} { id }';
+      }
+      // Ignoriamo le relazioni (RELATION, etc.) perché richiedono { edges { node { id } } } e appesantiscono la query
+      return null;
     }
-  } catch (_) {}
+
+    final personMetadata = metadata.where((e) => e.nameSingular.toLowerCase() == 'person').firstOrNull;
+    if (personMetadata != null) {
+      final stdLower = standardPersonFields.map((s) => s.toLowerCase()).toSet();
+      customFieldsMap['person'] = personMetadata.fields
+          .where((f) => f.isActive && !stdLower.contains(f.name.toLowerCase()) && !f.name.toLowerCase().contains('search') && !f.name.toLowerCase().contains('position'))
+          .map((f) => getGraphqlField(f))
+          .where((name) => name != null)
+          .cast<String>()
+          .toList();
+    }
+    
+    final companyMetadata = metadata.where((e) => e.nameSingular.toLowerCase() == 'company').firstOrNull;
+    if (companyMetadata != null) {
+      final stdCompanyLower = standardCompanyFields.map((s) => s.toLowerCase()).toSet();
+      customFieldsMap['company'] = companyMetadata.fields
+          .where((f) => f.isActive && !stdCompanyLower.contains(f.name.toLowerCase()) && !f.name.toLowerCase().contains('search') && !f.name.toLowerCase().contains('position'))
+          .map((f) => getGraphqlField(f))
+          .where((name) => name != null)
+          .cast<String>()
+          .toList();
+    }
+
+    print('DEBUG CUSTOM FIELDS MAP (PERSON): ${customFieldsMap['person']}');
+    print('DEBUG CUSTOM FIELDS MAP (COMPANY): ${customFieldsMap['company']}');
+
+  } catch (e) {
+    print('Error loading metadata for custom fields: $e');
+  }
 
   final customHttpClient = TimeoutHttpClient(
     timeoutDuration: const Duration(seconds: 30),
@@ -231,6 +274,7 @@ class Contacts extends _$Contacts {
     String? phone,
     String? companyId,
     bool clearCompany = false,
+    Map<String, dynamic>? customFields,
   }) async {
     final isDemo = await ref.read(isDemoModeProvider.future);
     if (isDemo) throw Exception('Demo mode: Modification is not allowed.');
@@ -244,6 +288,7 @@ class Contacts extends _$Contacts {
       phone: phone,
       companyId: companyId,
       clearCompany: clearCompany,
+      customFields: customFields,
     );
 
     // Optimistic update: replace the old contact with the updated one
@@ -561,6 +606,7 @@ class Companies extends _$Companies {
     String id, {
     String? name,
     String? domainName,
+    Map<String, dynamic>? customFields,
   }) async {
     final isDemo = await ref.read(isDemoModeProvider.future);
     if (isDemo) throw Exception('Demo mode: Modification is not allowed.');
@@ -570,6 +616,7 @@ class Companies extends _$Companies {
       id,
       name: name,
       domainName: domainName,
+      customFields: customFields,
     );
 
     final currentState = state.value;

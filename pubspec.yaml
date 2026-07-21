@@ -121,6 +121,7 @@ flutter:
   assets:
     - assets/images/logo.png
     - assets/images/logo_ios.png
+    - google_fonts/
 
 flutter_launcher_icons:
   android: "launcher_icon"

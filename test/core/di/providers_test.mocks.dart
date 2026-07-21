@@ -196,6 +196,7 @@ class MockCRMRepository extends _i1.Mock implements _i6.CRMRepository {
     String? phone,
     String? companyId,
     bool? clearCompany = false,
+    Map<String, dynamic>? customFields,
   }) =>
       (super.noSuchMethod(
             Invocation.method(
@@ -208,6 +209,7 @@ class MockCRMRepository extends _i1.Mock implements _i6.CRMRepository {
                 #phone: phone,
                 #companyId: companyId,
                 #clearCompany: clearCompany,
+                #customFields: customFields,
               },
             ),
             returnValue: _i7.Future<_i2.Contact>.value(
@@ -223,6 +225,7 @@ class MockCRMRepository extends _i1.Mock implements _i6.CRMRepository {
                     #phone: phone,
                     #companyId: companyId,
                     #clearCompany: clearCompany,
+                    #customFields: customFields,
                   },
                 ),
               ),
@@ -240,6 +243,7 @@ class MockCRMRepository extends _i1.Mock implements _i6.CRMRepository {
                     #phone: phone,
                     #companyId: companyId,
                     #clearCompany: clearCompany,
+                    #customFields: customFields,
                   },
                 ),
               ),
@@ -319,12 +323,17 @@ class MockCRMRepository extends _i1.Mock implements _i6.CRMRepository {
     String? id, {
     String? name,
     String? domainName,
+    Map<String, dynamic>? customFields,
   }) =>
       (super.noSuchMethod(
             Invocation.method(
               #updateCompany,
               [id],
-              {#name: name, #domainName: domainName},
+              {
+                #name: name,
+                #domainName: domainName,
+                #customFields: customFields,
+              },
             ),
             returnValue: _i7.Future<_i3.Company>.value(
               _FakeCompany_1(
@@ -332,7 +341,11 @@ class MockCRMRepository extends _i1.Mock implements _i6.CRMRepository {
                 Invocation.method(
                   #updateCompany,
                   [id],
-                  {#name: name, #domainName: domainName},
+                  {
+                    #name: name,
+                    #domainName: domainName,
+                    #customFields: customFields,
+                  },
                 ),
               ),
             ),
@@ -342,7 +355,11 @@ class MockCRMRepository extends _i1.Mock implements _i6.CRMRepository {
                 Invocation.method(
                   #updateCompany,
                   [id],
-                  {#name: name, #domainName: domainName},
+                  {
+                    #name: name,
+                    #domainName: domainName,
+                    #customFields: customFields,
+                  },
                 ),
               ),
             ),

@@ -13,6 +13,7 @@ _$FieldMetadataImpl _$$FieldMetadataImplFromJson(Map<String, dynamic> json) =>
       type: json['type'] as String,
       label: json['label'] as String?,
       isActive: json['isActive'] as bool? ?? true,
+      isCustom: json['isCustom'] as bool? ?? false,
     );
 
 Map<String, dynamic> _$$FieldMetadataImplToJson(_$FieldMetadataImpl instance) =>
@@ -22,4 +23,5 @@ Map<String, dynamic> _$$FieldMetadataImplToJson(_$FieldMetadataImpl instance) =>
       'type': instance.type,
       'label': instance.label,
       'isActive': instance.isActive,
+      'isCustom': instance.isCustom,
     };

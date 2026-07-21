@@ -91,7 +91,7 @@ final isDemoModeProvider = FutureProvider<bool>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef IsDemoModeRef = FutureProviderRef<bool>;
-String _$crmRepositoryHash() => r'bde229ec212be8bf6d71e1dbaccf179709423da6';
+String _$crmRepositoryHash() => r'82e5b0a8b9357450d0976931554a7416c634bfa7';
 
 /// See also [crmRepository].
 @ProviderFor(crmRepository)
@@ -142,7 +142,7 @@ final currentUserNameProvider = FutureProvider<String>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef CurrentUserNameRef = FutureProviderRef<String>;
-String _$contactsHash() => r'a7303ad7ae630a6b45cdbf4a5a324879dcf931c3';
+String _$contactsHash() => r'dcad07e19aa65aaaeef695de8f645351af5333cf';
 
 /// See also [Contacts].
 @ProviderFor(Contacts)
@@ -973,7 +973,7 @@ class _TaskContactsProviderElement
   String get id => (origin as TaskContactsProvider).id;
 }
 
-String _$companiesHash() => r'ab8d4bb51236f8623ad68e7520c8adf38f10bdbf';
+String _$companiesHash() => r'af4b00b00161161b1ef80ad49f21f5f720f380be';
 
 /// See also [Companies].
 @ProviderFor(Companies)

@@ -26,6 +26,7 @@ mixin _$FieldMetadata {
   String get type => throw _privateConstructorUsedError;
   String? get label => throw _privateConstructorUsedError;
   bool get isActive => throw _privateConstructorUsedError;
+  bool get isCustom => throw _privateConstructorUsedError;
 
   /// Serializes this FieldMetadata to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -50,6 +51,7 @@ abstract class $FieldMetadataCopyWith<$Res> {
     String type,
     String? label,
     bool isActive,
+    bool isCustom,
   });
 }
 
@@ -73,6 +75,7 @@ class _$FieldMetadataCopyWithImpl<$Res, $Val extends FieldMetadata>
     Object? type = null,
     Object? label = freezed,
     Object? isActive = null,
+    Object? isCustom = null,
   }) {
     return _then(
       _value.copyWith(
@@ -96,6 +99,10 @@ class _$FieldMetadataCopyWithImpl<$Res, $Val extends FieldMetadata>
                 ? _value.isActive
                 : isActive // ignore: cast_nullable_to_non_nullable
                       as bool,
+            isCustom: null == isCustom
+                ? _value.isCustom
+                : isCustom // ignore: cast_nullable_to_non_nullable
+                      as bool,
           )
           as $Val,
     );
@@ -117,6 +124,7 @@ abstract class _$$FieldMetadataImplCopyWith<$Res>
     String type,
     String? label,
     bool isActive,
+    bool isCustom,
   });
 }
 
@@ -139,6 +147,7 @@ class __$$FieldMetadataImplCopyWithImpl<$Res>
     Object? type = null,
     Object? label = freezed,
     Object? isActive = null,
+    Object? isCustom = null,
   }) {
     return _then(
       _$FieldMetadataImpl(
@@ -162,6 +171,10 @@ class __$$FieldMetadataImplCopyWithImpl<$Res>
             ? _value.isActive
             : isActive // ignore: cast_nullable_to_non_nullable
                   as bool,
+        isCustom: null == isCustom
+            ? _value.isCustom
+            : isCustom // ignore: cast_nullable_to_non_nullable
+                  as bool,
       ),
     );
   }
@@ -176,6 +189,7 @@ class _$FieldMetadataImpl implements _FieldMetadata {
     required this.type,
     this.label,
     this.isActive = true,
+    this.isCustom = false,
   });
 
   factory _$FieldMetadataImpl.fromJson(Map<String, dynamic> json) =>
@@ -192,10 +206,13 @@ class _$FieldMetadataImpl implements _FieldMetadata {
   @override
   @JsonKey()
   final bool isActive;
+  @override
+  @JsonKey()
+  final bool isCustom;
 
   @override
   String toString() {
-    return 'FieldMetadata(id: $id, name: $name, type: $type, label: $label, isActive: $isActive)';
+    return 'FieldMetadata(id: $id, name: $name, type: $type, label: $label, isActive: $isActive, isCustom: $isCustom)';
   }
 
   @override
@@ -208,12 +225,15 @@ class _$FieldMetadataImpl implements _FieldMetadata {
             (identical(other.type, type) || other.type == type) &&
             (identical(other.label, label) || other.label == label) &&
             (identical(other.isActive, isActive) ||
-                other.isActive == isActive));
+                other.isActive == isActive) &&
+            (identical(other.isCustom, isCustom) ||
+                other.isCustom == isCustom));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, id, name, type, label, isActive);
+  int get hashCode =>
+      Object.hash(runtimeType, id, name, type, label, isActive, isCustom);
 
   /// Create a copy of FieldMetadata
   /// with the given fields replaced by the non-null parameter values.
@@ -236,6 +256,7 @@ abstract class _FieldMetadata implements FieldMetadata {
     required final String type,
     final String? label,
     final bool isActive,
+    final bool isCustom,
   }) = _$FieldMetadataImpl;
 
   factory _FieldMetadata.fromJson(Map<String, dynamic> json) =
@@ -251,6 +272,8 @@ abstract class _FieldMetadata implements FieldMetadata {
   String? get label;
   @override
   bool get isActive;
+  @override
+  bool get isCustom;
 
   /// Create a copy of FieldMetadata
   /// with the given fields replaced by the non-null parameter values.

@@ -1,5 +1,6 @@
-import 'package:pocketcrm/shared/widgets/custom_fields_section.dart';
-//
+import 'package:pocketcrm/shared/widgets/custom_field_edit_dialog.dart';
+import 'package:pocketcrm/domain/models/metadata/field_metadata.dart';
+import 'package:pocketcrm/core/di/metadata_provider.dart';
 import 'dart:io' show Platform;
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
@@ -36,6 +37,24 @@ class ContactDetailScreen extends ConsumerStatefulWidget {
 
 class _ContactDetailScreenState extends ConsumerState<ContactDetailScreen> {
   bool _isSharing = false;
+
+  IconData _getIconForFieldType(String type) {
+    switch (type.toUpperCase()) {
+      case 'TEXT': return Icons.text_fields;
+      case 'NUMBER': return Icons.numbers;
+      case 'BOOLEAN': return Icons.check_box;
+      case 'DATE':
+      case 'DATE_TIME': return Icons.calendar_today;
+      case 'CURRENCY': return Icons.attach_money;
+      case 'SELECT':
+      case 'MULTI_SELECT': return Icons.list;
+      case 'EMAIL': return Icons.email;
+      case 'PHONE': return Icons.phone;
+      case 'URL':
+      case 'LINKS': return Icons.link;
+      default: return Icons.tune;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -121,15 +140,7 @@ class _ContactDetailScreenState extends ConsumerState<ContactDetailScreen> {
                         .deleteContact(widget.id);
 
                     // Cancella notifiche task collegati
-                    final tasks = ref.read(tasksProvider).valueOrNull ?? [];
-                    for (var task in tasks) {
-                      // Se i task non hanno le info del target (contactId) non possiamo filtrare qui,
-                      // ma assumiamo che se cancelliamo il contatto da UI, possiamo cancellare in
-                      // generale notifiche di task collegate.
-                      // Per ora lo omettiamo o proviamo a leggere taskContacts.
-                      // Since task target logic is decoupled, it's safer to only rely on backend cascade delete
-                      // and sync local tasks later. But prompt says "Cancella eventuali notifiche dei task collegati"
-                    }
+                    // (Logica da implementare o gestita dal backend)
 
                     if (context.mounted) {
                       Navigator.of(context).pop();
@@ -194,6 +205,28 @@ class _ContactDetailScreenState extends ConsumerState<ContactDetailScreen> {
 
   Widget _buildDetail(BuildContext context, Contact contact) {
     final bgColor = ColorUtils.avatarColor(contact.firstName);
+    final metadataAsync = ref.watch(workspaceMetadataProvider);
+    List<FieldMetadata> personFields = [];
+    if (metadataAsync.hasValue) {
+      final personMetadata = metadataAsync.value!.where((e) => e.nameSingular.toLowerCase() == 'person').firstOrNull;
+      final totalFields = metadataAsync.value?.where((e) => e.nameSingular.toLowerCase() == 'person').firstOrNull?.fields.length ?? 0;
+      final sessoField = metadataAsync.value?.where((e) => e.nameSingular.toLowerCase() == 'person').firstOrNull?.fields.where((f) => f.name.toLowerCase().contains('sess')).firstOrNull;
+      if (personMetadata != null) {
+        const standardPersonFields = {
+          'id', 'name', 'emails', 'phones', 'avatarUrl', 'company', 'createdAt', 'updatedAt', 
+          'deletedAt', 'createdBy', 'updatedBy', 'intro', 'jobTitle', 'linkedinLink', 
+          'xLink', 'position', 'workLocation', 'performanceRating', 'searchVector'
+        };
+        const excludedFieldTypes = {
+          'RELATION', 'MULTI_SELECT', 'RICH_TEXT', 'LINKS', 'PHONES', 'EMAILS', 'ADDRESS',
+        };
+        final stdLower = standardPersonFields.map((s) => s.toLowerCase()).toSet();
+        personFields = personMetadata.fields
+            .where((f) => f.isActive && !stdLower.contains(f.name.toLowerCase()) && !f.name.toLowerCase().contains('search') && !f.name.toLowerCase().contains('position') && !excludedFieldTypes.contains(f.type))
+            .toList();
+      }
+    }
+
     return ConstrainedContent(
       child: SingleChildScrollView(
       padding: const EdgeInsets.all(16),
@@ -334,6 +367,54 @@ class _ContactDetailScreenState extends ConsumerState<ContactDetailScreen> {
                         }
                       : null,
                 ),
+                if (metadataAsync.hasError)
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Text(
+                      'ERRORE METADATA: ${metadataAsync.error}',
+                      style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                if (personFields.isNotEmpty) ...[
+                  const Divider(height: 1),
+                  ...personFields.map((field) {
+                    final value = contact.customFields[field.name];
+                    return ListTile(
+                      leading: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.tertiary.withOpacity(0.1),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          _getIconForFieldType(field.type),
+                          color: Theme.of(context).colorScheme.tertiary,
+                          size: 20,
+                        ),
+                      ),
+                      title: Text(value?.toString() ?? 'N/A'),
+                      subtitle: Text(field.label ?? field.name),
+                      onTap: () {
+                        showDialog(
+                          context: context,
+                          builder: (context) => CustomFieldEditDialog(
+                            entityId: contact.id,
+                            entityType: 'person',
+                            fieldName: field.name,
+                            initialValue: value,
+                            metadata: field,
+                            onSave: (updatedFields) async {
+                              await ref.read(contactsProvider.notifier).updateContact(
+                                contact.id,
+                                customFields: updatedFields,
+                              );
+                            },
+                          ),
+                        );
+                      },
+                    );
+                  }),
+                ],
               ],
             ),
           ),
@@ -366,8 +447,6 @@ class _ContactDetailScreenState extends ConsumerState<ContactDetailScreen> {
             icon: const Icon(Icons.save_alt),
             label: const Text('Save to Contacts'),
           ),
-          const SizedBox(height: 24),
-          CustomFieldsSection(customFields: contact.customFields),
           const SizedBox(height: 24),
           const Text(
             'Related Notes',
