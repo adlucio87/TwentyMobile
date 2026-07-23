@@ -37,10 +37,30 @@ TwentyMobile is a native mobile application developed with **Flutter** that serv
   - Multi-step interactive flow (**Bottom Sheet**) including active workflow selection, real-time loading (shimmer effect), and empty state.
   - **Dynamic Input Forms:** Automatically renders input fields based on workflow schema constraints, with support for types such as `TEXT`, `NUMBER`, `SELECT` (dropdown), and `BOOLEAN` (switch).
   - Premium **Slide-to-Execute** confirmation button with anti-fat-finger threshold, linear haptic feedback progress, and shake feedback animation on errors.
+- **Dynamic & Custom Workspace Objects (More Section):**
+  - Full support for standard or custom CRM objects (e.g. Opportunities, custom reports) defined dynamically on the Twenty CRM backend.
+  - Generates GraphQL queries and mutations on the fly using runtime metadata.
+  - Lists workspace objects, including pagination (infinite scroll), text search, and pull-to-refresh.
+  - **Dynamic Detail View:** Inspects record properties, orders them, and lets users toggle their visibility (preferences saved locally per-object type via Hive).
+  - **Dynamic Form Engine:** Creates, edits, and saves dynamic records. Provides specialized fields for complex types:
+    - *Currency:* Dual-input for numeric amount (automatically converting to/from micros) and currency code.
+    - *Relations:* Searchable lookup pickers for linked contacts and companies.
+    - *Full Name, Emails, Phones, Links, Addresses:* Multi-field composite inputs that structure data precisely as expected by the Twenty CRM schema.
 - **UI/UX & Localization:**
   - Configuration and onboarding interface entirely in **English**.
   - Robust adaptive layouts for software keyboard handling (preventing unintended rebuilds and text selections).
   - Automatic cache invalidation on user change to ensure the integrity of displayed data.
+
+## ⚡ Dynamic & Custom Workspace Objects Configuration
+
+PocketCRM dynamically fetches metadata for all workspace objects via Twenty CRM's GraphQL API. 
+
+* **Fields Visibility & Sorting:** From any dynamic object's detail screen, press the ⚙/⚡ settings icon to toggle which fields are visible and customize their display order. These settings are persisted locally.
+* **Relations Editing Support:** 
+  - Fields pointing to a `Company` open the **Company Picker Bottom Sheet**.
+  - Fields pointing to a `Person`/`Contact` open the **Contact Picker Bottom Sheet**.
+  - `ACTOR` fields (like `createdBy`, `updatedBy`) are strictly read-only and point to their respective creators without allowing direct editing, keeping the workspace secure.
+* **Complex/Composite Fields:** Input formats for Address, Currency, and Phone numbers are automatically structured to match Twenty's native DB types.
 
 ## ⚡ Workflow Integration & Requirements
 
@@ -72,8 +92,8 @@ The structure inside `lib/` is organized by feature:
 ```text
 lib/
 ├── core/                           # Global dependency injection (Riverpod), Router, Theme, Utils, Notifications
-├── domain/                         # Core data models (Contact, Company, Note, Task, Workflow), Repository interfaces
-├── data/                           # GraphQL implementation (TwentyConnector), local storage Hive/SecureStorage
+├── domain/                         # Core data models (Contact, Company, Note, Task, Workflow, DynamicRecord), Repository interfaces
+├── data/                           # GraphQL implementation (TwentyConnector, DynamicObjectConnector), local storage Hive/SecureStorage
 ├── presentation/                   # UI Layer (Feature-First)
 │   ├── onboarding/                 # Initial setup and Demo access
 │   ├── home/                       # Dashboard 
@@ -83,8 +103,9 @@ lib/
 │   ├── scan/                       # Business card scanner
 │   ├── notes/                      # Text notes module
 │   ├── tasks/                      # Tasks module
-│   └── workflows/                  # Manual Workflows module (lists, dynamic forms, slide-to-confirm)
-└── shared/                         # Aesthetic widgets and cross-feature components (e.g., Demo block)
+│   ├── workflows/                  # Manual Workflows module (lists, dynamic forms, slide-to-confirm)
+│   └── dynamic_objects/            # Support for Custom/Dynamic Workspace objects (lists, preferences, detail, form engine)
+│   shared/                         # Aesthetic widgets and cross-feature components (e.g., Demo block, pickers)
 ```
 
 ## 🛠 Main Technology Stack

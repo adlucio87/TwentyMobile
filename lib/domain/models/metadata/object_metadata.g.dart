@@ -14,6 +14,7 @@ _$ObjectMetadataImpl _$$ObjectMetadataImplFromJson(Map<String, dynamic> json) =>
       labelSingular: json['labelSingular'] as String?,
       labelPlural: json['labelPlural'] as String?,
       icon: json['icon'] as String?,
+      isCustom: json['isCustom'] as bool? ?? false,
       fields:
           (json['fields'] as List<dynamic>?)
               ?.map((e) => FieldMetadata.fromJson(e as Map<String, dynamic>))
@@ -30,5 +31,6 @@ Map<String, dynamic> _$$ObjectMetadataImplToJson(
   'labelSingular': instance.labelSingular,
   'labelPlural': instance.labelPlural,
   'icon': instance.icon,
+  'isCustom': instance.isCustom,
   'fields': instance.fields,
 };

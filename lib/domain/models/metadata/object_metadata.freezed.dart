@@ -27,6 +27,7 @@ mixin _$ObjectMetadata {
   String? get labelSingular => throw _privateConstructorUsedError;
   String? get labelPlural => throw _privateConstructorUsedError;
   String? get icon => throw _privateConstructorUsedError;
+  bool get isCustom => throw _privateConstructorUsedError;
   List<FieldMetadata> get fields => throw _privateConstructorUsedError;
 
   /// Serializes this ObjectMetadata to a JSON map.
@@ -53,6 +54,7 @@ abstract class $ObjectMetadataCopyWith<$Res> {
     String? labelSingular,
     String? labelPlural,
     String? icon,
+    bool isCustom,
     List<FieldMetadata> fields,
   });
 }
@@ -78,6 +80,7 @@ class _$ObjectMetadataCopyWithImpl<$Res, $Val extends ObjectMetadata>
     Object? labelSingular = freezed,
     Object? labelPlural = freezed,
     Object? icon = freezed,
+    Object? isCustom = null,
     Object? fields = null,
   }) {
     return _then(
@@ -106,6 +109,10 @@ class _$ObjectMetadataCopyWithImpl<$Res, $Val extends ObjectMetadata>
                 ? _value.icon
                 : icon // ignore: cast_nullable_to_non_nullable
                       as String?,
+            isCustom: null == isCustom
+                ? _value.isCustom
+                : isCustom // ignore: cast_nullable_to_non_nullable
+                      as bool,
             fields: null == fields
                 ? _value.fields
                 : fields // ignore: cast_nullable_to_non_nullable
@@ -132,6 +139,7 @@ abstract class _$$ObjectMetadataImplCopyWith<$Res>
     String? labelSingular,
     String? labelPlural,
     String? icon,
+    bool isCustom,
     List<FieldMetadata> fields,
   });
 }
@@ -156,6 +164,7 @@ class __$$ObjectMetadataImplCopyWithImpl<$Res>
     Object? labelSingular = freezed,
     Object? labelPlural = freezed,
     Object? icon = freezed,
+    Object? isCustom = null,
     Object? fields = null,
   }) {
     return _then(
@@ -184,6 +193,10 @@ class __$$ObjectMetadataImplCopyWithImpl<$Res>
             ? _value.icon
             : icon // ignore: cast_nullable_to_non_nullable
                   as String?,
+        isCustom: null == isCustom
+            ? _value.isCustom
+            : isCustom // ignore: cast_nullable_to_non_nullable
+                  as bool,
         fields: null == fields
             ? _value._fields
             : fields // ignore: cast_nullable_to_non_nullable
@@ -203,6 +216,7 @@ class _$ObjectMetadataImpl implements _ObjectMetadata {
     this.labelSingular,
     this.labelPlural,
     this.icon,
+    this.isCustom = false,
     final List<FieldMetadata> fields = const [],
   }) : _fields = fields;
 
@@ -221,6 +235,9 @@ class _$ObjectMetadataImpl implements _ObjectMetadata {
   final String? labelPlural;
   @override
   final String? icon;
+  @override
+  @JsonKey()
+  final bool isCustom;
   final List<FieldMetadata> _fields;
   @override
   @JsonKey()
@@ -232,7 +249,7 @@ class _$ObjectMetadataImpl implements _ObjectMetadata {
 
   @override
   String toString() {
-    return 'ObjectMetadata(id: $id, nameSingular: $nameSingular, namePlural: $namePlural, labelSingular: $labelSingular, labelPlural: $labelPlural, icon: $icon, fields: $fields)';
+    return 'ObjectMetadata(id: $id, nameSingular: $nameSingular, namePlural: $namePlural, labelSingular: $labelSingular, labelPlural: $labelPlural, icon: $icon, isCustom: $isCustom, fields: $fields)';
   }
 
   @override
@@ -250,6 +267,8 @@ class _$ObjectMetadataImpl implements _ObjectMetadata {
             (identical(other.labelPlural, labelPlural) ||
                 other.labelPlural == labelPlural) &&
             (identical(other.icon, icon) || other.icon == icon) &&
+            (identical(other.isCustom, isCustom) ||
+                other.isCustom == isCustom) &&
             const DeepCollectionEquality().equals(other._fields, _fields));
   }
 
@@ -263,6 +282,7 @@ class _$ObjectMetadataImpl implements _ObjectMetadata {
     labelSingular,
     labelPlural,
     icon,
+    isCustom,
     const DeepCollectionEquality().hash(_fields),
   );
 
@@ -291,6 +311,7 @@ abstract class _ObjectMetadata implements ObjectMetadata {
     final String? labelSingular,
     final String? labelPlural,
     final String? icon,
+    final bool isCustom,
     final List<FieldMetadata> fields,
   }) = _$ObjectMetadataImpl;
 
@@ -309,6 +330,8 @@ abstract class _ObjectMetadata implements ObjectMetadata {
   String? get labelPlural;
   @override
   String? get icon;
+  @override
+  bool get isCustom;
   @override
   List<FieldMetadata> get fields;
 

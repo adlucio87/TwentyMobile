@@ -13,6 +13,7 @@ class ObjectMetadata with _$ObjectMetadata {
     String? labelSingular,
     String? labelPlural,
     String? icon,
+    @Default(false) bool isCustom,
     @Default([]) List<FieldMetadata> fields,
   }) = _ObjectMetadata;
 

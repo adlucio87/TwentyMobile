@@ -19,6 +19,9 @@ import 'package:pocketcrm/presentation/onboarding/notification_permission_screen
 import 'package:pocketcrm/presentation/onboarding/auth_method_screen.dart';
 import 'package:pocketcrm/presentation/onboarding/email_login_screen.dart';
 import 'package:pocketcrm/presentation/onboarding/otp_screen.dart';
+import 'package:pocketcrm/presentation/dynamic_objects/custom_objects_screen.dart';
+import 'package:pocketcrm/presentation/dynamic_objects/dynamic_list_screen.dart';
+import 'package:pocketcrm/presentation/dynamic_objects/dynamic_detail_screen.dart';
 
 part 'router.g.dart';
 
@@ -171,6 +174,23 @@ GoRouter appRouter(AppRouterRef ref) {
                 builder: (context, state) => const TasksScreen(),
               ),
             ],
+          ),
+          GoRoute(
+            path: '/objects',
+            builder: (context, state) => const CustomObjectsScreen(),
+          ),
+          GoRoute(
+            path: '/objects/:objectType',
+            builder: (context, state) => DynamicListScreen(
+              objectType: state.pathParameters['objectType']!,
+            ),
+          ),
+          GoRoute(
+            path: '/objects/:objectType/:id',
+            builder: (context, state) => DynamicDetailScreen(
+              objectType: state.pathParameters['objectType']!,
+              id: state.pathParameters['id']!,
+            ),
           ),
           GoRoute(
             path: '/settings',

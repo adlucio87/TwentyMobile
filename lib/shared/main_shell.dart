@@ -76,6 +76,11 @@ class MainShell extends ConsumerWidget {
                           selectedIcon: Icon(Icons.task),
                           label: Text('Tasks'),
                         ),
+                        NavigationRailDestination(
+                          icon: Icon(Icons.apps_outlined),
+                          selectedIcon: Icon(Icons.apps),
+                          label: Text('More'),
+                        ),
                       ],
                     ),
                     const VerticalDivider(width: 1, thickness: 1),
@@ -109,6 +114,7 @@ class MainShell extends ConsumerWidget {
           NavigationDestination(icon: Icon(Icons.people), label: 'Contacts'),
           NavigationDestination(icon: Icon(Icons.business), label: 'Companies'),
           NavigationDestination(icon: Icon(Icons.task), label: 'Tasks'),
+          NavigationDestination(icon: Icon(Icons.apps), label: 'More'),
         ],
       ),
     );
@@ -120,6 +126,7 @@ class MainShell extends ConsumerWidget {
     if (location.startsWith('/contacts')) return 1;
     if (location.startsWith('/companies')) return 2;
     if (location.startsWith('/tasks')) return 3;
+    if (location.startsWith('/objects')) return 4;
     return 0;
   }
 
@@ -136,6 +143,9 @@ class MainShell extends ConsumerWidget {
         break;
       case 3:
         context.go('/tasks');
+        break;
+      case 4:
+        context.go('/objects');
         break;
     }
   }
