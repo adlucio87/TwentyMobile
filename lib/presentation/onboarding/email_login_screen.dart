@@ -23,6 +23,7 @@ class _EmailLoginScreenState extends ConsumerState<EmailLoginScreen> {
   bool _obscureText = true;
   bool _isLoading = false;
   String? _error;
+  String? _loadingMessage;
 
   @override
   void dispose() {
@@ -37,6 +38,7 @@ class _EmailLoginScreenState extends ConsumerState<EmailLoginScreen> {
     setState(() {
       _isLoading = true;
       _error = null;
+      _loadingMessage = null;
     });
 
     try {
@@ -44,11 +46,30 @@ class _EmailLoginScreenState extends ConsumerState<EmailLoginScreen> {
       final baseUrl = await storage.read(key: 'instance_url');
       if (baseUrl == null) throw Exception('Instance URL missing');
 
+      // Step 1: Check if captcha is required on this instance
+      String? captchaToken;
+      final captchaService = ref.read(captchaServiceProvider);
+      final captchaConfig = await captchaService.fetchCaptchaConfig(baseUrl);
+
+      if (captchaConfig != null) {
+        if (mounted) {
+          setState(() => _loadingMessage = 'Verifica di sicurezza...');
+        }
+        captchaToken = await captchaService.generateCaptchaToken(captchaConfig);
+        debugPrint('Captcha token obtained successfully');
+      }
+
+      if (mounted) {
+        setState(() => _loadingMessage = 'Accesso in corso...');
+      }
+
+      // Step 2: Login with credentials (and captcha token if required)
       final authService = ref.read(authServiceProvider);
       await authService.loginWithCredentials(
         baseUrl,
         _emailController.text.trim(),
         _passwordController.text,
+        captchaToken: captchaToken,
       );
 
       final token = await storage.read(key: 'api_token');
@@ -200,14 +221,27 @@ class _EmailLoginScreenState extends ConsumerState<EmailLoginScreen> {
                         child: ElevatedButton(
                           onPressed: _isLoading ? null : _login,
                           child: _isLoading
-                              ? const SizedBox(
-                                  height: 20,
-                                  width: 20,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    color: Colors.white,
-                                  ),
-                                )
+                              ? Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    const SizedBox(
+                                      height: 20,
+                                      width: 20,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                    if (_loadingMessage != null) ...[
+                                      const SizedBox(width: 12),
+                                      Text(
+                                        _loadingMessage!,
+                                        style: const TextStyle(color: Colors.white),
+                                      ),
+                                    ],
+                                  ],
+                                 )
                               : const Text('Login'),
                         ),
                       ),

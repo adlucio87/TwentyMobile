@@ -8,11 +8,13 @@ const String getLoginTokenFromCredentialsMutation = r'''
 mutation GetLoginTokenFromCredentials(
   $email: String!,
   $password: String!,
+  $captchaToken: String,
   $origin: String!
 ) {
   getLoginTokenFromCredentials(
     email: $email,
     password: $password,
+    captchaToken: $captchaToken,
     origin: $origin
   ) {
     loginToken {

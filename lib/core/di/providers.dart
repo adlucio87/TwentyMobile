@@ -13,6 +13,7 @@ import 'package:pocketcrm/domain/models/workflow.dart';
 import 'package:pocketcrm/domain/models/workflow_run.dart';
 import 'package:pocketcrm/domain/models/workspace_member.dart';
 import 'package:pocketcrm/core/auth/auth_service.dart';
+import 'package:pocketcrm/core/auth/captcha_service.dart';
 import 'package:pocketcrm/domain/repositories/crm_repository.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:pocketcrm/core/notifications/notification_service.dart';
@@ -39,6 +40,11 @@ AuthService authService(AuthServiceRef ref) {
     aOptions: AndroidOptions(encryptedSharedPreferences: true),
   );
   return AuthService(secure);
+}
+
+@Riverpod(keepAlive: true)
+CaptchaService captchaService(CaptchaServiceRef ref) {
+  return CaptchaService();
 }
 
 @Riverpod(keepAlive: true)

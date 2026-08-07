@@ -18,18 +18,24 @@ class AuthService {
   Future<void> loginWithCredentials(
     String instanceUrl,
     String email,
-    String password,
-  ) async {
+    String password, {
+    String? captchaToken,
+  }) async {
     final client = _createUnauthenticatedClient(instanceUrl);
 
     // Step 1: Get a temporary login token from credentials
+    final variables = <String, dynamic>{
+      'email': email,
+      'password': password,
+      'origin': instanceUrl,
+    };
+    if (captchaToken != null) {
+      variables['captchaToken'] = captchaToken;
+    }
+
     final loginOptions = MutationOptions(
       document: gql(getLoginTokenFromCredentialsMutation),
-      variables: {
-        'email': email,
-        'password': password,
-        'origin': instanceUrl,
-      },
+      variables: variables,
     );
 
     final loginResult = await client.mutate(loginOptions);
@@ -53,6 +59,11 @@ class AuthService {
           exStr.contains('password-login-disabled')) {
         throw Exception(
           'Password login is disabled on this Twenty instance.',
+        );
+      }
+      if (exStr.contains('captcha')) {
+        throw Exception(
+          'Captcha verification failed. Please try again.',
         );
       }
       throw Exception(loginResult.exception.toString());

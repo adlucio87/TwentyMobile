@@ -132,12 +132,23 @@ class DynamicDetailScreen extends ConsumerWidget {
       case 'ACTOR':
         if (value is Map) {
           final nameObj = value['name'];
+          final titleObj = value['title'];
+          final subjectObj = value['subject'];
+          
           if (nameObj is Map) {
             final first = nameObj['firstName'] ?? '';
             final last = nameObj['lastName'] ?? '';
             return '$first $last'.trim();
           } else if (nameObj != null) {
             return nameObj.toString();
+          } else if (titleObj != null) {
+            return titleObj.toString();
+          } else if (subjectObj != null) {
+            return subjectObj.toString();
+          }
+          
+          if (value.containsKey('id')) {
+            return 'ID: ${value['id']}';
           }
         }
         return value.toString();

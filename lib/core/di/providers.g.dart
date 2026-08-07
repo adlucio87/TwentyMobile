@@ -57,6 +57,23 @@ final authServiceProvider = Provider<AuthService>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef AuthServiceRef = ProviderRef<AuthService>;
+String _$captchaServiceHash() => r'19085a8e200e2c4f54b3822281531d45a3c7a1db';
+
+/// See also [captchaService].
+@ProviderFor(captchaService)
+final captchaServiceProvider = Provider<CaptchaService>.internal(
+  captchaService,
+  name: r'captchaServiceProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$captchaServiceHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef CaptchaServiceRef = ProviderRef<CaptchaService>;
 String _$authMethodHash() => r'2400fccfa612d542c4cf29cf39650a90fa6bae47';
 
 /// See also [authMethod].

@@ -32,7 +32,11 @@ class DynamicQueryBuilder {
       const skipConnections = {
         'timelineactivities', 'favorites', 'tasktargets', 'notetargets', 'notes', 'tasks',
         'attachments', 'messages', 'events', 'comments', 'workflowruns',
-        'workflows', 'opportunities', 'people', 'companies', 'tags'
+        'workflows', 'opportunities', 'people', 'companies', 'tags',
+        'messagefolders', 'messagechannelmessageassociations', 'calendareventparticipants',
+        'messageparticipants', 'calendarchanneleventassociations', 'blocklists',
+        'dashboards', 'connectedaccounts', 'favoritefolders', 'workflowversions',
+        'messagechannels', 'calendarchannels', 'runs', 'workflowrun', 'triggers', 'workflowautomatedtriggers'
       };
       
       if (skipConnections.contains(nameLower) || nameLower.endsWith('connection')) {
@@ -41,10 +45,14 @@ class DynamicQueryBuilder {
       
       if (nameLower.contains('company')) {
         return '${field.name} { id name }';
-      } else if (nameLower.contains('person') || nameLower.contains('contact') || nameLower.contains('user') || nameLower.contains('owner') || nameLower.contains('by') || nameLower == 'assignee') {
+      } else if (nameLower.contains('person') || nameLower.contains('contact') || nameLower.contains('user') || nameLower.contains('owner') || nameLower.contains('by') || nameLower.contains('assignee') || nameLower.contains('participant')) {
         return '${field.name} { id name { firstName lastName } }';
+      } else if (nameLower.contains('event')) {
+        return '${field.name} { id title }';
+      } else if (nameLower.contains('message') || nameLower.contains('thread')) {
+        return '${field.name} { id }';
       } else {
-        return '${field.name} { id name }';
+        return '${field.name} { id }';
       }
     }
     
