@@ -18,6 +18,7 @@ TwentyMobile is a native mobile application developed with **Flutter** that serv
   - Comprehensive contact detail view.
   - Rapid creation and editing of contacts with **optimistic updates** (Optimistic UI).
   - Contact sharing and direct export to the system's address book (iOS/Android).
+  - **iOS 18+ Contacts Provider:** Settings toggle *Show Twenty people in iOS Contacts* adds a live **Twenty** account in the iOS Contacts app. People stay in a provider container (not copied to iCloud).
   - Rapid capture via integrated **Business Card Scanner**.
   - Quick actions for sending emails or starting phone calls.
 - **Company Management:**
@@ -61,6 +62,10 @@ PocketCRM dynamically fetches metadata for all workspace objects via Twenty CRM'
   - Fields pointing to a `Person`/`Contact` open the **Contact Picker Bottom Sheet**.
   - `ACTOR` fields (like `createdBy`, `updatedBy`) are strictly read-only and point to their respective creators without allowing direct editing, keeping the workspace secure.
 * **Complex/Composite Fields:** Input formats for Address, Currency, and Phone numbers are automatically structured to match Twenty's native DB types.
+
+## iOS Contacts Provider (iOS 18+)
+
+On iOS 18 or later, open **Settings → iOS Contacts** and enable **Show Twenty people in iOS Contacts**. Twenty people then appear as a live container named **Twenty** in the system Contacts app. This is not a one-off vCard export and does not copy contacts into iCloud. Disable the toggle or log out to remove the container.
 
 ## ⚡ Workflow Integration & Requirements
 

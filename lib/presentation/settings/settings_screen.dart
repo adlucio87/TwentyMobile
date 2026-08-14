@@ -5,6 +5,7 @@ import 'package:pocketcrm/core/theme/theme_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:pocketcrm/core/notifications/notification_service.dart';
 import 'package:pocketcrm/core/di/providers.dart';
+import 'package:pocketcrm/domain/services/ios_contacts_provider_service.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pocketcrm/shared/widgets/constrained_content.dart';
@@ -19,6 +20,8 @@ class SettingsScreen extends ConsumerStatefulWidget {
 class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   bool _notificationsEnabled = true;
   int _reminderAdvanceMinutes = 30;
+  bool _iosContactsSupported = false;
+  bool _iosContactsEnabled = false;
 
   @override
   void initState() {
@@ -28,10 +31,55 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
   Future<void> _loadSettings() async {
     final prefs = await SharedPreferences.getInstance();
+    final iosSupported = await IosContactsProviderService.instance.isSupported();
+    if (!mounted) return;
     setState(() {
       _notificationsEnabled = prefs.getBool('notifications_enabled') ?? true;
       _reminderAdvanceMinutes = prefs.getInt('reminder_advance_minutes') ?? 30;
+      _iosContactsSupported = iosSupported;
+      _iosContactsEnabled =
+          prefs.getBool(iosContactsProviderEnabledPrefKey) ?? false;
     });
+  }
+
+  Future<void> _saveIosContactsEnabled(bool value) async {
+    final service = IosContactsProviderService.instance;
+    if (value) {
+      try {
+        final all = await ref
+            .read(contactsProvider.notifier)
+            .fetchAllContactsForIosProvider();
+        await service.writeSnapshot(all);
+        await service.setEnabled(true);
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setBool(iosContactsProviderEnabledPrefKey, true);
+        if (mounted) {
+          setState(() {
+            _iosContactsEnabled = true;
+          });
+        }
+      } catch (_) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Could not enable Twenty in iOS Contacts.'),
+          ),
+        );
+      }
+      return;
+    }
+
+    try {
+      await service.setEnabled(false);
+      await service.writeSnapshot(const []);
+    } catch (_) {}
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(iosContactsProviderEnabledPrefKey, false);
+    if (mounted) {
+      setState(() {
+        _iosContactsEnabled = false;
+      });
+    }
   }
 
   Future<void> _saveNotificationEnabled(bool value) async {
@@ -216,6 +264,27 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   : null,
             ),
           ),
+          if (_iosContactsSupported) ...[
+            const SizedBox(height: 32),
+            const Text(
+              'iOS Contacts',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 16),
+            ListTile(
+              title: const Text('Show Twenty people in iOS Contacts'),
+              subtitle: const Text(
+                'Adds a Twenty account in the Contacts app (iOS 18+). Does not copy contacts into iCloud.',
+              ),
+              trailing: Switch(
+                value: _iosContactsEnabled,
+                onChanged: _saveIosContactsEnabled,
+              ),
+            ),
+          ],
           const SizedBox(height: 48),
           const Divider(),
           const SizedBox(height: 16),

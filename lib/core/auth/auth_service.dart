@@ -5,6 +5,7 @@ import 'package:pocketcrm/core/network/custom_http_client.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:pocketcrm/data/graphql/auth_mutations.dart';
+import 'package:pocketcrm/domain/services/ios_contacts_provider_service.dart';
 
 class AuthService {
   final FlutterSecureStorage _storage;
@@ -348,6 +349,7 @@ class AuthService {
 
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('token_expires_at');
+    await IosContactsProviderService.instance.disableAndClear();
   }
 
   GraphQLClient _createUnauthenticatedClient(String baseUrl) {

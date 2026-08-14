@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:pocketcrm/core/di/metadata_provider.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -15,6 +17,7 @@ import 'package:pocketcrm/domain/models/workspace_member.dart';
 import 'package:pocketcrm/core/auth/auth_service.dart';
 import 'package:pocketcrm/core/auth/captcha_service.dart';
 import 'package:pocketcrm/domain/repositories/crm_repository.dart';
+import 'package:pocketcrm/domain/services/ios_contacts_provider_service.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:pocketcrm/core/notifications/notification_service.dart';
 
@@ -202,6 +205,7 @@ class Contacts extends _$Contacts {
     final result = await repo.getContacts();
     _endCursor = result.endCursor;
     _hasNextPage = result.hasNextPage;
+    _scheduleIosSnapshot(result.contacts);
     return result.contacts;
   }
 
@@ -215,6 +219,7 @@ class Contacts extends _$Contacts {
       final result = await repo.getContacts(search: _currentSearch);
       _endCursor = result.endCursor;
       _hasNextPage = result.hasNextPage;
+      _scheduleIosSnapshot(result.contacts);
       return result.contacts;
     });
   }
@@ -236,10 +241,33 @@ class Contacts extends _$Contacts {
       );
       _endCursor = result.endCursor;
       _hasNextPage = result.hasNextPage;
-      state = AsyncValue.data([...current, ...result.contacts]);
+      final merged = [...current, ...result.contacts];
+      state = AsyncValue.data(merged);
+      _scheduleIosSnapshot(merged);
     } finally {
       _isLoadingMore = false;
     }
+  }
+
+  Future<List<Contact>> fetchAllContactsForIosProvider() async {
+    final repo = await ref.read(crmRepositoryProvider.future);
+    final all = <Contact>[];
+    String? after;
+    var hasNext = true;
+    while (hasNext) {
+      final result = await repo.getContacts(pageSize: 100, after: after);
+      all.addAll(result.contacts);
+      after = result.endCursor;
+      hasNext = result.hasNextPage && after != null;
+    }
+    return all;
+  }
+
+  void _scheduleIosSnapshot([List<Contact>? contacts]) {
+    if (_currentSearch != null) return;
+    final list = contacts ?? state.value;
+    if (list == null) return;
+    unawaited(IosContactsProviderService.instance.syncIfEnabled(list));
   }
 
   Future<Contact> addContact({
@@ -263,7 +291,9 @@ class Contacts extends _$Contacts {
     // alla lista attuale. In questo modo l'UI si aggiorna all'istante!
     final currentState = state.value;
     if (currentState != null) {
-      state = AsyncValue.data([newContact, ...currentState]);
+      final updated = [newContact, ...currentState];
+      state = AsyncValue.data(updated);
+      _scheduleIosSnapshot(updated);
     } else {
       // Se era vuoto o in errore, forziamo il reload dal backend
       ref.invalidateSelf();
@@ -324,6 +354,7 @@ class Contacts extends _$Contacts {
               : (updatedContact.companyName ?? oldContact.companyName),
         );
         state = AsyncValue.data(newList);
+        _scheduleIosSnapshot(newList);
       }
     }
 
@@ -346,6 +377,7 @@ class Contacts extends _$Contacts {
       previousState = List.from(currentState);
       final newList = currentState.where((c) => c.id != id).toList();
       state = AsyncValue.data(newList);
+      _scheduleIosSnapshot(newList);
     }
 
     try {

@@ -48,7 +48,7 @@
 		<key>ITSAppUsesNonExemptEncryption</key>
 		<false/>
 		<key>NSContactsUsageDescription</key>
-		<string>TwentyMobile can save CRM contacts directly to your address book when you request it.</string>
+		<string>TwentyMobile can show your Twenty people in the iOS Contacts app and save a contact when you request it.</string>
 		<key>NSCameraUsageDescription</key>
 		<string>TwentyMobile uses the camera to scan business cards and create contacts automatically.</string>
 		<key>NSPhotoLibraryUsageDescription</key>
