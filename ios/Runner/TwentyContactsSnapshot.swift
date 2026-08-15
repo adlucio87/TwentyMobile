@@ -4,6 +4,7 @@ enum TwentyContactsSnapshot {
     static let appGroupId = "group.com.luciosoft.pocketcrm"
     static let fileName = "twenty_people.json"
     static let lastIdsKey = "twenty_people_last_ids"
+    static let lastFingerprintsKey = "twenty_people_last_fingerprints"
 
     struct Person: Sendable {
         let id: String
@@ -12,6 +13,17 @@ enum TwentyContactsSnapshot {
         let email: String?
         let phone: String?
         let organization: String?
+
+        /// Stable field signature used to skip unchanged people in enumerateChanges.
+        var fingerprint: String {
+            [id, givenName, familyName, email ?? "", phone ?? "", organization ?? ""]
+                .joined(separator: "\u{1e}")
+        }
+    }
+
+    struct ChangeSet: Sendable {
+        let updated: [Person]
+        let deletedIds: [String]
     }
 
     struct Payload: Sendable {
@@ -167,11 +179,47 @@ enum TwentyContactsSnapshot {
     }
 
     static func lastEnumeratedIds() -> [String] {
-        UserDefaults(suiteName: appGroupId)?.stringArray(forKey: lastIdsKey) ?? []
+        let prints = lastEnumeratedFingerprints()
+        if !prints.isEmpty {
+            return Array(prints.keys)
+        }
+        return UserDefaults(suiteName: appGroupId)?.stringArray(forKey: lastIdsKey) ?? []
+    }
+
+    static func lastEnumeratedFingerprints() -> [String: String] {
+        UserDefaults(suiteName: appGroupId)?.dictionary(forKey: lastFingerprintsKey) as? [String: String] ?? [:]
     }
 
     static func storeEnumeratedIds(_ ids: [String]) {
         UserDefaults(suiteName: appGroupId)?.set(ids, forKey: lastIdsKey)
+    }
+
+    static func storeEnumerated(_ contacts: [Person]) {
+        let defaults = UserDefaults(suiteName: appGroupId)
+        defaults?.set(contacts.map(\.id), forKey: lastIdsKey)
+        var prints = [String: String](minimumCapacity: contacts.count)
+        for person in contacts {
+            prints[person.id] = person.fingerprint
+        }
+        defaults?.set(prints, forKey: lastFingerprintsKey)
+    }
+
+    /// Only people whose fields changed (or are new) plus IDs that disappeared.
+    static func changes(from snapshot: Payload) -> ChangeSet {
+        let previousPrints = lastEnumeratedFingerprints()
+        let previousIds = previousPrints.isEmpty
+            ? Set(lastEnumeratedIds())
+            : Set(previousPrints.keys)
+        let deletedIds = previousIds.subtracting(snapshot.ids)
+
+        var updated: [Person] = []
+        updated.reserveCapacity(min(snapshot.contacts.count, 64))
+        for person in snapshot.contacts {
+            if previousPrints[person.id] != person.fingerprint {
+                updated.append(person)
+            }
+        }
+        return ChangeSet(updated: updated, deletedIds: Array(deletedIds))
     }
 
     private static func nonempty(_ value: String?) -> String? {

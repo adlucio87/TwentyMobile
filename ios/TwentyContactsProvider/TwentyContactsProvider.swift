@@ -35,7 +35,7 @@ final class TwentyPeopleEnumerator: ContactItemEnumerator {
 
         guard offset <= items.count else {
             observer.didFinishEnumeratingContent(upTo: generation)
-            TwentyContactsSnapshot.storeEnumeratedIds(snapshot.ids)
+            TwentyContactsSnapshot.storeEnumerated(snapshot.contacts)
             return
         }
 
@@ -46,23 +46,26 @@ final class TwentyPeopleEnumerator: ContactItemEnumerator {
             let nextPage = ContactItemPage(generationMarker: generation, offset: end)
             observer.didFinishEnumeratingPage(upTo: nextPage)
         } else {
-            TwentyContactsSnapshot.storeEnumeratedIds(snapshot.ids)
+            TwentyContactsSnapshot.storeEnumerated(snapshot.contacts)
             observer.didFinishEnumeratingContent(upTo: generation)
         }
     }
 
     func enumerateChanges(startingAt syncAnchor: ContactItemSyncAnchor, for observer: any ContactItemChangeObserver) {
         let snapshot = TwentyContactsSnapshot.load()
-        let currentIds = Set(snapshot.ids)
-        let previousIds = Set(TwentyContactsSnapshot.lastEnumeratedIds())
-        let deleted = previousIds.subtracting(currentIds).map { ContactItem.Identifier($0) }
-        let items = snapshot.contacts.compactMap { Self.contactItem(from: $0) }
+        let delta = TwentyContactsSnapshot.changes(from: snapshot)
+        let updated = delta.updated.compactMap { Self.contactItem(from: $0) }
+        let deleted = delta.deletedIds.map { ContactItem.Identifier($0) }
         let nextAnchor = ContactItemSyncAnchor(generationMarker: snapshot.generationData, offset: 0)
 
-        observer.didUpdate(items)
-        observer.didDelete(deleted)
+        if !updated.isEmpty {
+            observer.didUpdate(updated)
+        }
+        if !deleted.isEmpty {
+            observer.didDelete(deleted)
+        }
         observer.didFinishEnumeratingChanges(upTo: nextAnchor, moreComing: false)
-        TwentyContactsSnapshot.storeEnumeratedIds(snapshot.ids)
+        TwentyContactsSnapshot.storeEnumerated(snapshot.contacts)
     }
 
     func invalidate() async {}

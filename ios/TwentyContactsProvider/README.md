@@ -9,6 +9,7 @@ iOS 18+ Contact Provider extension. Twenty CRM people appear as a live **Twenty*
 - App Group `group.com.luciosoft.pocketcrm` on Runner + this extension
 - Snapshot file: App Group `Library/Application Support/twenty_people.json`
 - Incremental updates: Dart calls `upsertContact` / `deleteContact` after create/edit/delete. Full `writeSnapshot` is only used when the Settings toggle is turned on (complete directory fetch) or off/logout (empty). Do **not** write the UI's paginated first page — that would delete everyone else from iOS Contacts.
+- `enumerateChanges` sends only the field-level delta (fingerprint per person), not the whole directory.
 
 If the Xcode project target is missing after a merge, recreate it:
 
