@@ -22,6 +22,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   int _reminderAdvanceMinutes = 30;
   bool _iosContactsSupported = false;
   bool _iosContactsEnabled = false;
+  bool _isSyncingIos = false;
 
   @override
   void initState() {
@@ -43,42 +44,61 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   }
 
   Future<void> _saveIosContactsEnabled(bool value) async {
+    if (_isSyncingIos) return;
+    setState(() {
+      _isSyncingIos = true;
+    });
     final service = IosContactsProviderService.instance;
-    if (value) {
-      try {
+    try {
+      if (value) {
         final all = await ref
             .read(contactsProvider.notifier)
             .fetchAllContactsForIosProvider();
+        if (!mounted) return;
         await service.writeSnapshot(all);
-        await service.setEnabled(true);
+        if (!mounted) return;
+        final enabled = await service.setEnabled(true);
+        if (!mounted) return;
+        if (!enabled) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Could not enable Twenty in iOS Contacts.'),
+            ),
+          );
+          return;
+        }
         final prefs = await SharedPreferences.getInstance();
         await prefs.setBool(iosContactsProviderEnabledPrefKey, true);
+        if (!mounted) return;
+        setState(() {
+          _iosContactsEnabled = true;
+        });
+      } else {
+        try {
+          await service.setEnabled(false);
+          await service.writeSnapshot(const []);
+        } catch (_) {}
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setBool(iosContactsProviderEnabledPrefKey, false);
         if (mounted) {
           setState(() {
-            _iosContactsEnabled = true;
+            _iosContactsEnabled = false;
           });
         }
-      } catch (_) {
-        if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Could not enable Twenty in iOS Contacts.'),
-          ),
-        );
       }
-      return;
-    }
-
-    try {
-      await service.setEnabled(false);
-      await service.writeSnapshot(const []);
-    } catch (_) {}
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(iosContactsProviderEnabledPrefKey, false);
-    if (mounted) {
-      setState(() {
-        _iosContactsEnabled = false;
-      });
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Could not enable Twenty in iOS Contacts.'),
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isSyncingIos = false;
+        });
+      }
     }
   }
 
@@ -279,10 +299,16 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               subtitle: const Text(
                 'Adds a Twenty account in the Contacts app (iOS 18+). Does not copy contacts into iCloud.',
               ),
-              trailing: Switch(
-                value: _iosContactsEnabled,
-                onChanged: _saveIosContactsEnabled,
-              ),
+              trailing: _isSyncingIos
+                  ? const SizedBox(
+                      width: 24,
+                      height: 24,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : Switch(
+                      value: _iosContactsEnabled,
+                      onChanged: _saveIosContactsEnabled,
+                    ),
             ),
           ],
           const SizedBox(height: 48),

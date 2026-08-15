@@ -25,6 +25,10 @@ enum IosContactsProviderPlugin {
                 setEnabled(call: call, result: result)
             case "writeSnapshot":
                 writeSnapshot(call: call, result: result)
+            case "upsertContact":
+                upsertContact(call: call, result: result)
+            case "deleteContact":
+                deleteContact(call: call, result: result)
             default:
                 result(FlutterMethodNotImplemented)
             }
@@ -94,6 +98,38 @@ enum IosContactsProviderPlugin {
             result(true)
         } catch {
             result(FlutterError(code: "write_failed", message: error.localizedDescription, details: nil))
+        }
+    }
+
+    private static func upsertContact(call: FlutterMethodCall, result: @escaping FlutterResult) {
+        guard let args = call.arguments as? [String: Any],
+              let contact = args["contact"] as? [String: Any]
+        else {
+            result(FlutterError(code: "bad_args", message: "contact is required", details: nil))
+            return
+        }
+        do {
+            try TwentyContactsSnapshot.upsert(contact: contact)
+            signalIfEnabled()
+            result(true)
+        } catch {
+            result(FlutterError(code: "upsert_failed", message: error.localizedDescription, details: nil))
+        }
+    }
+
+    private static func deleteContact(call: FlutterMethodCall, result: @escaping FlutterResult) {
+        guard let args = call.arguments as? [String: Any],
+              let id = args["id"] as? String, !id.isEmpty
+        else {
+            result(FlutterError(code: "bad_args", message: "id is required", details: nil))
+            return
+        }
+        do {
+            try TwentyContactsSnapshot.delete(id: id)
+            signalIfEnabled()
+            result(true)
+        } catch {
+            result(FlutterError(code: "delete_failed", message: error.localizedDescription, details: nil))
         }
     }
 

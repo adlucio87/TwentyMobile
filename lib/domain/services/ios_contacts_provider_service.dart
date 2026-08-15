@@ -75,14 +75,45 @@ class IosContactsProviderService {
     });
   }
 
+  Future<void> upsertContact(Contact contact) async {
+    if (!_isIos) return;
+    await _channel.invokeMethod<void>('upsertContact', {
+      'contact': contactToIosSnapshot(contact),
+    });
+  }
+
+  Future<void> deleteContact(String id) async {
+    if (!_isIos) return;
+    await _channel.invokeMethod<void>('deleteContact', {'id': id});
+  }
+
+  Future<bool> _prefEnabled() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(iosContactsProviderEnabledPrefKey) == true;
+  }
+
+  /// Full replace — only for the Settings enable path (complete directory).
   Future<void> syncIfEnabled(List<Contact> contacts) async {
     if (!_isIos) return;
     try {
-      final prefs = await SharedPreferences.getInstance();
-      if (prefs.getBool(iosContactsProviderEnabledPrefKey) != true) {
-        return;
-      }
+      if (!await _prefEnabled()) return;
       await writeSnapshot(contacts);
+    } catch (_) {}
+  }
+
+  Future<void> upsertIfEnabled(Contact contact) async {
+    if (!_isIos) return;
+    try {
+      if (!await _prefEnabled()) return;
+      await upsertContact(contact);
+    } catch (_) {}
+  }
+
+  Future<void> deleteIfEnabled(String id) async {
+    if (!_isIos) return;
+    try {
+      if (!await _prefEnabled()) return;
+      await deleteContact(id);
     } catch (_) {}
   }
 

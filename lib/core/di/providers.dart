@@ -205,7 +205,6 @@ class Contacts extends _$Contacts {
     final result = await repo.getContacts();
     _endCursor = result.endCursor;
     _hasNextPage = result.hasNextPage;
-    _scheduleIosSnapshot(result.contacts);
     return result.contacts;
   }
 
@@ -219,7 +218,6 @@ class Contacts extends _$Contacts {
       final result = await repo.getContacts(search: _currentSearch);
       _endCursor = result.endCursor;
       _hasNextPage = result.hasNextPage;
-      _scheduleIosSnapshot(result.contacts);
       return result.contacts;
     });
   }
@@ -243,7 +241,6 @@ class Contacts extends _$Contacts {
       _hasNextPage = result.hasNextPage;
       final merged = [...current, ...result.contacts];
       state = AsyncValue.data(merged);
-      _scheduleIosSnapshot(merged);
     } finally {
       _isLoadingMore = false;
     }
@@ -263,11 +260,12 @@ class Contacts extends _$Contacts {
     return all;
   }
 
-  void _scheduleIosSnapshot([List<Contact>? contacts]) {
-    if (_currentSearch != null) return;
-    final list = contacts ?? state.value;
-    if (list == null) return;
-    unawaited(IosContactsProviderService.instance.syncIfEnabled(list));
+  void _upsertIosContact(Contact contact) {
+    unawaited(IosContactsProviderService.instance.upsertIfEnabled(contact));
+  }
+
+  void _deleteIosContact(String id) {
+    unawaited(IosContactsProviderService.instance.deleteIfEnabled(id));
   }
 
   Future<Contact> addContact({
@@ -293,7 +291,7 @@ class Contacts extends _$Contacts {
     if (currentState != null) {
       final updated = [newContact, ...currentState];
       state = AsyncValue.data(updated);
-      _scheduleIosSnapshot(updated);
+      _upsertIosContact(newContact);
     } else {
       // Se era vuoto o in errore, forziamo il reload dal backend
       ref.invalidateSelf();
@@ -354,7 +352,7 @@ class Contacts extends _$Contacts {
               : (updatedContact.companyName ?? oldContact.companyName),
         );
         state = AsyncValue.data(newList);
-        _scheduleIosSnapshot(newList);
+        _upsertIosContact(newList[index]);
       }
     }
 
@@ -377,7 +375,7 @@ class Contacts extends _$Contacts {
       previousState = List.from(currentState);
       final newList = currentState.where((c) => c.id != id).toList();
       state = AsyncValue.data(newList);
-      _scheduleIosSnapshot(newList);
+      _deleteIosContact(id);
     }
 
     try {
@@ -390,6 +388,12 @@ class Contacts extends _$Contacts {
       // Revert optimistic update on error
       if (previousState != null) {
         state = AsyncValue.data(previousState);
+        for (final contact in previousState) {
+          if (contact.id == id) {
+            _upsertIosContact(contact);
+            break;
+          }
+        }
       } else {
         ref.invalidateSelf();
       }

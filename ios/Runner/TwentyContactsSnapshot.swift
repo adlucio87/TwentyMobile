@@ -73,28 +73,57 @@ enum TwentyContactsSnapshot {
 
         try FileManager.default.createDirectory(at: directoryURL, withIntermediateDirectories: true)
 
-        let sanitized: [[String: Any]] = contacts.compactMap { raw in
-            guard let id = raw["id"] as? String, !id.isEmpty else { return nil }
-            var item: [String: Any] = [
-                "id": id,
-                "givenName": raw["givenName"] as? String ?? "",
-                "familyName": raw["familyName"] as? String ?? "",
-            ]
-            if let email = nonempty(raw["email"] as? String) {
-                item["email"] = email
-            }
-            if let phone = nonempty(raw["phone"] as? String) {
-                item["phone"] = phone
-            }
-            if let organization = nonempty(raw["organization"] as? String) {
-                item["organization"] = organization
-            }
-            return item
+        let sanitized: [[String: Any]] = contacts.compactMap(sanitize)
+        try writeSanitized(sanitized)
+    }
+
+    static func upsert(contact: [String: Any]) throws {
+        guard let item = sanitize(contact) else {
+            throw NSError(
+                domain: "TwentyContactsSnapshot",
+                code: 2,
+                userInfo: [NSLocalizedDescriptionKey: "contact id is required"]
+            )
         }
+        guard let id = item["id"] as? String, !id.isEmpty else {
+            throw NSError(
+                domain: "TwentyContactsSnapshot",
+                code: 2,
+                userInfo: [NSLocalizedDescriptionKey: "contact id is required"]
+            )
+        }
+        var contacts = load().contacts.map(dictionary(from:))
+        if let index = contacts.firstIndex(where: { ($0["id"] as? String) == id }) {
+            contacts[index] = item
+        } else {
+            contacts.append(item)
+        }
+        try writeSanitized(contacts)
+    }
+
+    static func delete(id: String) throws {
+        let trimmed = id.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return }
+        let contacts = load().contacts
+            .map(dictionary(from:))
+            .filter { ($0["id"] as? String) != trimmed }
+        try writeSanitized(contacts)
+    }
+
+    private static func writeSanitized(_ contacts: [[String: Any]]) throws {
+        guard let directoryURL, let fileURL else {
+            throw NSError(
+                domain: "TwentyContactsSnapshot",
+                code: 1,
+                userInfo: [NSLocalizedDescriptionKey: "App Group container is unavailable"]
+            )
+        }
+
+        try FileManager.default.createDirectory(at: directoryURL, withIntermediateDirectories: true)
 
         let payload: [String: Any] = [
             "generation": ISO8601DateFormatter().string(from: Date()),
-            "contacts": sanitized,
+            "contacts": contacts,
         ]
         let data = try JSONSerialization.data(withJSONObject: payload, options: [.prettyPrinted])
         let tempURL = directoryURL.appendingPathComponent("\(fileName).tmp")
@@ -104,6 +133,37 @@ enum TwentyContactsSnapshot {
         } else {
             try FileManager.default.moveItem(at: tempURL, to: fileURL)
         }
+    }
+
+    private static func sanitize(_ raw: [String: Any]) -> [String: Any]? {
+        guard let id = raw["id"] as? String, !id.isEmpty else { return nil }
+        var item: [String: Any] = [
+            "id": id,
+            "givenName": raw["givenName"] as? String ?? "",
+            "familyName": raw["familyName"] as? String ?? "",
+        ]
+        if let email = nonempty(raw["email"] as? String) {
+            item["email"] = email
+        }
+        if let phone = nonempty(raw["phone"] as? String) {
+            item["phone"] = phone
+        }
+        if let organization = nonempty(raw["organization"] as? String) {
+            item["organization"] = organization
+        }
+        return item
+    }
+
+    private static func dictionary(from person: Person) -> [String: Any] {
+        var item: [String: Any] = [
+            "id": person.id,
+            "givenName": person.givenName,
+            "familyName": person.familyName,
+        ]
+        if let email = person.email { item["email"] = email }
+        if let phone = person.phone { item["phone"] = phone }
+        if let organization = person.organization { item["organization"] = organization }
+        return item
     }
 
     static func lastEnumeratedIds() -> [String] {
