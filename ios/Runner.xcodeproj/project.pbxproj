@@ -58,7 +58,7 @@
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
-			dstSubfolderSpec = 13;
+			dstSubfolderSpec = 16;
 			files = (
 				8F1A2B3C4D5E6F708192A3BF /* TwentyContactsProvider.appex in Embed Foundation Extensions */,
 			);
@@ -94,7 +94,7 @@
 		8F1A2B3C4D5E6F708192A3B1 /* TwentyContactsProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TwentyContactsProvider.swift; sourceTree = "<group>"; };
 		8F1A2B3C4D5E6F708192A3B2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8F1A2B3C4D5E6F708192A3B3 /* TwentyContactsProvider.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TwentyContactsProvider.entitlements; sourceTree = "<group>"; };
-		8F1A2B3C4D5E6F708192A3B4 /* TwentyContactsProvider.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = TwentyContactsProvider.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		8F1A2B3C4D5E6F708192A3B4 /* TwentyContactsProvider.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.extensionkit-extension"; includeInIndex = 0; path = TwentyContactsProvider.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		8F1A2B3C4D5E6F708192A3C3 /* ContactProvider.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ContactProvider.framework; path = System/Library/Frameworks/ContactProvider.framework; sourceTree = SDKROOT; };
 		8F1A2B3C4D5E6F708192A3C5 /* Contacts.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Contacts.framework; path = System/Library/Frameworks/Contacts.framework; sourceTree = SDKROOT; };
 		8F1A2B3C4D5E6F708192A3C7 /* Runner.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Runner.entitlements; sourceTree = "<group>"; };
