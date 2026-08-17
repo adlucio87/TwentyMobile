@@ -6,7 +6,5 @@
 	<array>
 		<string>group.com.luciosoft.pocketcrm</string>
 	</array>
-	<key>com.apple.developer.contact-provider</key>
-	<true/>
 </dict>
 </plist>
