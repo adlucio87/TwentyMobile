@@ -10,8 +10,9 @@ import 'package:pocketcrm/data/graphql/captcha_queries.dart';
 class CaptchaConfig {
   final String provider; // "GoogleRecaptcha" or "Turnstile"
   final String siteKey;
+  final String instanceUrl;
 
-  CaptchaConfig({required this.provider, required this.siteKey});
+  CaptchaConfig({required this.provider, required this.siteKey, required this.instanceUrl});
 }
 
 /// Service responsible for:
@@ -62,7 +63,7 @@ class CaptchaService {
         return null;
       }
 
-      _cachedConfig = CaptchaConfig(provider: provider, siteKey: siteKey);
+      _cachedConfig = CaptchaConfig(provider: provider, siteKey: siteKey, instanceUrl: instanceUrl);
       debugPrint('CaptchaService: Captcha enabled — provider=$provider');
       return _cachedConfig;
     } catch (e) {
@@ -96,7 +97,10 @@ class CaptchaService {
     final html = _buildCaptchaHtml(config);
 
     headlessWebView = HeadlessInAppWebView(
-      initialData: InAppWebViewInitialData(data: html),
+      initialData: InAppWebViewInitialData(
+        data: html,
+        baseUrl: WebUri(config.instanceUrl),
+      ),
       initialSettings: InAppWebViewSettings(
         javaScriptEnabled: true,
         // Allow Cloudflare/Google scripts to load

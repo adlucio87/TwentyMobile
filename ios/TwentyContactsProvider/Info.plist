@@ -28,7 +28,7 @@
 	<key>NSExtension</key>
 	<dict>
 		<key>NSExtensionPointIdentifier</key>
-		<string>com.apple.contactprovider</string>
+		<string>com.apple.contact.provider.extension</string>
 		<key>NSExtensionPrincipalClass</key>
 		<string>$(PRODUCT_MODULE_NAME).TwentyContactsProvider</string>
 	</dict>
