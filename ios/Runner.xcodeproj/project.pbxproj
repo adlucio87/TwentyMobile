@@ -62,7 +62,7 @@
 			files = (
 				8F1A2B3C4D5E6F708192A3BF /* TwentyContactsProvider.appex in Embed Foundation Extensions */,
 			);
-			name = "Embed Foundation Extensions";
+			name = "Embed ExtensionKit Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */

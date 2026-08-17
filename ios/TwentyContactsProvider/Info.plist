@@ -25,13 +25,7 @@
 		<key>EXExtensionPointIdentifier</key>
 		<string>com.apple.contact.provider.extension</string>
 	</dict>
-	<key>NSExtension</key>
-	<dict>
-		<key>NSExtensionPointIdentifier</key>
-		<string>com.apple.contact.provider.extension</string>
-		<key>NSExtensionPrincipalClass</key>
-		<string>$(PRODUCT_MODULE_NAME).TwentyContactsProvider</string>
-	</dict>
+	
 	<key>MinimumOSVersion</key>
 	<string>18.0</string>
 </dict>
