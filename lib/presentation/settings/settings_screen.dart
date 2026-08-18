@@ -62,7 +62,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         if (!enabled) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('Could not enable Twenty in iOS Contacts.'),
+              content: const Text('Could not enable Twenty in iOS Contacts.'),
             ),
           );
           return;
@@ -77,7 +77,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         try {
           await service.setEnabled(false);
           await service.writeSnapshot(const []);
-        } catch (_) {}
+        } catch (e) {}
         final prefs = await SharedPreferences.getInstance();
         await prefs.setBool(iosContactsProviderEnabledPrefKey, false);
         if (mounted) {
@@ -86,11 +86,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           });
         }
       }
-    } catch (_) {
+    } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Could not enable Twenty in iOS Contacts.'),
+          content: Text('Could not enable Twenty in iOS Contacts: $e'),
         ),
       );
     } finally {

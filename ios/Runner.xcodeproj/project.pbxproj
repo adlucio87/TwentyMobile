@@ -47,7 +47,7 @@
 		9705A1C41CF9048500538489 /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
-			dstPath = "";
+			dstPath = "Extensions";
 			dstSubfolderSpec = 10;
 			files = (
 			);
@@ -57,8 +57,8 @@
 		8F1A2B3C4D5E6F708192A3C2 /* Embed Foundation Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 16;
+			dstPath = "Extensions";
+			dstSubfolderSpec = 1;
 			files = (
 				8F1A2B3C4D5E6F708192A3BF /* TwentyContactsProvider.appex in Embed Foundation Extensions */,
 			);
