@@ -31,6 +31,8 @@ class _InstanceSetupScreenState extends ConsumerState<InstanceSetupScreen> {
     String serverUrl, {
     required bool isDemo,
   }) async {
+    // Temporarily disabled due to Glitchtip quota limits
+    /*
     await Sentry.captureMessage(
       'app_connected',
       level: SentryLevel.info,
@@ -42,6 +44,7 @@ class _InstanceSetupScreenState extends ConsumerState<InstanceSetupScreen> {
         });
       },
     );
+    */
   }
 
   Future<void> _loadStoredUrl() async {

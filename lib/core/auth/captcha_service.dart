@@ -1,10 +1,9 @@
+import 'dart:convert';
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:pocketcrm/core/network/custom_http_client.dart';
-import 'package:pocketcrm/data/graphql/captcha_queries.dart';
 
 /// Represents the captcha configuration retrieved from the Twenty server.
 class CaptchaConfig {
@@ -30,26 +29,21 @@ class CaptchaService {
       final customHttpClient = TimeoutHttpClient(
         timeoutDuration: const Duration(seconds: 15),
       );
-      final link = HttpLink(
-        '$instanceUrl/metadata',
-        httpClient: customHttpClient,
-      );
-      final client = GraphQLClient(
-        link: link,
-        cache: GraphQLCache(),
-        queryRequestTimeout: const Duration(seconds: 15),
-      );
+      
+      final uri = Uri.parse('$instanceUrl/client-config');
+      final response = await customHttpClient.get(uri);
 
-      final result = await client.query(
-        QueryOptions(document: gql(getClientConfigQuery)),
-      );
-
-      if (result.hasException) {
-        debugPrint('CaptchaService: Failed to fetch clientConfig: ${result.exception}');
+      if (response.statusCode != 200) {
+        debugPrint('CaptchaService: Failed to fetch client-config REST endpoint: \${response.statusCode}');
         return null;
       }
 
-      final captchaData = result.data?['clientConfig']?['captcha'];
+      final body = response.body;
+      if (body.isEmpty) return null;
+      
+      final dynamic decoded = jsonDecode(body);
+      final captchaData = decoded['captcha'];
+
       if (captchaData == null) {
         debugPrint('CaptchaService: No captcha config found — captcha is disabled.');
         return null;
