@@ -61,7 +61,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         if (!mounted) return;
         if (!enabled) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
+            SnackBar(
               content: const Text('Could not enable Twenty in iOS Contacts.'),
             ),
           );
@@ -89,7 +89,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Text('Could not enable Twenty in iOS Contacts: $e'),
         ),
       );
