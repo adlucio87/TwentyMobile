@@ -7,18 +7,18 @@ void main() {
     test('maps a full contact including company', () {
       final contact = Contact(
         id: 'person-1',
-        firstName: 'Henri',
+        firstName: 'Alex',
         lastName: 'Dupont',
-        email: 'henri@example.com',
+        email: 'alex@example.com',
         phone: '+33123456789',
         companyName: 'Luciosoft',
       );
 
       expect(contactToIosSnapshot(contact), {
         'id': 'person-1',
-        'givenName': 'Henri',
+        'givenName': 'Alex',
         'familyName': 'Dupont',
-        'email': 'henri@example.com',
+        'email': 'alex@example.com',
         'phone': '+33123456789',
         'organization': 'Luciosoft',
       });
