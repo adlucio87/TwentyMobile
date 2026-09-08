@@ -36,9 +36,18 @@ Future<void> main() async {
         final exceptions = event.exceptions;
         if (exceptions != null && exceptions.isNotEmpty) {
           final errorValue = exceptions.first.value ?? '';
+          // Drop font-loading errors entirely (offline noise)
           if (errorValue.contains('Failed to load font with url') ||
               errorValue.contains('fonts.gstatic.com')) {
             return null; // Ignore and drop this event
+          }
+          // Downgrade transient network errors from Fatal to Warning
+          if (errorValue.contains('TimeoutException') ||
+              errorValue.contains('SocketException') ||
+              errorValue.contains('Connection closed') ||
+              errorValue.contains('Network unreachable')) {
+            event.level = SentryLevel.warning;
+            return event;
           }
         }
         return event;
@@ -117,11 +126,12 @@ class _PocketCRMAppState extends ConsumerState<PocketCRMApp> {
     final router = ref.watch(appRouterProvider);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (initialNotificationRoute != null) {
+      final pendingRoute = initialNotificationRoute;
+      if (pendingRoute != null) {
+        clearInitialNotificationRoute();
         Future.delayed(const Duration(milliseconds: 500), () {
           if (navigatorKey.currentContext != null) {
-            navigatorKey.currentContext!.go(initialNotificationRoute!);
-            clearInitialNotificationRoute();
+            navigatorKey.currentContext!.go(pendingRoute);
           }
         });
       }

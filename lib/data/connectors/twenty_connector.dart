@@ -65,6 +65,13 @@ class TwentyConnector implements CRMRepository {
     return _currentMemberId;
   }
 
+  /// Checks whether the exception is a network timeout.
+  bool _isTimeout(OperationException exception) {
+    final linkException = exception.linkException;
+    if (linkException == null) return false;
+    return linkException.toString().contains('TimeoutException');
+  }
+
   Future<QueryResult> _queryWithRefresh(QueryOptions options) async {
     // Proactively refresh if we know the token is expired
     if (authService != null && await authService!.isTokenExpired()) {
@@ -72,6 +79,11 @@ class TwentyConnector implements CRMRepository {
     }
 
     QueryResult result = await client.query(options);
+
+    // Retry once on timeout (covers flaky network after foreground resume)
+    if (result.hasException && _isTimeout(result.exception!)) {
+      result = await client.query(options);
+    }
 
     if (result.hasException && _isUnauthenticated(result.exception!)) {
       final isRefreshed = await _tryRefresh();
@@ -89,6 +101,11 @@ class TwentyConnector implements CRMRepository {
     }
 
     QueryResult result = await client.mutate(options);
+
+    // Retry once on timeout (covers flaky network after foreground resume)
+    if (result.hasException && _isTimeout(result.exception!)) {
+      result = await client.mutate(options);
+    }
 
     if (result.hasException && _isUnauthenticated(result.exception!)) {
       final isRefreshed = await _tryRefresh();
