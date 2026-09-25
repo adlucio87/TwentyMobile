@@ -210,19 +210,19 @@ class TodayScreen extends ConsumerWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         if (hasRecent) ...[
-                          const SectionHeader(title: "Recent"),
+                          SectionHeader(title: l10n?.recentContacts ?? "Recent"),
                           RecentContactsRow(contacts: data.recentContacts),
                           const Spacer(),
                         ],
                         const Text("🎉", style: TextStyle(fontSize: 64)),
                         const SizedBox(height: 16),
                         Text(
-                          "Everything is in order!",
+                          l10n?.allInOrder ?? "Everything is in order!",
                           style: Theme.of(context).textTheme.headlineSmall,
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          "No tasks due today",
+                          l10n?.noTasksDueToday ?? "No tasks due today",
                           style: Theme.of(context).textTheme.bodyMedium,
                         ),
                         const SizedBox(height: 24),
@@ -235,7 +235,7 @@ class TodayScreen extends ConsumerWidget {
                             ),
                             builder: (context) => const AddTaskSheet(),
                           ),
-                          child: const Text("Add task"),
+                          child: Text(l10n?.addTask ?? "Add task"),
                         ),
                         if (hasRecent) const Spacer(flex: 2),
                       ],
@@ -275,7 +275,11 @@ class TodayScreen extends ConsumerWidget {
                       if (data.tomorrowTasks.length > 3)
                         Padding(
                           padding: const EdgeInsets.only(left: 16, top: 8),
-                          child: Text("and ${data.tomorrowTasks.length - 3} more...", style: Theme.of(context).textTheme.bodySmall),
+                          child: Text(
+                            l10n?.andMoreTasks(data.tomorrowTasks.length - 3) ??
+                                "and ${data.tomorrowTasks.length - 3} more...",
+                            style: Theme.of(context).textTheme.bodySmall,
+                          ),
                         ),
                     ],
 
@@ -318,7 +322,7 @@ class TodayScreen extends ConsumerWidget {
               error: (err, stack) => SliverFillRemaining(
                 hasScrollBody: false,
                 child: ErrorStateWidget(
-                  title: 'Loading error',
+                  title: l10n?.loadingError ?? 'Loading error',
                   message: err.toString().replaceAll('Exception: ', ''),
                   onRetry: () => ref.read(todayNotifierProvider.notifier).refresh(),
                 ),

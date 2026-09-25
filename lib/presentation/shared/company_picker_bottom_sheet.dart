@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pocketcrm/core/di/providers.dart';
-import 'package:pocketcrm/domain/models/company.dart';
 import 'package:pocketcrm/presentation/shared/snackbar_helper.dart';
+import 'package:pocketcrm/l10n/app_localizations.dart';
 
 class CompanyPickerBottomSheet extends ConsumerStatefulWidget {
   const CompanyPickerBottomSheet({super.key});
@@ -34,6 +34,7 @@ class _CompanyPickerBottomSheetState
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final companiesAsync = ref.watch(companiesProvider);
 
     return DraggableScrollableSheet(
@@ -56,7 +57,7 @@ class _CompanyPickerBottomSheetState
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'Select Company',
+                      l10n?.selectCompany ?? 'Select Company',
                       style: Theme.of(context).textTheme.titleLarge,
                     ),
                     IconButton(
@@ -75,7 +76,7 @@ class _CompanyPickerBottomSheetState
                   focusNode: _searchFocus,
                   onChanged: _onSearchChanged,
                   decoration: InputDecoration(
-                    hintText: 'Search companies...',
+                    hintText: l10n?.searchCompanies ?? 'Search companies...',
                     prefixIcon: const Icon(Icons.search),
                     suffixIcon: _searchQuery.isNotEmpty
                         ? IconButton(
@@ -119,7 +120,7 @@ class _CompanyPickerBottomSheetState
                         child: Text(
                           _searchQuery.isNotEmpty
                               ? 'No companies found for "$_searchQuery"'
-                              : 'No companies available',
+                              : (l10n?.noCompaniesFound ?? 'No companies available'),
                         ),
                       );
                     }
@@ -154,7 +155,7 @@ class _CompanyPickerBottomSheetState
                     child: CircularProgressIndicator(),
                   ),
                   error: (error, _) => Center(
-                    child: Text('Error: $error'),
+                    child: Text('${l10n?.error ?? 'Error'}: $error'),
                   ),
                 ),
               ),
@@ -170,19 +171,20 @@ class _CompanyPickerBottomSheetState
     final navigator = Navigator.of(context);
 
     // Show a dialog to confirm creation
+    final l10n = AppLocalizations.of(context);
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Create New Company'),
+        title: Text(l10n?.createNewCompany ?? 'Create New Company'),
         content: Text('Are you sure you want to create a new company named "$name"?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('Cancel'),
+            child: Text(l10n?.cancel ?? 'Cancel'),
           ),
           ElevatedButton(
             onPressed: () => Navigator.of(ctx).pop(true),
-            child: const Text('Create'),
+            child: Text(l10n?.create ?? 'Create'),
           ),
         ],
       ),

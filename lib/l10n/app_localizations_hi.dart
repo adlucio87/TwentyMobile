@@ -350,4 +350,222 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get close => 'बंद करें';
+
+  @override
+  String get allInOrder => 'सब कुछ क्रम में है!';
+
+  @override
+  String get noTasksDueToday => 'आज कोई कार्य देय नहीं है';
+
+  @override
+  String andMoreTasks(int count) {
+    return 'और $count अधिक...';
+  }
+
+  @override
+  String get loadingError => 'लोड करने में त्रुटि';
+
+  @override
+  String get requiredField => 'आवश्यक फ़ील्ड';
+
+  @override
+  String get invalidEmailFormat => 'अमान्य ईमेल प्रारूप';
+
+  @override
+  String get phoneMobile => 'फ़ोन (मोबाइल)';
+
+  @override
+  String get importFromContacts => 'संपर्क से आयात करें';
+
+  @override
+  String get saveContact => 'संपर्क सहेजें';
+
+  @override
+  String get saveChanges => 'परिवर्तन सहेजें';
+
+  @override
+  String get contactAdded => 'संपर्क जोड़ा गया';
+
+  @override
+  String get contactUpdated => 'संपर्क अद्यतन किया गया';
+
+  @override
+  String get contactDeleted => 'संपर्क हटा दिया गया';
+
+  @override
+  String get errorCreatingContact => 'संपर्क बनाने में त्रुटि';
+
+  @override
+  String get errorDuringDeletion => 'हटाने के दौरान त्रुटि';
+
+  @override
+  String deleteContactConfirmMessage(String name) {
+    return 'क्या आप वाकई $name को हटाना चाहते हैं?\nयह क्रिया पूर्ववत नहीं की जा सकती।';
+  }
+
+  @override
+  String get newNote => 'नया नोट';
+
+  @override
+  String get saveNote => 'नोट सहेजें';
+
+  @override
+  String get noNotesPresent => 'कोई नोट मौजूद नहीं है';
+
+  @override
+  String get saveToDeviceContacts => 'संपर्क में सहेजें';
+
+  @override
+  String get unableOpenEmail => 'ईमेल क्लाइंट खोलने में असमर्थ';
+
+  @override
+  String get unableStartCall => 'कॉल शुरू करने में असमर्थ';
+
+  @override
+  String get createTask => 'कार्य बनाएं';
+
+  @override
+  String get taskCreated => 'कार्य बनाया गया';
+
+  @override
+  String get taskUpdated => 'कार्य अद्यतन किया गया';
+
+  @override
+  String get taskDeleted => 'कार्य हटा दिया गया';
+
+  @override
+  String get reminderNotification => 'स्मरणपत्र सूचना';
+
+  @override
+  String get linkedTo => 'से जुड़ा हुआ';
+
+  @override
+  String get unassigned => 'अनिर्दिष्ट';
+
+  @override
+  String get privacyPolicy => 'गोपनीयता नीति';
+
+  @override
+  String get termsOfUse => 'उपयोग की शर्तें (EULA)';
+
+  @override
+  String get showTwentyInIosContacts => 'iOS संपर्कों में Twenty लोग दिखाएं';
+
+  @override
+  String get receiveNotificationBeforeDueDate =>
+      'नियत तारीख से पहले सूचना प्राप्त करें';
+
+  @override
+  String get startRecording => 'रिकॉर्डिंग प्रारंभ करें';
+
+  @override
+  String get recording => 'रिकॉर्डिंग जारी है...';
+
+  @override
+  String get rerecord => 'पुनः रिकॉर्ड करें';
+
+  @override
+  String get saveAsNote => 'नोट के रूप में सहेजें';
+
+  @override
+  String get speechNotAvailable => 'भाषण पहचान उपलब्ध नहीं है';
+
+  @override
+  String get createNewCompany => 'नई कंपनी बनाएं';
+
+  @override
+  String get create => 'बनाएं';
+
+  @override
+  String get removeDueDate => 'नियत तारीख हटाएं';
+
+  @override
+  String get analyzingBusinessCard =>
+      'बिजनेस कार्ड का विश्लेषण किया जा रहा है...';
+
+  @override
+  String get tryAgain => 'पुनः प्रयास करें';
+
+  @override
+  String get verifyData => 'डेटा सत्यापित करें';
+
+  @override
+  String get noLinkedContacts => 'कोई लिंक किया गया संपर्क नहीं';
+
+  @override
+  String get confidenceHigh => '✅ उत्कृष्ट कैप्चर — डेटा सत्यापित करें';
+
+  @override
+  String get confidenceMedium => '⚠️ आंशिक कैप्चर — फ़ील्ड जांचें';
+
+  @override
+  String get confidenceLow => '❌ पढ़ने में मुश्किल — मैन्युअल रूप से भरें';
+
+  @override
+  String get enterNameOrEmail => 'कम से कम नाम या ईमेल दर्ज करें';
+
+  @override
+  String get newCompany => 'नई कंपनी';
+
+  @override
+  String get editCompany => 'कंपनी संपादित करें';
+
+  @override
+  String get deleteCompany => 'कंपनी हटाएं';
+
+  @override
+  String get companyName => 'कंपनी का नाम';
+
+  @override
+  String get domainOrWebsite => 'डोमेन या वेबसाइट';
+
+  @override
+  String get saveCompany => 'कंपनी सहेजें';
+
+  @override
+  String get companyCreated => 'कंपनी सफलतापूर्वक बनाई गई';
+
+  @override
+  String get companyUpdated => 'कंपनी सफलतापूर्वक अपडेट की गई';
+
+  @override
+  String get companyDeleted => 'कंपनी हटाई गई';
+
+  @override
+  String deleteCompanyConfirmMessage(String name) {
+    return 'क्या आप वाकई $name को हटाना चाहते हैं?\nयह क्रिया पूर्ववत नहीं की जा सकती।';
+  }
+
+  @override
+  String get companyDetails => 'कंपनी विवरण';
+
+  @override
+  String get industry => 'उद्योग';
+
+  @override
+  String get noCompaniesInDatabase => 'डेटाबेस में कोई कंपनी नहीं है।';
+
+  @override
+  String get noteText => 'नोट पाठ';
+
+  @override
+  String get noteSaved => 'नोट सफलतापूर्वक सहेजा गया';
+
+  @override
+  String get selectCompany => 'कंपनी चुनें';
+
+  @override
+  String get selectContact => 'संपर्क चुनें';
+
+  @override
+  String get frameBusinessCard => 'बिजनेस कार्ड को फ्रेम करें';
+
+  @override
+  String get keepCardHorizontal => 'कार्ड को क्षैतिज और अच्छी रोशनी में रखें';
+
+  @override
+  String get cropBusinessCard => 'बिजनेस कार्ड क्रॉप करें';
+
+  @override
+  String get deleteTask => 'कार्य हटाएं';
 }

@@ -351,4 +351,224 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get close => 'Schließen';
+
+  @override
+  String get allInOrder => 'Alles in bester Ordnung!';
+
+  @override
+  String get noTasksDueToday => 'Heute keine fälligen Aufgaben';
+
+  @override
+  String andMoreTasks(int count) {
+    return 'und $count weitere...';
+  }
+
+  @override
+  String get loadingError => 'Ladefehler';
+
+  @override
+  String get requiredField => 'Pflichtfeld';
+
+  @override
+  String get invalidEmailFormat => 'Ungültiges E-Mail-Format';
+
+  @override
+  String get phoneMobile => 'Telefon (Mobil)';
+
+  @override
+  String get importFromContacts => 'Aus Kontakten importieren';
+
+  @override
+  String get saveContact => 'Kontakt speichern';
+
+  @override
+  String get saveChanges => 'Änderungen speichern';
+
+  @override
+  String get contactAdded => 'Kontakt hinzugefügt';
+
+  @override
+  String get contactUpdated => 'Kontakt aktualisiert';
+
+  @override
+  String get contactDeleted => 'Kontakt gelöscht';
+
+  @override
+  String get errorCreatingContact => 'Fehler beim Erstellen des Kontakts';
+
+  @override
+  String get errorDuringDeletion => 'Fehler beim Löschen';
+
+  @override
+  String deleteContactConfirmMessage(String name) {
+    return 'Möchten Sie $name wirklich löschen?\nDiese Aktion kann nicht rückgängig gemacht werden.';
+  }
+
+  @override
+  String get newNote => 'Neue Notiz';
+
+  @override
+  String get saveNote => 'Notiz speichern';
+
+  @override
+  String get noNotesPresent => 'Keine Notizen vorhanden';
+
+  @override
+  String get saveToDeviceContacts => 'In Kontakten speichern';
+
+  @override
+  String get unableOpenEmail => 'E-Mail-Client konnte nicht geöffnet werden';
+
+  @override
+  String get unableStartCall => 'Anruf konnte nicht gestartet werden';
+
+  @override
+  String get createTask => 'Aufgabe erstellen';
+
+  @override
+  String get taskCreated => 'Aufgabe erstellt';
+
+  @override
+  String get taskUpdated => 'Aufgabe aktualisiert';
+
+  @override
+  String get taskDeleted => 'Aufgabe gelöscht';
+
+  @override
+  String get reminderNotification => 'Erinnerungsbenachrichtigung';
+
+  @override
+  String get linkedTo => 'Verknüpft mit';
+
+  @override
+  String get unassigned => 'Nicht zugewiesen';
+
+  @override
+  String get privacyPolicy => 'Datenschutzerklärung';
+
+  @override
+  String get termsOfUse => 'Nutzungsbedingungen (EULA)';
+
+  @override
+  String get showTwentyInIosContacts =>
+      'Twenty-Kontakte in iOS-Kontakten anzeigen';
+
+  @override
+  String get receiveNotificationBeforeDueDate =>
+      'Benachrichtigung vor dem Fälligkeitsdatum erhalten';
+
+  @override
+  String get startRecording => 'Aufnahme starten';
+
+  @override
+  String get recording => 'Aufnahme läuft...';
+
+  @override
+  String get rerecord => 'Erneut aufnehmen';
+
+  @override
+  String get saveAsNote => 'Als Notiz speichern';
+
+  @override
+  String get speechNotAvailable => 'Spracherkennung nicht verfügbar';
+
+  @override
+  String get createNewCompany => 'Neues Unternehmen erstellen';
+
+  @override
+  String get create => 'Erstellen';
+
+  @override
+  String get removeDueDate => 'Fälligkeitsdatum entfernen';
+
+  @override
+  String get analyzingBusinessCard => 'Visitenkarte wird analysiert...';
+
+  @override
+  String get tryAgain => 'Erneut versuchen';
+
+  @override
+  String get verifyData => 'Daten überprüfen';
+
+  @override
+  String get noLinkedContacts => 'Keine verknüpften Kontakte';
+
+  @override
+  String get confidenceHigh => '✅ Hervorragende Erfassung — Daten überprüfen';
+
+  @override
+  String get confidenceMedium => '⚠️ Teilweise Erfassung — Felder überprüfen';
+
+  @override
+  String get confidenceLow => '❌ Schwer lesbar — manuell ausfüllen';
+
+  @override
+  String get enterNameOrEmail => 'Geben Sie mindestens Name oder E-Mail ein';
+
+  @override
+  String get newCompany => 'Neues Unternehmen';
+
+  @override
+  String get editCompany => 'Unternehmen bearbeiten';
+
+  @override
+  String get deleteCompany => 'Unternehmen löschen';
+
+  @override
+  String get companyName => 'Unternehmensname';
+
+  @override
+  String get domainOrWebsite => 'Domain oder Website';
+
+  @override
+  String get saveCompany => 'Unternehmen speichern';
+
+  @override
+  String get companyCreated => 'Unternehmen erfolgreich erstellt';
+
+  @override
+  String get companyUpdated => 'Unternehmen erfolgreich aktualisiert';
+
+  @override
+  String get companyDeleted => 'Unternehmen gelöscht';
+
+  @override
+  String deleteCompanyConfirmMessage(String name) {
+    return 'Möchten Sie $name wirklich löschen?\nDiese Aktion kann nicht rückgängig gemacht werden.';
+  }
+
+  @override
+  String get companyDetails => 'Unternehmensdetails';
+
+  @override
+  String get industry => 'Branche';
+
+  @override
+  String get noCompaniesInDatabase =>
+      'Es sind keine Unternehmen in der Datenbank vorhanden.';
+
+  @override
+  String get noteText => 'Notiztext';
+
+  @override
+  String get noteSaved => 'Notiz erfolgreich gespeichert';
+
+  @override
+  String get selectCompany => 'Unternehmen auswählen';
+
+  @override
+  String get selectContact => 'Kontakt auswählen';
+
+  @override
+  String get frameBusinessCard => 'Visitenkarte ausrichten';
+
+  @override
+  String get keepCardHorizontal =>
+      'Halten Sie die Karte horizontal und gut beleuchtet';
+
+  @override
+  String get cropBusinessCard => 'Visitenkarte zuschneiden';
+
+  @override
+  String get deleteTask => 'Aufgabe löschen';
 }

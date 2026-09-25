@@ -8,6 +8,7 @@ import 'package:flutter/services.dart';
 
 import 'scan_provider.dart';
 import 'scan_review_screen.dart';
+import 'package:pocketcrm/l10n/app_localizations.dart';
 
 class ScanCardScreen extends ConsumerStatefulWidget {
   const ScanCardScreen({super.key});
@@ -41,6 +42,7 @@ class _ScanCardScreenState extends ConsumerState<ScanCardScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: Colors.black,
       body: Stack(
@@ -65,11 +67,11 @@ class _ScanCardScreenState extends ConsumerState<ScanCardScreen> {
                         icon: const Icon(Icons.close, color: Colors.white),
                         onPressed: () => Navigator.pop(context),
                       ),
-                      const Expanded(
+                      Expanded(
                         child: Text(
-                          'Frame the business card',
+                          l10n?.frameBusinessCard ?? 'Frame the business card',
                           textAlign: TextAlign.center,
-                          style: TextStyle(color: Colors.white, fontSize: 16,
+                          style: const TextStyle(color: Colors.white, fontSize: 16,
                               fontWeight: FontWeight.w600),
                         ),
                       ),
@@ -85,11 +87,11 @@ class _ScanCardScreenState extends ConsumerState<ScanCardScreen> {
                 const Spacer(),
 
                 // Hint text
-                const Padding(
-                  padding: EdgeInsets.only(bottom: 32),
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 32),
                   child: Text(
-                    'Keep the card horizontal and well-lit',
-                    style: TextStyle(color: Colors.white70, fontSize: 13),
+                    l10n?.keepCardHorizontal ?? 'Keep the card horizontal and well-lit',
+                    style: const TextStyle(color: Colors.white70, fontSize: 13),
                   ),
                 ),
 
@@ -146,12 +148,13 @@ class _ScanCardScreenState extends ConsumerState<ScanCardScreen> {
 
   Future<void> _processAndNavigate(XFile image) async {
     // Optional Crop
+    final l10n = mounted ? AppLocalizations.of(context) : null;
     final cropped = await ImageCropper().cropImage(
       sourcePath: image.path,
       aspectRatio: const CropAspectRatio(ratioX: 85, ratioY: 55), // business card proportions
       uiSettings: [
         AndroidUiSettings(
-          toolbarTitle: 'Crop business card',
+          toolbarTitle: l10n?.cropBusinessCard ?? 'Crop business card',
           toolbarColor: Colors.black,
           statusBarLight: false,
           toolbarWidgetColor: Colors.white,

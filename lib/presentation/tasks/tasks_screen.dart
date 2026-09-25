@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pocketcrm/core/di/providers.dart';
 import 'package:pocketcrm/domain/models/contact.dart';
 import 'package:pocketcrm/domain/models/task.dart';
-import 'package:pocketcrm/presentation/shared/linked_contacts_widget.dart';
 import 'package:pocketcrm/presentation/shared/due_date_picker.dart';
 import 'package:pocketcrm/presentation/shared/skeleton_loading.dart';
 import 'package:pocketcrm/presentation/shared/snackbar_helper.dart';
@@ -18,6 +17,7 @@ import 'package:pocketcrm/core/utils/demo_utils.dart';
 import 'package:pocketcrm/shared/widgets/constrained_content.dart';
 import 'package:pocketcrm/shared/widgets/task_card.dart';
 import 'package:pocketcrm/presentation/shared/error_state_widget.dart';
+import 'package:pocketcrm/l10n/app_localizations.dart';
 
 class TasksScreen extends ConsumerStatefulWidget {
   const TasksScreen({super.key});
@@ -219,6 +219,7 @@ class AddTaskSheetState extends ConsumerState<AddTaskSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final contactsAsync = ref.watch(contactsProvider);
     final authMethodAsync = ref.watch(authMethodProvider);
     final workspaceMembersAsync = ref.watch(workspaceMembersProvider);
@@ -237,20 +238,20 @@ class AddTaskSheetState extends ConsumerState<AddTaskSheet> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(
-                'New Task',
+                l10n?.addTask ?? 'New Task',
                 style: Theme.of(context).textTheme.headlineSmall,
               ),
               const SizedBox(height: 24),
               TextFormField(
                 controller: _titleController,
-                decoration: const InputDecoration(
-                  labelText: 'Title',
+                decoration: InputDecoration(
+                  labelText: l10n?.taskTitle ?? 'Title',
                   hintText: 'What needs to be done?',
                 ),
                 autofocus: true,
                 enabled: !_isLoading,
                 validator: (v) =>
-                    v?.trim().isEmpty == true ? 'Please enter a title' : null,
+                    v?.trim().isEmpty == true ? (l10n?.requiredField ?? 'Please enter a title') : null,
               ),
               const SizedBox(height: 16),
               contactsAsync.when(
@@ -297,15 +298,15 @@ class AddTaskSheetState extends ConsumerState<AddTaskSheet> {
                           data: (members) {
                             if (members.isEmpty) return const SizedBox.shrink();
                             return DropdownButtonFormField<String>(
-                              decoration: const InputDecoration(
-                                labelText: 'Assign to',
+                              decoration: InputDecoration(
+                                labelText: l10n?.assignee ?? 'Assign to',
                                 hintText: 'Select team member',
                               ),
                               value: _selectedAssigneeId,
                               items: [
-                                const DropdownMenuItem(
+                                DropdownMenuItem(
                                   value: null,
-                                  child: Text('Unassigned'),
+                                  child: Text(l10n?.unassigned ?? 'Unassigned'),
                                 ),
                                 ...members.map((m) => DropdownMenuItem(
                                   value: m.id,
@@ -340,7 +341,7 @@ class AddTaskSheetState extends ConsumerState<AddTaskSheet> {
                 child: (_selectedDueDate != null && (_selectedDueDate!.hour != 0 || _selectedDueDate!.minute != 0))
                     ? SwitchListTile(
                         contentPadding: EdgeInsets.zero,
-                        title: const Text('Reminder notification'),
+                        title: Text(l10n?.reminderNotification ?? 'Reminder notification'),
                         subtitle: Text(
                           _notifyReminder
                               ? '30 min before — ${_selectedDueDate!.hour.toString().padLeft(2, '0')}:${_selectedDueDate!.minute.toString().padLeft(2, '0')}'
@@ -435,7 +436,7 @@ class AddTaskSheetState extends ConsumerState<AddTaskSheet> {
                         width: 20, 
                         child: CircularProgressIndicator(strokeWidth: 2)
                       )
-                    : const Text('Create Task'),
+                    : Text(l10n?.createTask ?? 'Create Task'),
               ),
               const SizedBox(height: 32),
             ],
@@ -524,6 +525,7 @@ class EditTaskSheetState extends ConsumerState<EditTaskSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final authMethodAsync = ref.watch(authMethodProvider);
     final workspaceMembersAsync = ref.watch(workspaceMembersProvider);
     return Padding(
@@ -544,7 +546,7 @@ class EditTaskSheetState extends ConsumerState<EditTaskSheet> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Edit Task',
+                    l10n?.editTask ?? 'Edit Task',
                     style: Theme.of(context).textTheme.headlineSmall,
                   ),
                   IconButton(
@@ -553,7 +555,7 @@ class EditTaskSheetState extends ConsumerState<EditTaskSheet> {
                       if (!await DemoUtils.checkDemoAction(context, ref)) return;
                       final confirm = await DialogHelper.showDeleteConfirmDialog(
                         context: context,
-                        title: 'Delete task',
+                        title: l10n?.deleteTask ?? 'Delete task',
                         message: 'Do you want to delete \'${widget.task.title}\'?',
                       );
 
@@ -563,11 +565,11 @@ class EditTaskSheetState extends ConsumerState<EditTaskSheet> {
                           ref.invalidate(todayNotifierProvider);
                           if (context.mounted) {
                             Navigator.of(context).pop();
-                            SnackbarHelper.showSuccess(context, 'Task deleted');
+                            SnackbarHelper.showSuccess(context, l10n?.taskDeleted ?? 'Task deleted');
                           }
                         } catch (e) {
                           if (context.mounted) {
-                            SnackbarHelper.showError(context, 'Error during deletion');
+                            SnackbarHelper.showError(context, l10n?.errorDuringDeletion ?? 'Error during deletion');
                           }
                         }
                       }
@@ -578,13 +580,13 @@ class EditTaskSheetState extends ConsumerState<EditTaskSheet> {
               const SizedBox(height: 24),
               TextFormField(
                 controller: _titleController,
-                decoration: const InputDecoration(
-                  labelText: 'Title',
+                decoration: InputDecoration(
+                  labelText: l10n?.taskTitle ?? 'Title',
                 ),
                 autofocus: true,
                 enabled: !_isLoading,
                 validator: (v) =>
-                    v?.trim().isEmpty == true ? 'Please enter a title' : null,
+                    v?.trim().isEmpty == true ? (l10n?.requiredField ?? 'Please enter a title') : null,
               ),
               const SizedBox(height: 16),
               TextFormField(
@@ -598,7 +600,7 @@ class EditTaskSheetState extends ConsumerState<EditTaskSheet> {
               ),
               if (widget.task.contactName != null) ...[
                 const SizedBox(height: 16),
-                Text('Linked to', style: Theme.of(context).textTheme.bodySmall),
+                Text(l10n?.linkedTo ?? 'Linked to', style: Theme.of(context).textTheme.bodySmall),
                 const SizedBox(height: 8),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
@@ -637,15 +639,15 @@ class EditTaskSheetState extends ConsumerState<EditTaskSheet> {
                           data: (members) {
                             if (members.isEmpty) return const SizedBox.shrink();
                             return DropdownButtonFormField<String>(
-                              decoration: const InputDecoration(
-                                labelText: 'Assign to',
+                              decoration: InputDecoration(
+                                labelText: l10n?.assignee ?? 'Assign to',
                                 hintText: 'Select team member',
                               ),
                               value: _selectedAssigneeId,
                               items: [
-                                const DropdownMenuItem(
+                                DropdownMenuItem(
                                   value: null,
-                                  child: Text('Unassigned'),
+                                  child: Text(l10n?.unassigned ?? 'Unassigned'),
                                 ),
                                 ...members.map((m) => DropdownMenuItem(
                                   value: m.id,
@@ -680,7 +682,7 @@ class EditTaskSheetState extends ConsumerState<EditTaskSheet> {
                 child: (_selectedDueDate != null && (_selectedDueDate!.hour != 0 || _selectedDueDate!.minute != 0))
                     ? SwitchListTile(
                         contentPadding: EdgeInsets.zero,
-                        title: const Text('Reminder notification'),
+                        title: Text(l10n?.reminderNotification ?? 'Reminder notification'),
                         subtitle: Text(
                           _notifyReminder
                               ? '30 min before — ${_selectedDueDate!.hour.toString().padLeft(2, '0')}:${_selectedDueDate!.minute.toString().padLeft(2, '0')}'
@@ -756,7 +758,10 @@ class EditTaskSheetState extends ConsumerState<EditTaskSheet> {
 
                             if (mounted) {
                               navigator.pop();
-                              SnackbarHelper.showSuccess(context, 'Task updated successfully');
+                              SnackbarHelper.showSuccess(
+                                context,
+                                l10n?.taskUpdated ?? 'Task updated successfully',
+                              );
                             }
                           } catch (e) {
                             if (mounted) {
@@ -778,7 +783,7 @@ class EditTaskSheetState extends ConsumerState<EditTaskSheet> {
                         width: 20, 
                         child: CircularProgressIndicator(strokeWidth: 2)
                       )
-                    : const Text('Save Changes'),
+                    : Text(l10n?.saveChanges ?? 'Save Changes'),
               ),
               const SizedBox(height: 32),
             ],

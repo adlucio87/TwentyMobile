@@ -15,6 +15,7 @@ import 'package:pocketcrm/presentation/shared/snackbar_helper.dart';
 import 'package:pocketcrm/core/utils/demo_utils.dart';
 import 'package:pocketcrm/presentation/shared/swipe_action_wrapper.dart';
 import 'package:pocketcrm/shared/widgets/constrained_content.dart';
+import 'package:pocketcrm/l10n/app_localizations.dart';
 import 'dart:async';
 
 class CompaniesScreen extends ConsumerStatefulWidget {
@@ -45,6 +46,7 @@ class _CompaniesScreenState extends ConsumerState<CompaniesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final companiesAsync = ref.watch(companiesProvider);
 
     return Scaffold(
@@ -52,7 +54,7 @@ class _CompaniesScreenState extends ConsumerState<CompaniesScreen> {
         title: TextField(
           controller: _searchController,
           decoration: InputDecoration(
-            hintText: 'Search companies...',
+            hintText: l10n?.searchCompanies ?? 'Search companies...',
             prefixIcon: const Icon(Icons.search),
             contentPadding: const EdgeInsets.symmetric(vertical: 0),
             border: OutlineInputBorder(
@@ -93,10 +95,10 @@ class _CompaniesScreenState extends ConsumerState<CompaniesScreen> {
                 physics: const AlwaysScrollableScrollPhysics(),
                 child: SizedBox(
                   height: MediaQuery.of(context).size.height * 0.7,
-                  child: const EmptyStateWidget(
+                  child: EmptyStateWidget(
                     icon: Icons.business,
-                    title: 'No companies',
-                    message: 'There are no companies in the database.',
+                    title: l10n?.noCompaniesFound ?? 'No companies',
+                    message: l10n?.noCompaniesInDatabase ?? 'There are no companies in the database.',
                   ),
                 ),
               ),
@@ -113,8 +115,9 @@ class _CompaniesScreenState extends ConsumerState<CompaniesScreen> {
                 final bgColor = ColorUtils.avatarColor(company.name);
                 return SwipeActionWrapper(
                   itemKey: ValueKey('company_${company.id}'),
-                  confirmTitle: 'Delete company',
+                  confirmTitle: l10n?.deleteCompany ?? 'Delete company',
                   confirmMessage:
+                      l10n?.deleteCompanyConfirmMessage(company.name) ??
                       'Are you sure you want to delete ${company.name}?\nThis action cannot be undone.',
                   onDelete: () async {
                     if (!await DemoUtils.checkDemoAction(context, ref)) return;
@@ -126,7 +129,7 @@ class _CompaniesScreenState extends ConsumerState<CompaniesScreen> {
                       if (context.mounted) {
                         SnackbarHelper.showError(
                           context,
-                          'Failed to delete company: ${e.toString().replaceAll('Exception: ', '')}',
+                          '${l10n?.errorDuringDeletion ?? 'Failed to delete company'}: ${e.toString().replaceAll('Exception: ', '')}',
                         );
                       }
                     }
@@ -251,7 +254,7 @@ class _CompaniesScreenState extends ConsumerState<CompaniesScreen> {
         },
         loading: () => const ListSkeleton(),
         error: (err, stack) => ErrorStateWidget(
-          title: 'Loading error',
+          title: l10n?.loadingError ?? 'Loading error',
           message: err.toString().replaceAll('Exception: ', ''),
           onRetry: () => ref.invalidate(companiesProvider),
         ),
@@ -284,6 +287,7 @@ class AddCompanySheetState extends ConsumerState<AddCompanySheet> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Padding(
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,
@@ -302,7 +306,7 @@ class AddCompanySheetState extends ConsumerState<AddCompanySheet> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'New Company',
+                    l10n?.newCompany ?? 'New Company',
                     style: Theme.of(context).textTheme.headlineSmall,
                   ),
                 ],
@@ -310,15 +314,15 @@ class AddCompanySheetState extends ConsumerState<AddCompanySheet> {
               const SizedBox(height: 24),
               TextFormField(
                 controller: _nameController,
-                decoration: const InputDecoration(labelText: 'Company Name'),
-                validator: (v) => v?.trim().isEmpty == true ? 'Required' : null,
+                decoration: InputDecoration(labelText: l10n?.companyName ?? 'Company Name'),
+                validator: (v) => v?.trim().isEmpty == true ? (l10n?.requiredField ?? 'Required') : null,
                 enabled: !_isLoading,
               ),
               const SizedBox(height: 16),
               TextFormField(
                 controller: _domainController,
-                decoration: const InputDecoration(
-                  labelText: 'Domain or Website',
+                decoration: InputDecoration(
+                  labelText: l10n?.domainOrWebsite ?? 'Domain or Website',
                   hintText: 'e.g. example.com',
                 ),
                 keyboardType: TextInputType.url,
@@ -383,7 +387,7 @@ class AddCompanySheetState extends ConsumerState<AddCompanySheet> {
                               navigator.pop();
                               SnackbarHelper.showSuccess(
                                 context,
-                                'Company created successfully',
+                                l10n?.companyCreated ?? 'Company created successfully',
                               );
                             }
                           } catch (e) {
@@ -409,7 +413,7 @@ class AddCompanySheetState extends ConsumerState<AddCompanySheet> {
                         width: 20,
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
-                    : const Text('Save Company'),
+                    : Text(l10n?.saveCompany ?? 'Save Company'),
               ),
               const SizedBox(height: 32),
             ],
@@ -453,6 +457,7 @@ class EditCompanySheetState extends ConsumerState<EditCompanySheet> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Padding(
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,
@@ -471,7 +476,7 @@ class EditCompanySheetState extends ConsumerState<EditCompanySheet> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Edit Company',
+                    l10n?.editCompany ?? 'Edit Company',
                     style: Theme.of(context).textTheme.headlineSmall,
                   ),
                 ],
@@ -479,15 +484,15 @@ class EditCompanySheetState extends ConsumerState<EditCompanySheet> {
               const SizedBox(height: 24),
               TextFormField(
                 controller: _nameController,
-                decoration: const InputDecoration(labelText: 'Company Name'),
-                validator: (v) => v?.trim().isEmpty == true ? 'Required' : null,
+                decoration: InputDecoration(labelText: l10n?.companyName ?? 'Company Name'),
+                validator: (v) => v?.trim().isEmpty == true ? (l10n?.requiredField ?? 'Required') : null,
                 enabled: !_isLoading,
               ),
               const SizedBox(height: 16),
               TextFormField(
                 controller: _domainController,
-                decoration: const InputDecoration(
-                  labelText: 'Domain or Website',
+                decoration: InputDecoration(
+                  labelText: l10n?.domainOrWebsite ?? 'Domain or Website',
                   hintText: 'e.g. example.com',
                 ),
                 keyboardType: TextInputType.url,
@@ -551,7 +556,7 @@ class EditCompanySheetState extends ConsumerState<EditCompanySheet> {
                               navigator.pop();
                               SnackbarHelper.showSuccess(
                                 context,
-                                'Company updated successfully',
+                                l10n?.companyUpdated ?? 'Company updated successfully',
                               );
                             }
                           } catch (e) {
@@ -577,7 +582,7 @@ class EditCompanySheetState extends ConsumerState<EditCompanySheet> {
                         width: 20,
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
-                    : const Text('Save Changes'),
+                    : Text(l10n?.saveChanges ?? 'Save Changes'),
               ),
               const SizedBox(height: 32),
             ],

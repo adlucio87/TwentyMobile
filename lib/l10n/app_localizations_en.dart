@@ -350,6 +350,223 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get close => 'Close';
+
+  @override
+  String get allInOrder => 'Everything is in order!';
+
+  @override
+  String get noTasksDueToday => 'No tasks due today';
+
+  @override
+  String andMoreTasks(int count) {
+    return 'and $count more...';
+  }
+
+  @override
+  String get loadingError => 'Loading error';
+
+  @override
+  String get requiredField => 'Required field';
+
+  @override
+  String get invalidEmailFormat => 'Invalid email format';
+
+  @override
+  String get phoneMobile => 'Phone (Mobile)';
+
+  @override
+  String get importFromContacts => 'Import from contacts';
+
+  @override
+  String get saveContact => 'Save Contact';
+
+  @override
+  String get saveChanges => 'Save Changes';
+
+  @override
+  String get contactAdded => 'Contact added';
+
+  @override
+  String get contactUpdated => 'Contact updated';
+
+  @override
+  String get contactDeleted => 'Contact deleted';
+
+  @override
+  String get errorCreatingContact => 'Error creating contact';
+
+  @override
+  String get errorDuringDeletion => 'Error during deletion';
+
+  @override
+  String deleteContactConfirmMessage(String name) {
+    return 'Are you sure you want to delete $name?\nThis action cannot be undone.';
+  }
+
+  @override
+  String get newNote => 'New Note';
+
+  @override
+  String get saveNote => 'Save Note';
+
+  @override
+  String get noNotesPresent => 'No notes present';
+
+  @override
+  String get saveToDeviceContacts => 'Save to Contacts';
+
+  @override
+  String get unableOpenEmail => 'Unable to open email client';
+
+  @override
+  String get unableStartCall => 'Unable to start the call';
+
+  @override
+  String get createTask => 'Create Task';
+
+  @override
+  String get taskCreated => 'Task created';
+
+  @override
+  String get taskUpdated => 'Task updated';
+
+  @override
+  String get taskDeleted => 'Task deleted';
+
+  @override
+  String get reminderNotification => 'Reminder notification';
+
+  @override
+  String get linkedTo => 'Linked to';
+
+  @override
+  String get unassigned => 'Unassigned';
+
+  @override
+  String get privacyPolicy => 'Privacy Policy';
+
+  @override
+  String get termsOfUse => 'Terms of Use (EULA)';
+
+  @override
+  String get showTwentyInIosContacts => 'Show Twenty people in iOS Contacts';
+
+  @override
+  String get receiveNotificationBeforeDueDate =>
+      'Receive notification before due date';
+
+  @override
+  String get startRecording => 'Start recording';
+
+  @override
+  String get recording => 'Recording...';
+
+  @override
+  String get rerecord => 'Rerecord';
+
+  @override
+  String get saveAsNote => 'Save as note';
+
+  @override
+  String get speechNotAvailable => 'Speech recognition not available';
+
+  @override
+  String get createNewCompany => 'Create New Company';
+
+  @override
+  String get create => 'Create';
+
+  @override
+  String get removeDueDate => 'Remove due date';
+
+  @override
+  String get analyzingBusinessCard => 'Analyzing business card...';
+
+  @override
+  String get tryAgain => 'Try Again';
+
+  @override
+  String get verifyData => 'Verify data';
+
+  @override
+  String get noLinkedContacts => 'No linked contacts';
+
+  @override
+  String get confidenceHigh => '✅ Excellent capture — verify data';
+
+  @override
+  String get confidenceMedium => '⚠️ Partial capture — check fields';
+
+  @override
+  String get confidenceLow => '❌ Difficult to read — fill manually';
+
+  @override
+  String get enterNameOrEmail => 'Enter at least name or email';
+
+  @override
+  String get newCompany => 'New Company';
+
+  @override
+  String get editCompany => 'Edit Company';
+
+  @override
+  String get deleteCompany => 'Delete Company';
+
+  @override
+  String get companyName => 'Company Name';
+
+  @override
+  String get domainOrWebsite => 'Domain or Website';
+
+  @override
+  String get saveCompany => 'Save Company';
+
+  @override
+  String get companyCreated => 'Company created successfully';
+
+  @override
+  String get companyUpdated => 'Company updated successfully';
+
+  @override
+  String get companyDeleted => 'Company deleted';
+
+  @override
+  String deleteCompanyConfirmMessage(String name) {
+    return 'Are you sure you want to delete $name?\nThis action cannot be undone.';
+  }
+
+  @override
+  String get companyDetails => 'Company Details';
+
+  @override
+  String get industry => 'Industry';
+
+  @override
+  String get noCompaniesInDatabase => 'There are no companies in the database.';
+
+  @override
+  String get noteText => 'Note text';
+
+  @override
+  String get noteSaved => 'Note saved successfully';
+
+  @override
+  String get selectCompany => 'Select Company';
+
+  @override
+  String get selectContact => 'Select Contact';
+
+  @override
+  String get frameBusinessCard => 'Frame the business card';
+
+  @override
+  String get keepCardHorizontal => 'Keep the card horizontal and well-lit';
+
+  @override
+  String get cropBusinessCard => 'Crop business card';
+
+  @override
+  String get deleteTask => 'Delete Task';
 }
 
 /// The translations for English, as used in the United Kingdom (`en_GB`).
@@ -698,4 +915,221 @@ class AppLocalizationsEnGb extends AppLocalizationsEn {
 
   @override
   String get close => 'Close';
+
+  @override
+  String get allInOrder => 'Everything is in order!';
+
+  @override
+  String get noTasksDueToday => 'No tasks due today';
+
+  @override
+  String andMoreTasks(int count) {
+    return 'and $count more...';
+  }
+
+  @override
+  String get loadingError => 'Loading error';
+
+  @override
+  String get requiredField => 'Required field';
+
+  @override
+  String get invalidEmailFormat => 'Invalid email format';
+
+  @override
+  String get phoneMobile => 'Phone (Mobile)';
+
+  @override
+  String get importFromContacts => 'Import from contacts';
+
+  @override
+  String get saveContact => 'Save Contact';
+
+  @override
+  String get saveChanges => 'Save Changes';
+
+  @override
+  String get contactAdded => 'Contact added';
+
+  @override
+  String get contactUpdated => 'Contact updated';
+
+  @override
+  String get contactDeleted => 'Contact deleted';
+
+  @override
+  String get errorCreatingContact => 'Error creating contact';
+
+  @override
+  String get errorDuringDeletion => 'Error during deletion';
+
+  @override
+  String deleteContactConfirmMessage(String name) {
+    return 'Are you sure you want to delete $name?\nThis action cannot be undone.';
+  }
+
+  @override
+  String get newNote => 'New Note';
+
+  @override
+  String get saveNote => 'Save Note';
+
+  @override
+  String get noNotesPresent => 'No notes present';
+
+  @override
+  String get saveToDeviceContacts => 'Save to Contacts';
+
+  @override
+  String get unableOpenEmail => 'Unable to open email client';
+
+  @override
+  String get unableStartCall => 'Unable to start the call';
+
+  @override
+  String get createTask => 'Create Task';
+
+  @override
+  String get taskCreated => 'Task created';
+
+  @override
+  String get taskUpdated => 'Task updated';
+
+  @override
+  String get taskDeleted => 'Task deleted';
+
+  @override
+  String get reminderNotification => 'Reminder notification';
+
+  @override
+  String get linkedTo => 'Linked to';
+
+  @override
+  String get unassigned => 'Unassigned';
+
+  @override
+  String get privacyPolicy => 'Privacy Policy';
+
+  @override
+  String get termsOfUse => 'Terms of Use (EULA)';
+
+  @override
+  String get showTwentyInIosContacts => 'Show Twenty people in iOS Contacts';
+
+  @override
+  String get receiveNotificationBeforeDueDate =>
+      'Receive notification before due date';
+
+  @override
+  String get startRecording => 'Start recording';
+
+  @override
+  String get recording => 'Recording...';
+
+  @override
+  String get rerecord => 'Rerecord';
+
+  @override
+  String get saveAsNote => 'Save as note';
+
+  @override
+  String get speechNotAvailable => 'Speech recognition not available';
+
+  @override
+  String get createNewCompany => 'Create New Company';
+
+  @override
+  String get create => 'Create';
+
+  @override
+  String get removeDueDate => 'Remove due date';
+
+  @override
+  String get analyzingBusinessCard => 'Analyzing business card...';
+
+  @override
+  String get tryAgain => 'Try Again';
+
+  @override
+  String get verifyData => 'Verify data';
+
+  @override
+  String get noLinkedContacts => 'No linked contacts';
+
+  @override
+  String get confidenceHigh => '✅ Excellent capture — verify data';
+
+  @override
+  String get confidenceMedium => '⚠️ Partial capture — check fields';
+
+  @override
+  String get confidenceLow => '❌ Difficult to read — fill manually';
+
+  @override
+  String get enterNameOrEmail => 'Enter at least name or email';
+
+  @override
+  String get newCompany => 'New Company';
+
+  @override
+  String get editCompany => 'Edit Company';
+
+  @override
+  String get deleteCompany => 'Delete Company';
+
+  @override
+  String get companyName => 'Company Name';
+
+  @override
+  String get domainOrWebsite => 'Domain or Website';
+
+  @override
+  String get saveCompany => 'Save Company';
+
+  @override
+  String get companyCreated => 'Company created successfully';
+
+  @override
+  String get companyUpdated => 'Company updated successfully';
+
+  @override
+  String get companyDeleted => 'Company deleted';
+
+  @override
+  String deleteCompanyConfirmMessage(String name) {
+    return 'Are you sure you want to delete $name?\nThis action cannot be undone.';
+  }
+
+  @override
+  String get companyDetails => 'Company Details';
+
+  @override
+  String get industry => 'Industry';
+
+  @override
+  String get noCompaniesInDatabase => 'There are no companies in the database.';
+
+  @override
+  String get noteText => 'Note text';
+
+  @override
+  String get noteSaved => 'Note saved successfully';
+
+  @override
+  String get selectCompany => 'Select Company';
+
+  @override
+  String get selectContact => 'Select Contact';
+
+  @override
+  String get frameBusinessCard => 'Frame the business card';
+
+  @override
+  String get keepCardHorizontal => 'Keep the card horizontal and well-lit';
+
+  @override
+  String get cropBusinessCard => 'Crop business card';
+
+  @override
+  String get deleteTask => 'Delete Task';
 }

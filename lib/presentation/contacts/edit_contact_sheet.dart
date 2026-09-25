@@ -7,6 +7,7 @@ import 'package:pocketcrm/presentation/shared/snackbar_helper.dart';
 import 'package:pocketcrm/presentation/shared/company_picker_bottom_sheet.dart';
 import 'package:pocketcrm/shared/widgets/phone_input_field.dart';
 import 'package:pocketcrm/core/utils/demo_utils.dart';
+import 'package:pocketcrm/l10n/app_localizations.dart';
 
 class EditContactSheet extends ConsumerStatefulWidget {
   final Contact contact;
@@ -53,6 +54,7 @@ class _EditContactSheetState extends ConsumerState<EditContactSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Padding(
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,
@@ -68,7 +70,7 @@ class _EditContactSheetState extends ConsumerState<EditContactSheet> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(
-                'Edit Contact',
+                l10n?.editContact ?? 'Edit Contact',
                 style: Theme.of(context).textTheme.headlineSmall,
               ),
               const SizedBox(height: 24),
@@ -78,9 +80,9 @@ class _EditContactSheetState extends ConsumerState<EditContactSheet> {
                     child: TextFormField(
                       controller: _firstNameController,
                       enabled: !_isLoading,
-                      decoration: const InputDecoration(labelText: 'First Name'),
+                      decoration: InputDecoration(labelText: l10n?.firstName ?? 'First Name'),
                       validator: (v) =>
-                          v?.trim().isEmpty == true ? 'Required field' : null,
+                          v?.trim().isEmpty == true ? (l10n?.requiredField ?? 'Required field') : null,
                     ),
                   ),
                   const SizedBox(width: 16),
@@ -88,9 +90,9 @@ class _EditContactSheetState extends ConsumerState<EditContactSheet> {
                     child: TextFormField(
                       controller: _lastNameController,
                       enabled: !_isLoading,
-                      decoration: const InputDecoration(labelText: 'Last Name'),
+                      decoration: InputDecoration(labelText: l10n?.lastName ?? 'Last Name'),
                       validator: (v) =>
-                          v?.trim().isEmpty == true ? 'Required field' : null,
+                          v?.trim().isEmpty == true ? (l10n?.requiredField ?? 'Required field') : null,
                     ),
                   ),
                 ],
@@ -99,15 +101,15 @@ class _EditContactSheetState extends ConsumerState<EditContactSheet> {
               TextFormField(
                 controller: _emailController,
                 enabled: !_isLoading,
-                decoration: const InputDecoration(
-                  labelText: 'Email',
-                  prefixIcon: Icon(Icons.email),
+                decoration: InputDecoration(
+                  labelText: l10n?.email ?? 'Email',
+                  prefixIcon: const Icon(Icons.email),
                 ),
                 keyboardType: TextInputType.emailAddress,
                 validator: (v) {
                   if (v != null && v.trim().isNotEmpty) {
                     if (!v.contains('@') || !v.contains('.')) {
-                      return 'Please enter a valid email address';
+                      return l10n?.invalidEmailFormat ?? 'Please enter a valid email address';
                     }
                   }
                   return null;
@@ -118,7 +120,7 @@ class _EditContactSheetState extends ConsumerState<EditContactSheet> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Phone',
+                    l10n?.phone ?? 'Phone',
                     style: TextStyle(
                       color: Theme.of(context).colorScheme.onSurfaceVariant,
                       fontSize: 12,
@@ -142,7 +144,7 @@ class _EditContactSheetState extends ConsumerState<EditContactSheet> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Company',
+                    l10n?.company ?? 'Company',
                     style: TextStyle(
                       color: Theme.of(context).colorScheme.onSurfaceVariant,
                       fontSize: 12,
@@ -235,7 +237,7 @@ class _EditContactSheetState extends ConsumerState<EditContactSheet> {
                         width: 20,
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
-                    : const Text('Save Changes'),
+                    : Text(l10n?.saveChanges ?? 'Save Changes'),
               ),
               const SizedBox(height: 32),
             ],
@@ -271,7 +273,10 @@ class _EditContactSheetState extends ConsumerState<EditContactSheet> {
 
         if (mounted) {
           navigator.pop(); 
-          SnackbarHelper.showSuccess(context, 'Contact updated successfully');
+          SnackbarHelper.showSuccess(
+            context,
+            AppLocalizations.of(context)?.contactUpdated ?? 'Contact updated successfully',
+          );
         }
       } catch (e) {
         if (mounted) {

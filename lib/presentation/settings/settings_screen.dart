@@ -350,7 +350,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           const SizedBox(height: 16),
           ListTile(
             title: Text(l10n?.taskReminderNotifications ?? 'Task reminders'),
-            subtitle: const Text('Receive notification before due date'),
+            subtitle: Text(l10n?.receiveNotificationBeforeDueDate ?? 'Receive notification before due date'),
             trailing: Switch(
               value: _notificationsEnabled,
               onChanged: _saveNotificationEnabled,
@@ -383,7 +383,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             ),
             const SizedBox(height: 16),
             ListTile(
-              title: const Text('Show Twenty people in iOS Contacts'),
+              title: Text(l10n?.showTwentyInIosContacts ?? 'Show Twenty people in iOS Contacts'),
               subtitle: Text(
                 l10n?.iosContactsSubtitle ??
                     'Adds a Twenty account in the Contacts app (iOS 18+). Does not copy contacts into iCloud.',
@@ -425,13 +425,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           const SizedBox(height: 16),
           ListTile(
             leading: const Icon(Icons.privacy_tip_outlined),
-            title: const Text('Privacy Policy'),
+            title: Text(l10n?.privacyPolicy ?? 'Privacy Policy'),
             trailing: const Icon(Icons.open_in_new, size: 20),
             onTap: () => launchUrl(Uri.parse('https://privacy.luciosoft.it/twentymobilecrm/')),
           ),
           ListTile(
             leading: const Icon(Icons.description_outlined),
-            title: const Text('Terms of Use (EULA)'),
+            title: Text(l10n?.termsOfUse ?? 'Terms of Use (EULA)'),
             trailing: const Icon(Icons.open_in_new, size: 20),
             onTap: () => launchUrl(Uri.parse('https://www.apple.com/legal/internet-services/itunes/dev/stdeula/')),
           ),

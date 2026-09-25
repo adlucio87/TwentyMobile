@@ -782,6 +782,426 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Close'**
   String get close;
+
+  /// No description provided for @allInOrder.
+  ///
+  /// In en, this message translates to:
+  /// **'Everything is in order!'**
+  String get allInOrder;
+
+  /// No description provided for @noTasksDueToday.
+  ///
+  /// In en, this message translates to:
+  /// **'No tasks due today'**
+  String get noTasksDueToday;
+
+  /// No description provided for @andMoreTasks.
+  ///
+  /// In en, this message translates to:
+  /// **'and {count} more...'**
+  String andMoreTasks(int count);
+
+  /// No description provided for @loadingError.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading error'**
+  String get loadingError;
+
+  /// No description provided for @requiredField.
+  ///
+  /// In en, this message translates to:
+  /// **'Required field'**
+  String get requiredField;
+
+  /// No description provided for @invalidEmailFormat.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid email format'**
+  String get invalidEmailFormat;
+
+  /// No description provided for @phoneMobile.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone (Mobile)'**
+  String get phoneMobile;
+
+  /// No description provided for @importFromContacts.
+  ///
+  /// In en, this message translates to:
+  /// **'Import from contacts'**
+  String get importFromContacts;
+
+  /// No description provided for @saveContact.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Contact'**
+  String get saveContact;
+
+  /// No description provided for @saveChanges.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Changes'**
+  String get saveChanges;
+
+  /// No description provided for @contactAdded.
+  ///
+  /// In en, this message translates to:
+  /// **'Contact added'**
+  String get contactAdded;
+
+  /// No description provided for @contactUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Contact updated'**
+  String get contactUpdated;
+
+  /// No description provided for @contactDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Contact deleted'**
+  String get contactDeleted;
+
+  /// No description provided for @errorCreatingContact.
+  ///
+  /// In en, this message translates to:
+  /// **'Error creating contact'**
+  String get errorCreatingContact;
+
+  /// No description provided for @errorDuringDeletion.
+  ///
+  /// In en, this message translates to:
+  /// **'Error during deletion'**
+  String get errorDuringDeletion;
+
+  /// No description provided for @deleteContactConfirmMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete {name}?\nThis action cannot be undone.'**
+  String deleteContactConfirmMessage(String name);
+
+  /// No description provided for @newNote.
+  ///
+  /// In en, this message translates to:
+  /// **'New Note'**
+  String get newNote;
+
+  /// No description provided for @saveNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Note'**
+  String get saveNote;
+
+  /// No description provided for @noNotesPresent.
+  ///
+  /// In en, this message translates to:
+  /// **'No notes present'**
+  String get noNotesPresent;
+
+  /// No description provided for @saveToDeviceContacts.
+  ///
+  /// In en, this message translates to:
+  /// **'Save to Contacts'**
+  String get saveToDeviceContacts;
+
+  /// No description provided for @unableOpenEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to open email client'**
+  String get unableOpenEmail;
+
+  /// No description provided for @unableStartCall.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to start the call'**
+  String get unableStartCall;
+
+  /// No description provided for @createTask.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Task'**
+  String get createTask;
+
+  /// No description provided for @taskCreated.
+  ///
+  /// In en, this message translates to:
+  /// **'Task created'**
+  String get taskCreated;
+
+  /// No description provided for @taskUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Task updated'**
+  String get taskUpdated;
+
+  /// No description provided for @taskDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Task deleted'**
+  String get taskDeleted;
+
+  /// No description provided for @reminderNotification.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminder notification'**
+  String get reminderNotification;
+
+  /// No description provided for @linkedTo.
+  ///
+  /// In en, this message translates to:
+  /// **'Linked to'**
+  String get linkedTo;
+
+  /// No description provided for @unassigned.
+  ///
+  /// In en, this message translates to:
+  /// **'Unassigned'**
+  String get unassigned;
+
+  /// No description provided for @privacyPolicy.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy Policy'**
+  String get privacyPolicy;
+
+  /// No description provided for @termsOfUse.
+  ///
+  /// In en, this message translates to:
+  /// **'Terms of Use (EULA)'**
+  String get termsOfUse;
+
+  /// No description provided for @showTwentyInIosContacts.
+  ///
+  /// In en, this message translates to:
+  /// **'Show Twenty people in iOS Contacts'**
+  String get showTwentyInIosContacts;
+
+  /// No description provided for @receiveNotificationBeforeDueDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Receive notification before due date'**
+  String get receiveNotificationBeforeDueDate;
+
+  /// No description provided for @startRecording.
+  ///
+  /// In en, this message translates to:
+  /// **'Start recording'**
+  String get startRecording;
+
+  /// No description provided for @recording.
+  ///
+  /// In en, this message translates to:
+  /// **'Recording...'**
+  String get recording;
+
+  /// No description provided for @rerecord.
+  ///
+  /// In en, this message translates to:
+  /// **'Rerecord'**
+  String get rerecord;
+
+  /// No description provided for @saveAsNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Save as note'**
+  String get saveAsNote;
+
+  /// No description provided for @speechNotAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Speech recognition not available'**
+  String get speechNotAvailable;
+
+  /// No description provided for @createNewCompany.
+  ///
+  /// In en, this message translates to:
+  /// **'Create New Company'**
+  String get createNewCompany;
+
+  /// No description provided for @create.
+  ///
+  /// In en, this message translates to:
+  /// **'Create'**
+  String get create;
+
+  /// No description provided for @removeDueDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove due date'**
+  String get removeDueDate;
+
+  /// No description provided for @analyzingBusinessCard.
+  ///
+  /// In en, this message translates to:
+  /// **'Analyzing business card...'**
+  String get analyzingBusinessCard;
+
+  /// No description provided for @tryAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Try Again'**
+  String get tryAgain;
+
+  /// No description provided for @verifyData.
+  ///
+  /// In en, this message translates to:
+  /// **'Verify data'**
+  String get verifyData;
+
+  /// No description provided for @noLinkedContacts.
+  ///
+  /// In en, this message translates to:
+  /// **'No linked contacts'**
+  String get noLinkedContacts;
+
+  /// No description provided for @confidenceHigh.
+  ///
+  /// In en, this message translates to:
+  /// **'✅ Excellent capture — verify data'**
+  String get confidenceHigh;
+
+  /// No description provided for @confidenceMedium.
+  ///
+  /// In en, this message translates to:
+  /// **'⚠️ Partial capture — check fields'**
+  String get confidenceMedium;
+
+  /// No description provided for @confidenceLow.
+  ///
+  /// In en, this message translates to:
+  /// **'❌ Difficult to read — fill manually'**
+  String get confidenceLow;
+
+  /// No description provided for @enterNameOrEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter at least name or email'**
+  String get enterNameOrEmail;
+
+  /// No description provided for @newCompany.
+  ///
+  /// In en, this message translates to:
+  /// **'New Company'**
+  String get newCompany;
+
+  /// No description provided for @editCompany.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Company'**
+  String get editCompany;
+
+  /// No description provided for @deleteCompany.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Company'**
+  String get deleteCompany;
+
+  /// No description provided for @companyName.
+  ///
+  /// In en, this message translates to:
+  /// **'Company Name'**
+  String get companyName;
+
+  /// No description provided for @domainOrWebsite.
+  ///
+  /// In en, this message translates to:
+  /// **'Domain or Website'**
+  String get domainOrWebsite;
+
+  /// No description provided for @saveCompany.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Company'**
+  String get saveCompany;
+
+  /// No description provided for @companyCreated.
+  ///
+  /// In en, this message translates to:
+  /// **'Company created successfully'**
+  String get companyCreated;
+
+  /// No description provided for @companyUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Company updated successfully'**
+  String get companyUpdated;
+
+  /// No description provided for @companyDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Company deleted'**
+  String get companyDeleted;
+
+  /// No description provided for @deleteCompanyConfirmMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete {name}?\nThis action cannot be undone.'**
+  String deleteCompanyConfirmMessage(String name);
+
+  /// No description provided for @companyDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Company Details'**
+  String get companyDetails;
+
+  /// No description provided for @industry.
+  ///
+  /// In en, this message translates to:
+  /// **'Industry'**
+  String get industry;
+
+  /// No description provided for @noCompaniesInDatabase.
+  ///
+  /// In en, this message translates to:
+  /// **'There are no companies in the database.'**
+  String get noCompaniesInDatabase;
+
+  /// No description provided for @noteText.
+  ///
+  /// In en, this message translates to:
+  /// **'Note text'**
+  String get noteText;
+
+  /// No description provided for @noteSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Note saved successfully'**
+  String get noteSaved;
+
+  /// No description provided for @selectCompany.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Company'**
+  String get selectCompany;
+
+  /// No description provided for @selectContact.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Contact'**
+  String get selectContact;
+
+  /// No description provided for @frameBusinessCard.
+  ///
+  /// In en, this message translates to:
+  /// **'Frame the business card'**
+  String get frameBusinessCard;
+
+  /// No description provided for @keepCardHorizontal.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep the card horizontal and well-lit'**
+  String get keepCardHorizontal;
+
+  /// No description provided for @cropBusinessCard.
+  ///
+  /// In en, this message translates to:
+  /// **'Crop business card'**
+  String get cropBusinessCard;
+
+  /// No description provided for @deleteTask.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Task'**
+  String get deleteTask;
 }
 
 class _AppLocalizationsDelegate

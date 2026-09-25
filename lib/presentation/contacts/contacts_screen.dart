@@ -15,6 +15,7 @@ import 'package:pocketcrm/core/utils/color_utils.dart';
 import 'package:pocketcrm/presentation/contacts/edit_contact_sheet.dart';
 import 'package:pocketcrm/presentation/shared/error_state_widget.dart';
 import 'package:pocketcrm/shared/widgets/constrained_content.dart';
+import 'package:pocketcrm/l10n/app_localizations.dart';
 
 class ContactsScreen extends ConsumerStatefulWidget {
   const ContactsScreen({super.key});
@@ -57,13 +58,14 @@ class _ContactsScreenState extends ConsumerState<ContactsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final contactsAsync = ref.watch(contactsProvider);
 
     return Scaffold(
       appBar: AppBar(
         title: TextField(
           decoration: InputDecoration(
-            hintText: 'Search contacts...',
+            hintText: l10n?.searchContacts ?? 'Search contacts...',
             prefixIcon: const Icon(Icons.search),
             contentPadding: const EdgeInsets.symmetric(vertical: 0),
             border: OutlineInputBorder(
@@ -88,9 +90,9 @@ class _ContactsScreenState extends ConsumerState<ContactsScreen> {
                 physics: const AlwaysScrollableScrollPhysics(),
                 child: SizedBox(
                   height: MediaQuery.of(context).size.height * 0.7,
-                  child: const EmptyStateWidget(
+                  child: EmptyStateWidget(
                     icon: Icons.people_outline,
-                    title: 'No contacts',
+                    title: l10n?.noContactsFound ?? 'No contacts',
                     message: 'No results match your search.',
                   ),
                 ),
@@ -271,6 +273,7 @@ class AddContactSheetState extends ConsumerState<AddContactSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Padding(
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,
@@ -289,12 +292,12 @@ class AddContactSheetState extends ConsumerState<AddContactSheet> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'New Contact',
+                    l10n?.newContact ?? 'New Contact',
                     style: Theme.of(context).textTheme.headlineSmall,
                   ),
                   IconButton(
                     icon: const Icon(Icons.import_contacts),
-                    tooltip: 'Import from contacts',
+                    tooltip: l10n?.importFromContacts ?? 'Import from contacts',
                     onPressed: _isLoading
                         ? null
                         : () async {
@@ -363,24 +366,24 @@ class AddContactSheetState extends ConsumerState<AddContactSheet> {
               const SizedBox(height: 24),
               TextFormField(
                 controller: _firstNameController,
-                decoration: const InputDecoration(labelText: 'First Name'),
-                validator: (v) => v?.isEmpty == true ? 'Required' : null,
+                decoration: InputDecoration(labelText: l10n?.firstName ?? 'First Name'),
+                validator: (v) => v?.isEmpty == true ? (l10n?.requiredField ?? 'Required') : null,
                 enabled: !_isLoading,
               ),
               const SizedBox(height: 16),
               TextFormField(
                 controller: _lastNameController,
-                decoration: const InputDecoration(labelText: 'Last Name'),
-                validator: (v) => v?.trim().isEmpty == true ? 'Required' : null,
+                decoration: InputDecoration(labelText: l10n?.lastName ?? 'Last Name'),
+                validator: (v) => v?.trim().isEmpty == true ? (l10n?.requiredField ?? 'Required') : null,
                 enabled: !_isLoading,
               ),
               const SizedBox(height: 16),
               TextFormField(
                 controller: _emailController,
-                decoration: const InputDecoration(labelText: 'Email'),
+                decoration: InputDecoration(labelText: l10n?.email ?? 'Email'),
                 keyboardType: TextInputType.emailAddress,
                 validator: (v) =>
-                    !_isValidEmail(v ?? '') ? 'Invalid email format' : null,
+                    !_isValidEmail(v ?? '') ? (l10n?.invalidEmailFormat ?? 'Invalid email format') : null,
                 enabled: !_isLoading,
               ),
               const SizedBox(height: 16),
@@ -388,7 +391,7 @@ class AddContactSheetState extends ConsumerState<AddContactSheet> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Phone (Mobile)',
+                    l10n?.phoneMobile ?? 'Phone (Mobile)',
                     style: TextStyle(
                       color: Theme.of(context).colorScheme.onSurfaceVariant,
                       fontSize: 12,
@@ -470,7 +473,7 @@ class AddContactSheetState extends ConsumerState<AddContactSheet> {
                               navigator.pop(); // Pop solo se successo
                               SnackbarHelper.showSuccess(
                                 context,
-                                'Contact created successfully',
+                                l10n?.contactAdded ?? 'Contact created successfully',
                               );
                             }
                           } catch (e) {
@@ -504,7 +507,7 @@ class AddContactSheetState extends ConsumerState<AddContactSheet> {
                         width: 20,
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
-                    : const Text('Save Contact'),
+                    : Text(l10n?.saveContact ?? 'Save Contact'),
               ),
               const SizedBox(height: 32),
             ],

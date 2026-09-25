@@ -25,6 +25,7 @@ import 'package:pocketcrm/core/utils/demo_utils.dart';
 import 'package:pocketcrm/core/utils/color_utils.dart';
 import 'package:pocketcrm/presentation/shared/error_state_widget.dart';
 import 'package:pocketcrm/shared/widgets/constrained_content.dart';
+import 'package:pocketcrm/l10n/app_localizations.dart';
 
 class ContactDetailScreen extends ConsumerStatefulWidget {
   final String id;
@@ -58,11 +59,12 @@ class _ContactDetailScreenState extends ConsumerState<ContactDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final detailAsync = ref.watch(contactDetailProvider(widget.id));
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Contact Details'),
+        title: Text(l10n?.contactDetails ?? 'Contact Details'),
         actions: [
           if (detailAsync.hasValue)
             WorkflowActionButton(
@@ -79,7 +81,7 @@ class _ContactDetailScreenState extends ConsumerState<ContactDetailScreen> {
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
                     : Icon(Platform.isIOS ? Icons.ios_share : Icons.share),
-                tooltip: 'Share contact',
+                tooltip: l10n?.shareContact ?? 'Share contact',
                 onPressed: _isSharing
                     ? null
                     : () async {
@@ -110,7 +112,7 @@ class _ContactDetailScreenState extends ConsumerState<ContactDetailScreen> {
           if (detailAsync.hasValue)
             IconButton(
               icon: const Icon(Icons.edit),
-              tooltip: 'Edit contact',
+              tooltip: l10n?.editContact ?? 'Edit contact',
               onPressed: () {
                 showModalBottomSheet(
                   context: context,
@@ -122,14 +124,16 @@ class _ContactDetailScreenState extends ConsumerState<ContactDetailScreen> {
           if (detailAsync.hasValue)
             IconButton(
               icon: const Icon(Icons.delete),
-              tooltip: 'Delete contact',
+              tooltip: l10n?.deleteContact ?? 'Delete contact',
               onPressed: () async {
                 if (!await DemoUtils.checkDemoAction(context, ref)) return;
 
                 final confirm = await DialogHelper.showDeleteConfirmDialog(
                   context: context,
-                  title: 'Delete contact',
-                  message:
+                  title: l10n?.deleteContact ?? 'Delete contact',
+                  message: l10n?.deleteContactConfirmMessage(
+                        '${detailAsync.value!.firstName} ${detailAsync.value!.lastName}',
+                      ) ??
                       'Are you sure you want to delete ${detailAsync.value!.firstName} ${detailAsync.value!.lastName}?\nThis action cannot be undone.',
                 );
 
@@ -144,13 +148,16 @@ class _ContactDetailScreenState extends ConsumerState<ContactDetailScreen> {
 
                     if (context.mounted) {
                       Navigator.of(context).pop();
-                      SnackbarHelper.showSuccess(context, 'Contact deleted');
+                      SnackbarHelper.showSuccess(
+                        context,
+                        l10n?.contactDeleted ?? 'Contact deleted',
+                      );
                     }
                   } catch (e) {
                     if (context.mounted) {
                       SnackbarHelper.showError(
                         context,
-                        'Error during deletion',
+                        l10n?.errorDuringDeletion ?? 'Error during deletion',
                       );
                     }
                   }
@@ -186,7 +193,7 @@ class _ContactDetailScreenState extends ConsumerState<ContactDetailScreen> {
                 );
               },
               icon: const Icon(Icons.add),
-              label: const Text('New Note'),
+              label: Text(l10n?.newNote ?? 'New Note'),
             ),
           ],
         ),
@@ -195,7 +202,7 @@ class _ContactDetailScreenState extends ConsumerState<ContactDetailScreen> {
         data: (contact) => _buildDetail(context, contact),
         loading: () => const DetailSkeleton(),
         error: (err, stack) => ErrorStateWidget(
-          title: 'Loading error',
+          title: l10n?.loadingError ?? 'Loading error',
           message: err.toString().replaceAll('Exception: ', ''),
           onRetry: () => ref.invalidate(contactDetailProvider(widget.id)),
         ),
@@ -204,6 +211,7 @@ class _ContactDetailScreenState extends ConsumerState<ContactDetailScreen> {
   }
 
   Widget _buildDetail(BuildContext context, Contact contact) {
+    final l10n = AppLocalizations.of(context);
     final bgColor = ColorUtils.avatarColor(contact.firstName);
     final metadataAsync = ref.watch(workspaceMetadataProvider);
     List<FieldMetadata> personFields = [];
@@ -305,8 +313,8 @@ class _ContactDetailScreenState extends ConsumerState<ContactDetailScreen> {
                           } else {
                             if (context.mounted) {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Unable to open email client'),
+                                SnackBar(
+                                  content: Text(l10n?.unableOpenEmail ?? 'Unable to open email client'),
                                 ),
                               );
                             }
@@ -358,8 +366,8 @@ class _ContactDetailScreenState extends ConsumerState<ContactDetailScreen> {
                           } else {
                             if (context.mounted) {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Unable to start the call'),
+                                SnackBar(
+                                  content: Text(l10n?.unableStartCall ?? 'Unable to start the call'),
                                 ),
                               );
                             }
@@ -445,12 +453,12 @@ class _ContactDetailScreenState extends ConsumerState<ContactDetailScreen> {
               }
             },
             icon: const Icon(Icons.save_alt),
-            label: const Text('Save to Contacts'),
+            label: Text(l10n?.saveToDeviceContacts ?? 'Save to Contacts'),
           ),
           const SizedBox(height: 24),
-          const Text(
-            'Related Notes',
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+          Text(
+            l10n?.notes ?? 'Related Notes',
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
           ),
           const SizedBox(height: 8),
           _NotesList(contactId: contact.id),
@@ -467,15 +475,16 @@ class _NotesList extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final notesAsync = ref.watch(contactNotesProvider(contactId));
 
     return notesAsync.when(
       data: (notes) {
         if (notes.isEmpty) {
-          return const Center(
+          return Center(
             child: Padding(
-              padding: EdgeInsets.all(16.0),
-              child: Text('No notes present'),
+              padding: const EdgeInsets.all(16.0),
+              child: Text(l10n?.noNotesPresent ?? 'No notes present'),
             ),
           );
         }
@@ -539,6 +548,7 @@ class _AddNoteSheetState extends ConsumerState<_AddNoteSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Padding(
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,
@@ -551,7 +561,7 @@ class _AddNoteSheetState extends ConsumerState<_AddNoteSheet> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text('New Note', style: Theme.of(context).textTheme.headlineSmall),
+            Text(l10n?.newNote ?? 'New Note', style: Theme.of(context).textTheme.headlineSmall),
             const SizedBox(height: 24),
             TextField(
               controller: _bodyController,
@@ -574,7 +584,7 @@ class _AddNoteSheetState extends ConsumerState<_AddNoteSheet> {
                       width: 20,
                       child: CircularProgressIndicator(strokeWidth: 2),
                     )
-                  : const Text('Save Note'),
+                  : Text(l10n?.saveNote ?? 'Save Note'),
             ),
             const SizedBox(height: 32),
           ],
