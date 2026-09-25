@@ -128,6 +128,7 @@ class _EditContactSheetState extends ConsumerState<EditContactSheet> {
                   AbsorbPointer(
                     absorbing: _isLoading,
                     child: PhoneInputField(
+                      key: ValueKey('edit_phone_${_phoneController.text}'),
                       initialValue: _phoneController.text,
                       onChanged: (val) {
                         _phoneController.text = val ?? '';

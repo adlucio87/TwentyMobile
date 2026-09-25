@@ -303,32 +303,57 @@ class AddContactSheetState extends ConsumerState<AddContactSheet> {
                                 ) ==
                                 fc.PermissionStatus.granted) {
                               final pickedContact = await fc.FlutterContacts.native
-                                  .showPicker();
-                              if (pickedContact != null && pickedContact.id != null) {
-                                final contact = await fc.FlutterContacts.get(
-                                  pickedContact.id!,
-                                  properties: {
-                                    fc.ContactProperty.name,
-                                    fc.ContactProperty.phone,
-                                    fc.ContactProperty.email,
-                                  },
-                                );
-                                if (contact != null) {
-                                  setState(() {
-                                    _firstNameController.text =
-                                        contact.name?.first ?? '';
-                                    _lastNameController.text =
-                                        contact.name?.last ?? '';
-                                    if (contact.phones.isNotEmpty) {
-                                      _phoneController.text =
-                                          contact.phones.first.number;
-                                    }
-                                    if (contact.emails.isNotEmpty) {
-                                      _emailController.text =
-                                          contact.emails.first.address;
-                                    }
-                                  });
+                                  .showPicker(
+                                properties: {
+                                  fc.ContactProperty.name,
+                                  fc.ContactProperty.phone,
+                                  fc.ContactProperty.email,
+                                },
+                              );
+                              if (pickedContact != null) {
+                                fc.Contact? contact = pickedContact;
+                                if (contact.phones.isEmpty && contact.emails.isEmpty && pickedContact.id != null) {
+                                  contact = await fc.FlutterContacts.get(
+                                    pickedContact.id!,
+                                    properties: {
+                                      fc.ContactProperty.name,
+                                      fc.ContactProperty.phone,
+                                      fc.ContactProperty.email,
+                                    },
+                                  ) ?? pickedContact;
                                 }
+
+                                setState(() {
+                                  final dName = contact?.displayName ?? '';
+                                  final fName = contact?.name?.first ?? '';
+                                  final lName = contact?.name?.last ?? '';
+
+                                  final String firstName = fName.isNotEmpty
+                                      ? fName
+                                      : (dName.isNotEmpty ? dName.split(' ').first : '');
+                                  final String lastName = lName.isNotEmpty
+                                      ? lName
+                                      : (dName.contains(' ') ? dName.split(' ').sublist(1).join(' ') : '');
+
+                                  _firstNameController.text = firstName;
+                                  _lastNameController.text = lastName;
+
+                                  final loadedContact = contact;
+                                  if (loadedContact != null && loadedContact.phones.isNotEmpty) {
+                                    final phone = loadedContact.phones.firstWhere(
+                                      (p) => p.number.trim().isNotEmpty,
+                                      orElse: () => loadedContact.phones.first,
+                                    ).number.trim();
+                                    _phoneController.text = phone;
+                                  }
+                                  if (loadedContact != null && loadedContact.emails.isNotEmpty) {
+                                    final email = loadedContact.emails.firstWhere(
+                                      (e) => e.address.trim().isNotEmpty,
+                                      orElse: () => loadedContact.emails.first,
+                                    ).address.trim();
+                                    _emailController.text = email;
+                                  }
+                                });
                               }
                             }
                           },
@@ -373,6 +398,7 @@ class AddContactSheetState extends ConsumerState<AddContactSheet> {
                   AbsorbPointer(
                     absorbing: _isLoading,
                     child: PhoneInputField(
+                      key: ValueKey('phone_${_phoneController.text}'),
                       initialValue: _phoneController.text,
                       onChanged: (val) {
                         _phoneController.text = val ?? '';

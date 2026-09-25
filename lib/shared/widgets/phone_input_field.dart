@@ -16,18 +16,28 @@ class PhoneInputField extends StatefulWidget {
   });
 
   static (String, String) parseE164(String? phone) {
-    if (phone == null || phone.isEmpty) return ('+39', '');
-    if (!phone.startsWith('+')) return ('+39', phone);
+    if (phone == null || phone.trim().isEmpty) return ('+39', '');
+    String p = phone.trim();
+    if (p.startsWith('00')) {
+      p = '+${p.substring(2)}';
+    }
+    if (!p.startsWith('+')) {
+      final cleanLocal = p.replaceAll(RegExp(r'[^0-9\s\-]'), '').trim();
+      return ('+39', cleanLocal);
+    }
 
     for (var i = 4; i >= 2; i--) {
-      if (phone.length > i) {
-        final prefix = phone.substring(0, i);
+      if (p.length > i) {
+        final prefix = p.substring(0, i);
         if (countryCodes.any((c) => c.dialCode == prefix)) {
-          return (prefix, phone.substring(i));
+          final rest = p.substring(i).trim();
+          final cleanLocal = rest.replaceAll(RegExp(r'[^0-9\s\-]'), '').trim();
+          return (prefix, cleanLocal);
         }
       }
     }
-    return ('+39', phone);
+    final cleanLocal = p.replaceAll(RegExp(r'[^0-9\s\-]'), '').trim();
+    return ('+39', cleanLocal);
   }
 
   @override
@@ -55,6 +65,32 @@ class _PhoneInputFieldState extends State<PhoneInputField> {
     }
 
     _controller.addListener(_updateValue);
+  }
+
+  @override
+  void didUpdateWidget(PhoneInputField oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.initialValue != oldWidget.initialValue) {
+      final (dialCode, localNumber) = PhoneInputField.parseE164(widget.initialValue);
+      final currentLocalClean = _controller.text.replaceAll(RegExp(r'[\s\-]'), '');
+      final newLocalClean = localNumber.replaceAll(RegExp(r'[\s\-]'), '');
+
+      if (currentLocalClean != newLocalClean) {
+        _controller.text = localNumber;
+      }
+
+      if (widget.initialValue != null && widget.initialValue!.isNotEmpty) {
+        final newCountry = countryCodes.firstWhere(
+          (c) => c.dialCode == dialCode,
+          orElse: () => _selectedCountry,
+        );
+        if (newCountry != _selectedCountry) {
+          setState(() {
+            _selectedCountry = newCountry;
+          });
+        }
+      }
+    }
   }
 
   CountryCode _getDefaultCountry() {
