@@ -26,10 +26,12 @@ class EmptyStateWidget extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Icon(
-              icon,
-              size: 64,
-              color: theme.colorScheme.onSurface.withValues(alpha: 0.3),
+            ExcludeSemantics(
+              child: Icon(
+                icon,
+                size: 64,
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.3),
+              ),
             ),
             const SizedBox(height: 24),
             Text(

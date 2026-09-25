@@ -72,29 +72,34 @@ class TaskCard extends StatelessWidget {
               : theme.dividerColor,
         ),
       ),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(14),
-        child: Padding(
-          padding: const EdgeInsets.all(12.0),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Transform.scale(
-                scale: 1.2,
-                child: Checkbox(
-                  value: isCompleted,
-                  onChanged: onToggleCompletion,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(6),
+      child: Semantics(
+        container: true,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(14),
+          child: Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Transform.scale(
+                  scale: 1.2,
+                  child: Checkbox(
+                    value: isCompleted,
+                    semanticLabel: isCompleted
+                        ? 'Mark "${task.title}" as incomplete'
+                        : 'Mark "${task.title}" as complete',
+                    onChanged: onToggleCompletion,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(6),
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
                     const SizedBox(height: 8),
                     AnimatedDefaultTextStyle(
                       duration: const Duration(milliseconds: 300),
@@ -115,6 +120,7 @@ class TaskCard extends StatelessWidget {
             ],
           ),
         ),
+      ),
       ),
     );
   }
@@ -212,7 +218,9 @@ class TaskCard extends StatelessWidget {
         return Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.calendar_today, size: 14, color: dateColor),
+            ExcludeSemantics(
+              child: Icon(Icons.calendar_today, size: 14, color: dateColor),
+            ),
             const SizedBox(width: 4),
             Text(
               '$dateStr$timeStr',
@@ -223,10 +231,12 @@ class TaskCard extends StatelessWidget {
             ),
             if (hasTime && hasNotification) ...[
               const SizedBox(width: 6),
-              Icon(
-                Icons.notifications_active,
-                size: 13,
-                color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
+              ExcludeSemantics(
+                child: Icon(
+                  Icons.notifications_active,
+                  size: 13,
+                  color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
+                ),
               ),
             ],
           ],
@@ -236,47 +246,51 @@ class TaskCard extends StatelessWidget {
   }
 
   Widget _buildContactRow(BuildContext context, Color secondaryColor) {
-    return InkWell(
-      onTap: task.targetType == 'person' || task.targetType == null
-          ? () => context.push('/contacts/${task.contactId}')
-          : task.targetType == 'company'
-              ? () => context.push('/companies/${task.contactId}')
-              : null, // Opportunities don't have a detail screen yet
-      borderRadius: BorderRadius.circular(20),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 2.0, horizontal: 2.0),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            CircleAvatar(
-              radius: 10,
-              backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-              child: task.targetType == 'opportunity'
-                ? Icon(
-                    Icons.monetization_on_outlined,
-                    size: 12,
-                    color: Theme.of(context).colorScheme.onPrimaryContainer,
-                  )
-                : task.targetType == 'company'
+    final targetLabel = task.targetType == 'company' ? 'Company' : 'Contact';
+    return Semantics(
+      button: true,
+      label: '$targetLabel: ${task.contactName}',
+      child: InkWell(
+        onTap: task.targetType == 'person' || task.targetType == null
+            ? () => context.push('/contacts/${task.contactId}')
+            : task.targetType == 'company'
+                ? () => context.push('/companies/${task.contactId}')
+                : null, // Opportunities don't have a detail screen yet
+        borderRadius: BorderRadius.circular(20),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 2.0, horizontal: 2.0),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              CircleAvatar(
+                radius: 10,
+                backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+                child: task.targetType == 'opportunity'
                   ? Icon(
-                      Icons.business,
+                      Icons.monetization_on_outlined,
                       size: 12,
                       color: Theme.of(context).colorScheme.onPrimaryContainer,
                     )
-                  : Text(
-                      _getInitials(task.contactName!),
-                      style: TextStyle(
-                        fontSize: 9,
-                        fontWeight: FontWeight.bold,
+                  : task.targetType == 'company'
+                    ? Icon(
+                        Icons.business,
+                        size: 12,
                         color: Theme.of(context).colorScheme.onPrimaryContainer,
+                      )
+                    : Text(
+                        _getInitials(task.contactName!),
+                        style: TextStyle(
+                          fontSize: 9,
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(context).colorScheme.onPrimaryContainer,
+                        ),
                       ),
-                    ),
-            ),
-            const SizedBox(width: 6),
-            Flexible(
-              child: Text(
-                task.contactName!,
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              ),
+              const SizedBox(width: 6),
+              Flexible(
+                child: Text(
+                  task.contactName!,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   color: secondaryColor,
                   fontWeight: FontWeight.w500,
                 ),
@@ -287,6 +301,7 @@ class TaskCard extends StatelessWidget {
           ],
         ),
       ),
+    ),
     );
   }
 }

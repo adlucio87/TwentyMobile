@@ -20,45 +20,53 @@ class RecentContactsRow extends StatelessWidget {
         itemBuilder: (context, index) {
           final contact = contacts[index];
           final bgColor = ColorUtils.avatarColor(contact.firstName);
-          return GestureDetector(
-            onTap: () => context.push('/contacts/${contact.id}'),
-            child: Container(
-              width: 72,
-              margin: const EdgeInsets.only(right: 16),
-              child: Column(
-                children: [
-                  CircleAvatar(
-                    radius: 36,
-                    backgroundColor: bgColor.withValues(alpha: 0.2),
-                    backgroundImage:
-                        (contact.avatarUrl != null &&
-                            contact.avatarUrl!.isNotEmpty)
-                        ? CachedNetworkImageProvider(contact.avatarUrl!)
-                        : null,
-                    child:
-                        (contact.avatarUrl == null ||
-                            contact.avatarUrl!.isEmpty)
-                        ? Text(
-                            contact.firstName.isNotEmpty
-                                ? contact.firstName[0].toUpperCase()
-                                : '?',
-                            style: TextStyle(
-                              color: bgColor,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 20,
-                            ),
-                          )
-                        : null,
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    contact.firstName,
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w500),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    textAlign: TextAlign.center,
-                  ),
-                ],
+          final fullName = '${contact.firstName} ${contact.lastName}'.trim();
+          final displayName = fullName.isNotEmpty ? fullName : (contact.firstName.isNotEmpty ? contact.firstName : 'Contact');
+          return Semantics(
+            button: true,
+            label: displayName,
+            hint: 'Double tap to open contact details',
+            excludeSemantics: true,
+            child: GestureDetector(
+              onTap: () => context.push('/contacts/${contact.id}'),
+              child: Container(
+                width: 72,
+                margin: const EdgeInsets.only(right: 16),
+                child: Column(
+                  children: [
+                    CircleAvatar(
+                      radius: 36,
+                      backgroundColor: bgColor.withValues(alpha: 0.2),
+                      backgroundImage:
+                          (contact.avatarUrl != null &&
+                              contact.avatarUrl!.isNotEmpty)
+                          ? CachedNetworkImageProvider(contact.avatarUrl!)
+                          : null,
+                      child:
+                          (contact.avatarUrl == null ||
+                              contact.avatarUrl!.isEmpty)
+                          ? Text(
+                              contact.firstName.isNotEmpty
+                                  ? contact.firstName[0].toUpperCase()
+                                  : '?',
+                              style: TextStyle(
+                                color: bgColor,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 20,
+                              ),
+                            )
+                          : null,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      contact.firstName,
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w500),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
               ),
             ),
           );

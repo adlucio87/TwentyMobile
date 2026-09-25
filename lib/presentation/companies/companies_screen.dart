@@ -71,6 +71,7 @@ class _CompaniesScreenState extends ConsumerState<CompaniesScreen> {
         actions: const [],
       ),
       floatingActionButton: FloatingActionButton(
+        tooltip: 'Add company',
         onPressed: () async {
           if (!await DemoUtils.checkDemoAction(context, ref)) return;
           if (mounted) {

@@ -222,6 +222,7 @@ class _ContactsScreenState extends ConsumerState<ContactsScreen> {
         ),
       )),
       floatingActionButton: FloatingActionButton(
+        tooltip: 'Add contact',
         onPressed: () async {
           if (!await DemoUtils.checkDemoAction(context, ref)) return;
           if (mounted) _showAddContactDialog(context);

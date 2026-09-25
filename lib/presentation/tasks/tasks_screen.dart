@@ -178,6 +178,7 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
         ),
       )),
       floatingActionButton: FloatingActionButton(
+        tooltip: 'Add task',
         onPressed: () async {
           if (!await DemoUtils.checkDemoAction(context, ref)) return;
           if (mounted) _showAddTaskDialog(context);

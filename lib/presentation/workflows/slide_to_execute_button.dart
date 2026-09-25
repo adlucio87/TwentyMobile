@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:pocketcrm/core/theme/app_colors.dart';
 
@@ -114,20 +115,34 @@ class _SlideToExecuteButtonState extends State<SlideToExecuteButton>
     });
   }
 
+  void _announce(String message) {
+    if (!mounted) return;
+    try {
+      SemanticsService.sendAnnouncement(
+        View.of(context),
+        message,
+        TextDirection.ltr,
+      );
+    } catch (_) {}
+  }
+
   Future<void> _execute() async {
     setState(() {
       _state = _SlideState.loading;
       _dragPosition = _maxDrag; // Snap to end
     });
+    _announce('Executing workflow');
 
     try {
       await widget.onExecute();
       if (!mounted) return;
       HapticFeedback.heavyImpact();
+      _announce('Workflow executed successfully');
       setState(() => _state = _SlideState.success);
     } catch (e) {
       if (!mounted) return;
       HapticFeedback.heavyImpact();
+      _announce('Failed to execute workflow');
       setState(() => _state = _SlideState.error);
       _shakeController.forward(from: 0).then((_) {
         if (mounted) {
@@ -149,6 +164,71 @@ class _SlideToExecuteButtonState extends State<SlideToExecuteButton>
     final borderColor = isDark ? AppColors.darkBorder : AppColors.lightBorder;
     final textColor = Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5);
 
+    final accessibleNavigation = MediaQuery.maybeOf(context)?.accessibleNavigation ?? false;
+
+    if (accessibleNavigation) {
+      String buttonText;
+      Widget icon;
+      VoidCallback? onPressed;
+
+      switch (_state) {
+        case _SlideState.loading:
+          buttonText = 'Executing...';
+          icon = const SizedBox(
+            width: 18,
+            height: 18,
+            child: CircularProgressIndicator(
+              strokeWidth: 2,
+              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+            ),
+          );
+          onPressed = null;
+          break;
+        case _SlideState.success:
+          buttonText = 'Done!';
+          icon = const Icon(Icons.check_circle_rounded, color: Colors.white);
+          onPressed = null;
+          break;
+        case _SlideState.error:
+          buttonText = 'Execution failed. Tap to retry';
+          icon = const Icon(Icons.error_outline_rounded, color: Colors.white);
+          onPressed = widget.enabled ? _execute : null;
+          break;
+        default:
+          buttonText = widget.label;
+          icon = const Icon(Icons.play_arrow_rounded, color: Colors.white);
+          onPressed = widget.enabled ? _execute : null;
+      }
+
+      Color btnBgColor;
+      if (_state == _SlideState.success) {
+        btnBgColor = successColor;
+      } else if (_state == _SlideState.error) {
+        btnBgColor = errorColor;
+      } else {
+        btnBgColor = widget.enabled ? primaryColor : primaryColor.withValues(alpha: 0.4);
+      }
+
+      return SizedBox(
+        width: double.infinity,
+        height: _trackHeight,
+        child: FilledButton.icon(
+          onPressed: onPressed,
+          icon: icon,
+          label: Text(
+            buttonText,
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+          ),
+          style: FilledButton.styleFrom(
+            backgroundColor: btnBgColor,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(_trackHeight / 2),
+            ),
+          ),
+        ),
+      );
+    }
+
     Color trackColor;
     Color thumbColor;
     switch (_state) {
@@ -165,7 +245,7 @@ class _SlideToExecuteButtonState extends State<SlideToExecuteButton>
         thumbColor = widget.enabled ? primaryColor : primaryColor.withValues(alpha: 0.4);
     }
 
-    return AnimatedBuilder(
+    final sliderWidget = AnimatedBuilder(
       animation: _shakeAnimation,
       builder: (context, child) {
         double shakeOffset = 0;
@@ -278,6 +358,17 @@ class _SlideToExecuteButtonState extends State<SlideToExecuteButton>
           ],
         ),
       ),
+    );
+
+    return Semantics(
+      button: true,
+      enabled: widget.enabled && _state != _SlideState.loading && _state != _SlideState.success,
+      label: widget.label,
+      hint: 'Double tap to execute, or slide horizontally',
+      onTap: widget.enabled && _state != _SlideState.loading && _state != _SlideState.success
+          ? _execute
+          : null,
+      child: sliderWidget,
     );
   }
 
