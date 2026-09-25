@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pocketcrm/l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pocketcrm/domain/models/task.dart';
 import 'package:pocketcrm/presentation/home/today_provider.dart';
@@ -18,10 +19,11 @@ class TaskTodayCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     return SwipeActionWrapper(
       itemKey: ValueKey('today_task_${task.id}'),
-      confirmTitle: 'Delete task',
-      confirmMessage: 'Do you want to delete \'${task.title}\'?',
+      confirmTitle: l10n?.deleteTask ?? 'Delete Task',
+      confirmMessage: l10n?.deleteTaskConfirmMessage(task.title) ?? 'Are you sure you want to delete ${task.title}?\nThis action cannot be undone.',
       onEdit: () {
         showModalBottomSheet(
           context: context,

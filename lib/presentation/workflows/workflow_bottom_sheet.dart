@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:pocketcrm/l10n/app_localizations.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -618,6 +619,7 @@ class _WorkflowBottomSheetState extends ConsumerState<WorkflowBottomSheet> {
 
         // Slide to execute
         SlideToExecuteButton(
+          label: AppLocalizations.of(context)?.slideToExecute ?? 'Slide to execute',
           enabled: _isFormValid,
           onExecute: _executeWorkflow,
         ),

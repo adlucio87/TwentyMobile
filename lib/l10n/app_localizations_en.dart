@@ -567,6 +567,33 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get deleteTask => 'Delete Task';
+
+  @override
+  String get filterCompleted => 'Filter completed';
+
+  @override
+  String get addCompany => 'Add Company';
+
+  @override
+  String deleteTaskConfirmMessage(String name) {
+    return 'Are you sure you want to delete $name?\nThis action cannot be undone.';
+  }
+
+  @override
+  String get noCompletedTasks => 'No completed tasks';
+
+  @override
+  String get allClear => 'All clear!';
+
+  @override
+  String get noCheckedTasksYet => 'You haven\'t checked any tasks yet.';
+
+  @override
+  String get noPendingTasksAtTheMoment =>
+      'You have no pending tasks at the moment.';
+
+  @override
+  String get noResultsMatchSearch => 'No results match your search.';
 }
 
 /// The translations for English, as used in the United Kingdom (`en_GB`).
@@ -1132,4 +1159,31 @@ class AppLocalizationsEnGb extends AppLocalizationsEn {
 
   @override
   String get deleteTask => 'Delete Task';
+
+  @override
+  String get filterCompleted => 'Filter completed';
+
+  @override
+  String get addCompany => 'Add Company';
+
+  @override
+  String deleteTaskConfirmMessage(String name) {
+    return 'Are you sure you want to delete $name?\nThis action cannot be undone.';
+  }
+
+  @override
+  String get noCompletedTasks => 'No completed tasks';
+
+  @override
+  String get allClear => 'All clear!';
+
+  @override
+  String get noCheckedTasksYet => 'You haven\'t checked any tasks yet.';
+
+  @override
+  String get noPendingTasksAtTheMoment =>
+      'You have no pending tasks at the moment.';
+
+  @override
+  String get noResultsMatchSearch => 'No results match your search.';
 }

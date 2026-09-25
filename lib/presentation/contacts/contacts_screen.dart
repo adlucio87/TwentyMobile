@@ -93,7 +93,7 @@ class _ContactsScreenState extends ConsumerState<ContactsScreen> {
                   child: EmptyStateWidget(
                     icon: Icons.people_outline,
                     title: l10n?.noContactsFound ?? 'No contacts',
-                    message: 'No results match your search.',
+                    message: l10n?.noResultsMatchSearch ?? 'No results match your search.',
                   ),
                 ),
               ),
@@ -222,7 +222,7 @@ class _ContactsScreenState extends ConsumerState<ContactsScreen> {
         ),
       )),
       floatingActionButton: FloatingActionButton(
-        tooltip: 'Add contact',
+        tooltip: l10n?.addContact ?? 'Add Contact',
         onPressed: () async {
           if (!await DemoUtils.checkDemoAction(context, ref)) return;
           if (mounted) _showAddContactDialog(context);

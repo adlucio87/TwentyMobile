@@ -220,7 +220,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get manualWorkflows => 'Workflows manuels';
 
   @override
-  String get slideToExecute => 'Glisser pour exécuter';
+  String get slideToExecute => 'Faites glisser pour exécuter';
 
   @override
   String get executing => 'Exécution en cours...';
@@ -571,4 +571,32 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get deleteTask => 'Supprimer la tâche';
+
+  @override
+  String get filterCompleted => 'Filtrer les terminés';
+
+  @override
+  String get addCompany => 'Ajouter une entreprise';
+
+  @override
+  String deleteTaskConfirmMessage(String name) {
+    return 'Êtes-vous sûr de vouloir supprimer $name ?\nCette action ne peut pas être annulée.';
+  }
+
+  @override
+  String get noCompletedTasks => 'Aucune tâche terminée';
+
+  @override
+  String get allClear => 'Tout est clair !';
+
+  @override
+  String get noCheckedTasksYet => 'Vous n\'avez encore coché aucune tâche.';
+
+  @override
+  String get noPendingTasksAtTheMoment =>
+      'Vous n\'avez aucune tâche en attente pour le moment.';
+
+  @override
+  String get noResultsMatchSearch =>
+      'Aucun résultat ne correspond à votre recherche.';
 }

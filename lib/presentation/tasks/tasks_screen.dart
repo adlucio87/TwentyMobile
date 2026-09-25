@@ -30,6 +30,7 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     ref.listen(tasksProvider, (previous, next) {
       next.whenData((tasks) {
         NotificationService().syncTaskNotifications(tasks);
@@ -75,7 +76,7 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
             onPressed: () {
               ref.read(taskFilterProvider.notifier).toggle();
             },
-            tooltip: 'Filter completed',
+            tooltip: l10n?.filterCompleted ?? 'Filter completed',
           ),
         ],
       ),
@@ -90,10 +91,10 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
                   height: MediaQuery.of(context).size.height * 0.7,
                   child: EmptyStateWidget(
                     icon: isShowingCompleted ? Icons.task_alt : Icons.checklist,
-                    title: isShowingCompleted ? 'No completed tasks' : 'All clear!',
+                    title: isShowingCompleted ? (l10n?.noCompletedTasks ?? 'No completed tasks') : (l10n?.allClear ?? 'All clear!'),
                     message: isShowingCompleted
-                        ? "You haven't checked any tasks yet."
-                        : 'You have no pending tasks at the moment.',
+                        ? (l10n?.noCheckedTasksYet ?? "You haven't checked any tasks yet.")
+                        : (l10n?.noPendingTasksAtTheMoment ?? 'You have no pending tasks at the moment.'),
                   ),
                 ),
               ),
@@ -109,8 +110,8 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
                 final task = tasks[index];
                 return SwipeActionWrapper(
                   itemKey: ValueKey('task_${task.id}'),
-                  confirmTitle: 'Delete task',
-                  confirmMessage: 'Do you want to delete \'${task.title}\'?',
+                  confirmTitle: l10n?.deleteTask ?? 'Delete Task',
+                  confirmMessage: l10n?.deleteTaskConfirmMessage(task.title) ?? 'Are you sure you want to delete ${task.title}?\nThis action cannot be undone.',
                   onDelete: () async {
                     if (!await DemoUtils.checkDemoAction(context, ref)) return;
                     try {
@@ -178,7 +179,7 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
         ),
       )),
       floatingActionButton: FloatingActionButton(
-        tooltip: 'Add task',
+        tooltip: l10n?.addTask ?? 'Add Task',
         onPressed: () async {
           if (!await DemoUtils.checkDemoAction(context, ref)) return;
           if (mounted) _showAddTaskDialog(context);

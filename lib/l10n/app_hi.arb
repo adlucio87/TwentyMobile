@@ -70,7 +70,7 @@
   "taskReopened": "कार्य पुनः खोला गया",
   "workflows": "वर्कफ़्लो",
   "manualWorkflows": "मैन्युअल वर्कफ़्लो",
-  "slideToExecute": "चलाने के लिए स्लाइड करें",
+  "slideToExecute": "निष्पादित करने के लिए स्लाइड करें",
   "executing": "चल रहा है...",
   "workflowSuccess": "वर्कफ़्लो सफलतापूर्वक निष्पादित हुआ",
   "workflowFailed": "वर्कफ़्लो निष्पादन विफल रहा",
@@ -182,5 +182,13 @@
   "frameBusinessCard": "बिजनेस कार्ड को फ्रेम करें",
   "keepCardHorizontal": "कार्ड को क्षैतिज और अच्छी रोशनी में रखें",
   "cropBusinessCard": "बिजनेस कार्ड क्रॉप करें",
-  "deleteTask": "कार्य हटाएं"
+  "deleteTask": "कार्य हटाएं",
+  "filterCompleted": "पूर्ण किए गए फ़िल्टर करें",
+  "addCompany": "कंपनी जोड़ें",
+  "deleteTaskConfirmMessage": "क्या आप वाकई {name} को हटाना चाहते हैं?\nयह क्रिया पूर्ववत नहीं की जा सकती।",
+  "noCompletedTasks": "कोई पूर्ण कार्य नहीं",
+  "allClear": "सब स्पष्ट!",
+  "noCheckedTasksYet": "आपने अभी तक कोई कार्य चेक नहीं किया है।",
+  "noPendingTasksAtTheMoment": "इस समय आपके पास कोई लंबित कार्य नहीं है।",
+  "noResultsMatchSearch": "आपकी खोज से कोई परिणाम मेल नहीं खाता।"
 }

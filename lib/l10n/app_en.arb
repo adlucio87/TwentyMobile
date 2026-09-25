@@ -210,5 +210,21 @@
   "frameBusinessCard": "Frame the business card",
   "keepCardHorizontal": "Keep the card horizontal and well-lit",
   "cropBusinessCard": "Crop business card",
-  "deleteTask": "Delete Task"
+  "deleteTask": "Delete Task",
+  "filterCompleted": "Filter completed",
+  "addCompany": "Add Company",
+  "deleteTaskConfirmMessage": "Are you sure you want to delete {name}?\nThis action cannot be undone.",
+  "noCompletedTasks": "No completed tasks",
+  "allClear": "All clear!",
+  "noCheckedTasksYet": "You haven't checked any tasks yet.",
+  "noPendingTasksAtTheMoment": "You have no pending tasks at the moment.",
+  "noResultsMatchSearch": "No results match your search.",
+  "@deleteTaskConfirmMessage": {
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "Task name"
+      }
+    }
+  }
 }

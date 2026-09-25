@@ -70,7 +70,7 @@
   "taskReopened": "Tâche rouverte",
   "workflows": "Workflows",
   "manualWorkflows": "Workflows manuels",
-  "slideToExecute": "Glisser pour exécuter",
+  "slideToExecute": "Faites glisser pour exécuter",
   "executing": "Exécution en cours...",
   "workflowSuccess": "Workflow exécuté avec succès",
   "workflowFailed": "Échec de l'exécution du workflow",
@@ -182,5 +182,13 @@
   "frameBusinessCard": "Cadrez la carte de visite",
   "keepCardHorizontal": "Gardez la carte horizontale et bien éclairée",
   "cropBusinessCard": "Recadrer la carte de visite",
-  "deleteTask": "Supprimer la tâche"
+  "deleteTask": "Supprimer la tâche",
+  "filterCompleted": "Filtrer les terminés",
+  "addCompany": "Ajouter une entreprise",
+  "deleteTaskConfirmMessage": "Êtes-vous sûr de vouloir supprimer {name} ?\nCette action ne peut pas être annulée.",
+  "noCompletedTasks": "Aucune tâche terminée",
+  "allClear": "Tout est clair !",
+  "noCheckedTasksYet": "Vous n'avez encore coché aucune tâche.",
+  "noPendingTasksAtTheMoment": "Vous n'avez aucune tâche en attente pour le moment.",
+  "noResultsMatchSearch": "Aucun résultat ne correspond à votre recherche."
 }

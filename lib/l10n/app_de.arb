@@ -182,5 +182,13 @@
   "frameBusinessCard": "Visitenkarte ausrichten",
   "keepCardHorizontal": "Halten Sie die Karte horizontal und gut beleuchtet",
   "cropBusinessCard": "Visitenkarte zuschneiden",
-  "deleteTask": "Aufgabe löschen"
+  "deleteTask": "Aufgabe löschen",
+  "filterCompleted": "Abgeschlossene filtern",
+  "addCompany": "Unternehmen hinzufügen",
+  "deleteTaskConfirmMessage": "Sind Sie sicher, dass Sie {name} löschen möchten?\nDiese Aktion kann nicht rückgängig gemacht werden.",
+  "noCompletedTasks": "Keine abgeschlossenen Aufgaben",
+  "allClear": "Alles klar!",
+  "noCheckedTasksYet": "Sie haben noch keine Aufgaben abgehakt.",
+  "noPendingTasksAtTheMoment": "Sie haben derzeit keine ausstehenden Aufgaben.",
+  "noResultsMatchSearch": "Keine Ergebnisse entsprechen Ihrer Suche."
 }

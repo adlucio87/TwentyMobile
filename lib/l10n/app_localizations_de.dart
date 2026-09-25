@@ -571,4 +571,32 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get deleteTask => 'Aufgabe löschen';
+
+  @override
+  String get filterCompleted => 'Abgeschlossene filtern';
+
+  @override
+  String get addCompany => 'Unternehmen hinzufügen';
+
+  @override
+  String deleteTaskConfirmMessage(String name) {
+    return 'Sind Sie sicher, dass Sie $name löschen möchten?\nDiese Aktion kann nicht rückgängig gemacht werden.';
+  }
+
+  @override
+  String get noCompletedTasks => 'Keine abgeschlossenen Aufgaben';
+
+  @override
+  String get allClear => 'Alles klar!';
+
+  @override
+  String get noCheckedTasksYet => 'Sie haben noch keine Aufgaben abgehakt.';
+
+  @override
+  String get noPendingTasksAtTheMoment =>
+      'Sie haben derzeit keine ausstehenden Aufgaben.';
+
+  @override
+  String get noResultsMatchSearch =>
+      'Keine Ergebnisse entsprechen Ihrer Suche.';
 }

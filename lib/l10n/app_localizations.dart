@@ -1202,6 +1202,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Delete Task'**
   String get deleteTask;
+
+  /// No description provided for @filterCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Filter completed'**
+  String get filterCompleted;
+
+  /// No description provided for @addCompany.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Company'**
+  String get addCompany;
+
+  /// No description provided for @deleteTaskConfirmMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete {name}?\nThis action cannot be undone.'**
+  String deleteTaskConfirmMessage(String name);
+
+  /// No description provided for @noCompletedTasks.
+  ///
+  /// In en, this message translates to:
+  /// **'No completed tasks'**
+  String get noCompletedTasks;
+
+  /// No description provided for @allClear.
+  ///
+  /// In en, this message translates to:
+  /// **'All clear!'**
+  String get allClear;
+
+  /// No description provided for @noCheckedTasksYet.
+  ///
+  /// In en, this message translates to:
+  /// **'You haven\'t checked any tasks yet.'**
+  String get noCheckedTasksYet;
+
+  /// No description provided for @noPendingTasksAtTheMoment.
+  ///
+  /// In en, this message translates to:
+  /// **'You have no pending tasks at the moment.'**
+  String get noPendingTasksAtTheMoment;
+
+  /// No description provided for @noResultsMatchSearch.
+  ///
+  /// In en, this message translates to:
+  /// **'No results match your search.'**
+  String get noResultsMatchSearch;
 }
 
 class _AppLocalizationsDelegate

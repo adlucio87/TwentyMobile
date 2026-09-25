@@ -220,7 +220,7 @@ class AppLocalizationsHi extends AppLocalizations {
   String get manualWorkflows => 'मैन्युअल वर्कफ़्लो';
 
   @override
-  String get slideToExecute => 'चलाने के लिए स्लाइड करें';
+  String get slideToExecute => 'निष्पादित करने के लिए स्लाइड करें';
 
   @override
   String get executing => 'चल रहा है...';
@@ -568,4 +568,31 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get deleteTask => 'कार्य हटाएं';
+
+  @override
+  String get filterCompleted => 'पूर्ण किए गए फ़िल्टर करें';
+
+  @override
+  String get addCompany => 'कंपनी जोड़ें';
+
+  @override
+  String deleteTaskConfirmMessage(String name) {
+    return 'क्या आप वाकई $name को हटाना चाहते हैं?\nयह क्रिया पूर्ववत नहीं की जा सकती।';
+  }
+
+  @override
+  String get noCompletedTasks => 'कोई पूर्ण कार्य नहीं';
+
+  @override
+  String get allClear => 'सब स्पष्ट!';
+
+  @override
+  String get noCheckedTasksYet => 'आपने अभी तक कोई कार्य चेक नहीं किया है।';
+
+  @override
+  String get noPendingTasksAtTheMoment =>
+      'इस समय आपके पास कोई लंबित कार्य नहीं है।';
+
+  @override
+  String get noResultsMatchSearch => 'आपकी खोज से कोई परिणाम मेल नहीं खाता।';
 }

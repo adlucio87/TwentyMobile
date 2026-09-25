@@ -182,5 +182,13 @@
   "frameBusinessCard": "Inquadra il biglietto da visita",
   "keepCardHorizontal": "Tieni il biglietto orizzontale e ben illuminato",
   "cropBusinessCard": "Ritaglia biglietto da visita",
-  "deleteTask": "Elimina attività"
+  "deleteTask": "Elimina attività",
+  "filterCompleted": "Filtra completati",
+  "addCompany": "Aggiungi Azienda",
+  "deleteTaskConfirmMessage": "Sei sicuro di voler eliminare {name}?\nQuesta azione non può essere annullata.",
+  "noCompletedTasks": "Nessun task completato",
+  "allClear": "Tutto libero!",
+  "noCheckedTasksYet": "Non hai ancora completato alcun task.",
+  "noPendingTasksAtTheMoment": "Non hai task in sospeso al momento.",
+  "noResultsMatchSearch": "Nessun risultato corrisponde alla tua ricerca."
 }
