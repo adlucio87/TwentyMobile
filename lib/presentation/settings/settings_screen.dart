@@ -9,6 +9,8 @@ import 'package:pocketcrm/domain/services/ios_contacts_provider_service.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pocketcrm/shared/widgets/constrained_content.dart';
+import 'package:pocketcrm/l10n/app_localizations.dart';
+import 'package:pocketcrm/core/localization/locale_provider.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
@@ -137,7 +139,22 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final themeMode = ref.watch(themeModeProvider);
+    final currentLocale = ref.watch(localeProvider);
+    final currentOption = appLocaleOptions.firstWhere(
+      (o) {
+        if (currentLocale == null) return o.code == 'system';
+        if (o.locale == null) return false;
+        if (currentLocale.countryCode != null) {
+          return o.locale!.languageCode == currentLocale.languageCode &&
+              o.locale!.countryCode == currentLocale.countryCode;
+        }
+        return o.locale!.languageCode == currentLocale.languageCode &&
+            o.locale!.countryCode == null;
+      },
+      orElse: () => appLocaleOptions[0],
+    );
 
     return Scaffold(
       appBar: AppBar(
@@ -148,9 +165,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         child: ListView(
         padding: const EdgeInsets.all(16.0),
         children: [
-          const Text(
-            'Account',
-            style: TextStyle(
+          Text(
+            l10n?.account ?? 'Account',
+            style: const TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
             ),
@@ -176,7 +193,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: Text(
-                              isEmail ? 'Personal Account' : 'API Key Admin',
+                              isEmail
+                                  ? (l10n?.personalAccount ?? 'Personal Account')
+                                  : (l10n?.apiKeyAdmin ?? 'API Key Admin'),
                               style: Theme.of(context).textTheme.labelSmall?.copyWith(
                                 color: isEmail ? Colors.green : Theme.of(context).colorScheme.primary,
                                 fontWeight: FontWeight.bold,
@@ -206,7 +225,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                           }
                         },
                         icon: const Icon(Icons.swap_horiz),
-                        label: const Text('Change login method'),
+                        label: Text(l10n?.changeLoginMethod ?? 'Change login method'),
                         style: OutlinedButton.styleFrom(
                           minimumSize: const Size.fromHeight(40),
                         ),
@@ -215,35 +234,35 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   );
                 },
                 loading: () => const CircularProgressIndicator(),
-                error: (_, __) => const Text('Error loading account data'),
+                error: (_, __) => Text(l10n?.error ?? 'Error loading account data'),
               );
             },
           ),
           const SizedBox(height: 32),
-          const Text(
-            'Application Theme',
-            style: TextStyle(
+          Text(
+            l10n?.applicationTheme ?? 'Application Theme',
+            style: const TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
             ),
           ),
           const SizedBox(height: 16),
           SegmentedButton<ThemeMode>(
-            segments: const [
+            segments: [
               ButtonSegment(
                 value: ThemeMode.system,
-                icon: Icon(Icons.brightness_auto),
-                label: Text('System'),
+                icon: const Icon(Icons.brightness_auto),
+                label: Text(l10n?.themeSystem ?? 'System'),
               ),
               ButtonSegment(
                 value: ThemeMode.light,
-                icon: Icon(Icons.light_mode),
-                label: Text('Light'),
+                icon: const Icon(Icons.light_mode),
+                label: Text(l10n?.themeLight ?? 'Light'),
               ),
               ButtonSegment(
                 value: ThemeMode.dark,
-                icon: Icon(Icons.dark_mode),
-                label: Text('Dark'),
+                icon: const Icon(Icons.dark_mode),
+                label: Text(l10n?.themeDark ?? 'Dark'),
               ),
             ],
             selected: {themeMode},
@@ -252,16 +271,85 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             },
           ),
           const SizedBox(height: 32),
-          const Text(
-            'Notifications',
-            style: TextStyle(
+          Text(
+            l10n?.language ?? 'Language',
+            style: const TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
             ),
           ),
           const SizedBox(height: 16),
           ListTile(
-            title: const Text('Task reminders'),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+              side: BorderSide(
+                color: Theme.of(context).colorScheme.outlineVariant,
+              ),
+            ),
+            leading: Text(currentOption.flag, style: const TextStyle(fontSize: 24)),
+            title: Text(currentOption.name),
+            subtitle: Text(l10n?.language ?? 'Language'),
+            trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+            onTap: () {
+              showModalBottomSheet(
+                context: context,
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                ),
+                builder: (modalContext) {
+                  return SafeArea(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Text(
+                            l10n?.language ?? 'Select Language',
+                            style: Theme.of(modalContext).textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        const Divider(height: 1),
+                        Flexible(
+                          child: ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: appLocaleOptions.length,
+                            itemBuilder: (context, index) {
+                              final option = appLocaleOptions[index];
+                              final isSelected = option.code == currentOption.code;
+                              return ListTile(
+                                leading: Text(option.flag, style: const TextStyle(fontSize: 24)),
+                                title: Text(option.name),
+                                trailing: isSelected
+                                    ? const Icon(Icons.check, color: Colors.green)
+                                    : null,
+                                onTap: () {
+                                  ref.read(localeProvider.notifier).setLocale(option.code);
+                                  Navigator.pop(modalContext);
+                                },
+                              );
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              );
+            },
+          ),
+          const SizedBox(height: 32),
+          Text(
+            l10n?.notifications ?? 'Notifications',
+            style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 16),
+          ListTile(
+            title: Text(l10n?.taskReminderNotifications ?? 'Task reminders'),
             subtitle: const Text('Receive notification before due date'),
             trailing: Switch(
               value: _notificationsEnabled,
@@ -269,13 +357,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             ),
           ),
           ListTile(
-            title: const Text('Reminder advance'),
+            title: Text(l10n?.reminderAdvance ?? 'Reminder advance'),
             trailing: DropdownButton<int>(
               value: _reminderAdvanceMinutes,
-              items: const [
-                DropdownMenuItem(value: 15, child: Text('15 minutes before')),
-                DropdownMenuItem(value: 30, child: Text('30 minutes before')),
-                DropdownMenuItem(value: 60, child: Text('1 hour before')),
+              items: [
+                DropdownMenuItem(value: 15, child: Text(l10n?.minutesBefore(15) ?? '15 minutes before')),
+                DropdownMenuItem(value: 30, child: Text(l10n?.minutesBefore(30) ?? '30 minutes before')),
+                DropdownMenuItem(value: 60, child: Text(l10n?.hourBefore ?? '1 hour before')),
               ],
               onChanged: _notificationsEnabled
                   ? (value) {
@@ -286,9 +374,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           ),
           if (_iosContactsSupported) ...[
             const SizedBox(height: 32),
-            const Text(
-              'iOS Contacts',
-              style: TextStyle(
+            Text(
+              l10n?.iosContacts ?? 'iOS Contacts',
+              style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
               ),
@@ -296,8 +384,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             const SizedBox(height: 16),
             ListTile(
               title: const Text('Show Twenty people in iOS Contacts'),
-              subtitle: const Text(
-                'Adds a Twenty account in the Contacts app (iOS 18+). Does not copy contacts into iCloud.',
+              subtitle: Text(
+                l10n?.iosContactsSubtitle ??
+                    'Adds a Twenty account in the Contacts app (iOS 18+). Does not copy contacts into iCloud.',
               ),
               trailing: _isSyncingIos
                   ? const SizedBox(
@@ -316,9 +405,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           const SizedBox(height: 16),
           ListTile(
             leading: const Icon(Icons.logout, color: Colors.red),
-            title: const Text(
-              'Logout / Reset Token',
-              style: TextStyle(color: Colors.red),
+            title: Text(
+              l10n?.logout ?? 'Logout',
+              style: const TextStyle(color: Colors.red),
             ),
             onTap: () async {
               await ref.read(authServiceProvider).logout();

@@ -1,4 +1,4 @@
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:pocketcrm/core/utils/storage_service.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:pocketcrm/core/auth/two_factor_exception.dart';
 import 'package:pocketcrm/core/network/custom_http_client.dart';
@@ -8,7 +8,7 @@ import 'package:pocketcrm/data/graphql/auth_mutations.dart';
 import 'package:pocketcrm/domain/services/ios_contacts_provider_service.dart';
 
 class AuthService {
-  final FlutterSecureStorage _storage;
+  final StorageService _storage;
 
   /// Mutex for refresh — prevents concurrent refresh attempts from
   /// different callers (lifecycle handler, connector, router).

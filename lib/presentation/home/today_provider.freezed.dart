@@ -147,7 +147,7 @@ class __$$TodayDataImplCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _$TodayDataImpl implements _TodayData {
+class _$TodayDataImpl with DiagnosticableTreeMixin implements _TodayData {
   _$TodayDataImpl({
     required final List<Task> overdueTasks,
     required final List<Task> todayTasks,
@@ -191,8 +191,19 @@ class _$TodayDataImpl implements _TodayData {
   }
 
   @override
-  String toString() {
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
     return 'TodayData(overdueTasks: $overdueTasks, todayTasks: $todayTasks, tomorrowTasks: $tomorrowTasks, recentContacts: $recentContacts)';
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties
+      ..add(DiagnosticsProperty('type', 'TodayData'))
+      ..add(DiagnosticsProperty('overdueTasks', overdueTasks))
+      ..add(DiagnosticsProperty('todayTasks', todayTasks))
+      ..add(DiagnosticsProperty('tomorrowTasks', tomorrowTasks))
+      ..add(DiagnosticsProperty('recentContacts', recentContacts));
   }
 
   @override

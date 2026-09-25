@@ -64,7 +64,7 @@ class LinkedContactsWidget extends ConsumerWidget {
                     visualDensity: VisualDensity.compact,
                     avatar: CircleAvatar(
                       radius: 12,
-                      backgroundColor: bgColor.withOpacity(0.2),
+                      backgroundColor: bgColor.withValues(alpha: 0.2),
                       backgroundImage: contact.avatarUrl != null
                           ? CachedNetworkImageProvider(contact.avatarUrl!)
                           : null,
@@ -96,7 +96,7 @@ class LinkedContactsWidget extends ConsumerWidget {
                       '+${contacts.length - 3} others',
                       style: TextStyle(
                         fontSize: 12,
-                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                       ),
                     ),
                   ),

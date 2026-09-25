@@ -1,10 +1,11 @@
+import 'package:flutter/foundation.dart';
 class BusinessCardParser {
   /// Main entry point — analyzes raw OCR text
   static BusinessCardData parse(String rawText) {
     // Normalize text: remove odd characters, normalize spaces
     final lines = _normalizeText(rawText);
     // Removed PII-related logging or wrapped in kDebugMode
-    // print('PARSER: Normalized ${lines.length} lines');
+    // debugPrint('PARSER: Normalized ${lines.length} lines');
 
     return BusinessCardData(
       firstName: _extractFirstName(lines),
@@ -13,7 +14,7 @@ class BusinessCardParser {
       phone: _extractPhone(rawText),
       company: _extractCompany(lines),
       jobTitle: _extractJobTitle(lines),
-      website: _extractWebsite(rawText),
+      website: _extractWebsite(rawText.replaceAll(RegExp(r'[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}'), '').replaceAll(RegExp(r'linkedin\.com/in/[a-zA-Z0-9\-]+', caseSensitive: false), '')),
       linkedin: _extractLinkedIn(rawText),
     );
   }

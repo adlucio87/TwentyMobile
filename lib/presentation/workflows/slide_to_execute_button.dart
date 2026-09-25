@@ -147,22 +147,22 @@ class _SlideToExecuteButtonState extends State<SlideToExecuteButton>
     final errorColor = isDark ? AppColors.darkError : AppColors.lightError;
     final surfaceColor = isDark ? AppColors.darkSurfaceHigh : AppColors.lightSurfaceHigh;
     final borderColor = isDark ? AppColors.darkBorder : AppColors.lightBorder;
-    final textColor = Theme.of(context).colorScheme.onSurface.withOpacity(0.5);
+    final textColor = Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5);
 
     Color trackColor;
     Color thumbColor;
     switch (_state) {
       case _SlideState.success:
-        trackColor = successColor.withOpacity(0.2);
+        trackColor = successColor.withValues(alpha: 0.2);
         thumbColor = successColor;
         break;
       case _SlideState.error:
-        trackColor = errorColor.withOpacity(0.15);
+        trackColor = errorColor.withValues(alpha: 0.15);
         thumbColor = errorColor;
         break;
       default:
         trackColor = surfaceColor;
-        thumbColor = widget.enabled ? primaryColor : primaryColor.withOpacity(0.4);
+        thumbColor = widget.enabled ? primaryColor : primaryColor.withValues(alpha: 0.4);
     }
 
     return AnimatedBuilder(
@@ -187,7 +187,7 @@ class _SlideToExecuteButtonState extends State<SlideToExecuteButton>
           borderRadius: BorderRadius.circular(_trackHeight / 2),
           border: Border.all(
             color: _state == _SlideState.error
-                ? errorColor.withOpacity(0.5)
+                ? errorColor.withValues(alpha: 0.5)
                 : borderColor,
             width: 1,
           ),
@@ -211,7 +211,7 @@ class _SlideToExecuteButtonState extends State<SlideToExecuteButton>
                         style: TextStyle(
                           color: widget.enabled
                               ? textColor
-                              : textColor.withOpacity(0.3),
+                              : textColor.withValues(alpha: 0.3),
                           fontSize: 15,
                           fontWeight: FontWeight.w500,
                           letterSpacing: 0.3,
@@ -223,7 +223,7 @@ class _SlideToExecuteButtonState extends State<SlideToExecuteButton>
                         size: 16,
                         color: widget.enabled
                             ? textColor
-                            : textColor.withOpacity(0.3),
+                            : textColor.withValues(alpha: 0.3),
                       ),
                     ],
                   ),
@@ -265,7 +265,7 @@ class _SlideToExecuteButtonState extends State<SlideToExecuteButton>
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: thumbColor.withOpacity(0.3),
+                        color: thumbColor.withValues(alpha: 0.3),
                         blurRadius: 8,
                         offset: const Offset(0, 2),
                       ),

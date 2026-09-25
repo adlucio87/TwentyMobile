@@ -30,7 +30,7 @@ class _ScanReviewScreenState extends ConsumerState<ScanReviewScreen> {
     final state = ref.read(scanNotifierProvider);
     final data = state.parsedData;
     if (kDebugMode) {
-      print('REVIEW: initState - status: ${state.status}, data: $data');
+      debugPrint('REVIEW: initState - status: ${state.status}, data: $data');
     }
     _firstName = TextEditingController(text: data?.firstName ?? '');
     _lastName = TextEditingController(text: data?.lastName ?? '');
@@ -44,7 +44,7 @@ class _ScanReviewScreenState extends ConsumerState<ScanReviewScreen> {
   Widget build(BuildContext context) {
     final scanState = ref.watch(scanNotifierProvider);
     if (kDebugMode) {
-      print(
+      debugPrint(
           'REVIEW: build - status: ${scanState.status}, data: ${scanState.parsedData}');
     }
 

@@ -72,7 +72,7 @@ class NotificationService {
         onDidReceiveBackgroundNotificationResponse: _onNotificationTappedBackground,
       );
     } catch (e) {
-      if (kDebugMode) print('Notification plugin initialization failed: $e');
+      if (kDebugMode) debugPrint('Notification plugin initialization failed: $e');
     }
 
     // Controlla se l'app è stata aperta da una notifica

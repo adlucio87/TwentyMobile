@@ -117,7 +117,7 @@ class _DynamicFormScreenState extends ConsumerState<DynamicFormScreen> {
       // Invalidate the list and detail providers
       ref.invalidate(dynamicObjectListProvider);
       if (widget.existingRecord != null) {
-        ref.invalidate(dynamicRecordDetailProvider((objectType: widget.metadata.nameSingular, id: widget.existingRecord!.id)));
+        ref.invalidate(dynamicRecordDetailProvider(objectType: widget.metadata.nameSingular, id: widget.existingRecord!.id));
       }
       
       if (mounted) context.pop(true);
@@ -251,7 +251,7 @@ class _DynamicFormScreenState extends ConsumerState<DynamicFormScreen> {
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
                   decoration: BoxDecoration(
                     border: Border.all(
-                      color: Theme.of(context).colorScheme.outline.withOpacity(0.5),
+                      color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.5),
                     ),
                     borderRadius: BorderRadius.circular(4),
                   ),

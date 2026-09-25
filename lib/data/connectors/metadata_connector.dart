@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:pocketcrm/core/utils/storage_service.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:pocketcrm/core/auth/auth_service.dart';
 import 'package:pocketcrm/domain/models/metadata/object_metadata.dart';
@@ -8,13 +8,13 @@ import 'package:pocketcrm/domain/models/metadata/object_metadata.dart';
 class MetadataConnector {
   final GraphQLClient client;
   final AuthService? authService;
+  final StorageService storageService;
 
-  MetadataConnector({required this.client, this.authService});
+  MetadataConnector({required this.client, required this.storageService, this.authService});
 
   Future<List<ObjectMetadata>> getWorkspaceMetadata() async {
-    const storage = FlutterSecureStorage(aOptions: AndroidOptions(encryptedSharedPreferences: true));
-    final token = await storage.read(key: 'api_token');
-    final instanceUrl = await storage.read(key: 'instance_url');
+    final token = await storageService.read(key: 'api_token');
+    final instanceUrl = await storageService.read(key: 'instance_url');
 
     if (token == null || instanceUrl == null) {
       return [];

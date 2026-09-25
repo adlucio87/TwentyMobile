@@ -23,7 +23,7 @@ final hiveStorageBoxProvider = Provider<Box<String>>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef HiveStorageBoxRef = ProviderRef<Box<String>>;
-String _$storageServiceHash() => r'5c42b009606eff2830b2cef0914a72c78ac18a3c';
+String _$storageServiceHash() => r'635fa8a2436337d48593328cee21e0c7825e17ef';
 
 /// See also [storageService].
 @ProviderFor(storageService)
@@ -40,7 +40,7 @@ final storageServiceProvider = Provider<StorageService>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef StorageServiceRef = ProviderRef<StorageService>;
-String _$authServiceHash() => r'd2f64b0f6413b3d7afdb9237e268df47c790b9e1';
+String _$authServiceHash() => r'e3dcc40aaf1d755a97ff956ed01b969e8a23903c';
 
 /// See also [authService].
 @ProviderFor(authService)
@@ -74,7 +74,7 @@ final captchaServiceProvider = Provider<CaptchaService>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef CaptchaServiceRef = ProviderRef<CaptchaService>;
-String _$authMethodHash() => r'2400fccfa612d542c4cf29cf39650a90fa6bae47';
+String _$authMethodHash() => r'4230e6958334ca8524295fb5fb79fbfb0f0760e3';
 
 /// See also [authMethod].
 @ProviderFor(authMethod)
@@ -108,7 +108,7 @@ final isDemoModeProvider = FutureProvider<bool>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef IsDemoModeRef = FutureProviderRef<bool>;
-String _$crmRepositoryHash() => r'fe5c8feeb7bbb84259655a15b184126700efb4fd';
+String _$crmRepositoryHash() => r'0bff2f5eac61563e8da8402e4a6825a3037bf074';
 
 /// See also [crmRepository].
 @ProviderFor(crmRepository)
@@ -142,7 +142,7 @@ final workspaceMembersProvider = FutureProvider<List<WorkspaceMember>>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef WorkspaceMembersRef = FutureProviderRef<List<WorkspaceMember>>;
-String _$currentUserNameHash() => r'171161f12ce32915e039659d1a4737236ac1f8f7';
+String _$currentUserNameHash() => r'd02ff6040d0c269be8d06d27504545bbe46322c4';
 
 /// See also [currentUserName].
 @ProviderFor(currentUserName)
@@ -159,7 +159,7 @@ final currentUserNameProvider = FutureProvider<String>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef CurrentUserNameRef = FutureProviderRef<String>;
-String _$contactsHash() => r'dcad07e19aa65aaaeef695de8f645351af5333cf';
+String _$contactsHash() => r'49386cc600eae301ed702b7e205f01a7cac7751e';
 
 /// See also [Contacts].
 @ProviderFor(Contacts)

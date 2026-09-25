@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:pocketcrm/core/di/providers.dart';
@@ -39,19 +40,19 @@ class TodayNotifier extends _$TodayNotifier {
 
     await Future.wait([
       repo.getOverdueTasks().then(overdueTasks.addAll).catchError((e) {
-        print('>>> [1/4] ERROR: overdueTasks failed: $e');
+        debugPrint('>>> [1/4] ERROR: overdueTasks failed: $e');
         handleError(e);
       }),
       repo.getTodayTasks().then(todayTasks.addAll).catchError((e) {
-        print('>>> [2/4] ERROR: todayTasks failed: $e');
+        debugPrint('>>> [2/4] ERROR: todayTasks failed: $e');
         handleError(e);
       }),
       repo.getTomorrowTasks().then(tomorrowTasks.addAll).catchError((e) {
-        print('>>> [3/4] ERROR: tomorrowTasks failed: $e');
+        debugPrint('>>> [3/4] ERROR: tomorrowTasks failed: $e');
         handleError(e);
       }),
       repo.getRecentContacts(limit: 5).then(recentContacts.addAll).catchError((e) {
-        print('>>> [4/4] ERROR: recentContacts failed: $e');
+        debugPrint('>>> [4/4] ERROR: recentContacts failed: $e');
         handleError(e);
       }),
     ]);

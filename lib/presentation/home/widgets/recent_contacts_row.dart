@@ -29,7 +29,7 @@ class RecentContactsRow extends StatelessWidget {
                 children: [
                   CircleAvatar(
                     radius: 36,
-                    backgroundColor: bgColor.withOpacity(0.2),
+                    backgroundColor: bgColor.withValues(alpha: 0.2),
                     backgroundImage:
                         (contact.avatarUrl != null &&
                             contact.avatarUrl!.isNotEmpty)

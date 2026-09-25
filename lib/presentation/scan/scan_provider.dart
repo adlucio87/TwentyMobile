@@ -25,14 +25,14 @@ class ScanState with _$ScanState {
 class ScanNotifier extends _$ScanNotifier {
   @override
   ScanState build() {
-    if (kDebugMode) print('SCAN: ScanNotifier build() called (isNew: true)');
+    if (kDebugMode) debugPrint('SCAN: ScanNotifier build() called (isNew: true)');
     ref.keepAlive();
     return ScanState();
   }
 
   Future<void> processImage(XFile imageFile) async {
     state = state.copyWith(status: ScanStatus.processing);
-    if (kDebugMode) print('SCAN: Starting processImage for ${imageFile.path}');
+    if (kDebugMode) debugPrint('SCAN: Starting processImage for ${imageFile.path}');
 
     try {
       // 1. ML Kit OCR
@@ -43,12 +43,12 @@ class ScanNotifier extends _$ScanNotifier {
 
       final rawText = recognized.text;
       if (kDebugMode) {
-        print('SCAN: OCR Raw Text length: ${rawText.length}');
-        print('SCAN: OCR Raw Text: \n$rawText');
+        debugPrint('SCAN: OCR Raw Text length: ${rawText.length}');
+        debugPrint('SCAN: OCR Raw Text: \n$rawText');
       }
 
       if (rawText.trim().isEmpty) {
-        if (kDebugMode) print('SCAN: Error - Raw text is empty');
+        if (kDebugMode) debugPrint('SCAN: Error - Raw text is empty');
         state = state.copyWith(
           status: ScanStatus.error,
           errorMessage: 'No text found. Try again with a clearer photo.',
@@ -60,12 +60,12 @@ class ScanNotifier extends _$ScanNotifier {
       final parsed = BusinessCardParser.parse(rawText);
 
       if (kDebugMode) {
-        print('SCAN: Parsing complete. Confidence: ${parsed.confidence}');
-        print('SCAN: Parsed Data: $parsed');
+        debugPrint('SCAN: Parsing complete. Confidence: ${parsed.confidence}');
+        debugPrint('SCAN: Parsed Data: $parsed');
       }
 
       if (!parsed.hasMinimumData) {
-        if (kDebugMode) print('SCAN: Error - Not enough data found');
+        if (kDebugMode) debugPrint('SCAN: Error - Not enough data found');
         state = state.copyWith(
           status: ScanStatus.error,
           errorMessage: 'Unable to read the card. Please try again.',
@@ -80,8 +80,8 @@ class ScanNotifier extends _$ScanNotifier {
       );
     } catch (e, stack) {
       if (kDebugMode) {
-        print('SCAN: Catch error: $e');
-        print('SCAN: Stack trace: $stack');
+        debugPrint('SCAN: Catch error: $e');
+        debugPrint('SCAN: Stack trace: $stack');
       }
       state = state.copyWith(
         status: ScanStatus.error,

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pocketcrm/core/utils/demo_utils.dart';
 import 'package:pocketcrm/core/utils/responsive.dart';
+import 'package:pocketcrm/l10n/app_localizations.dart';
 
 class MainShell extends ConsumerWidget {
   final Widget child;
@@ -11,6 +12,7 @@ class MainShell extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final isDemo = ref.watch(isDemoModeProvider).valueOrNull ?? false;
     final isTablet = Responsive.isTablet(context);
     final selectedIndex = _calculateSelectedIndex(context);
@@ -25,10 +27,10 @@ class MainShell extends ConsumerWidget {
                 bottom: BorderSide(color: Colors.amber, width: 1),
               ),
             ),
-            child: const Center(
+            child: Center(
               child: Text(
-                '🎭 Demo mode · Data is reset every night',
-                style: TextStyle(
+                l10n?.demoBanner ?? '🎭 Demo mode · Data is reset every night',
+                style: const TextStyle(
                   fontSize: 11,
                   color: Colors.amber,
                   fontWeight: FontWeight.bold,
@@ -55,31 +57,31 @@ class MainShell extends ConsumerWidget {
                       onDestinationSelected: (int index) =>
                           _onItemTapped(index, context),
                       labelType: NavigationRailLabelType.all,
-                      destinations: const [
+                      destinations: [
                         NavigationRailDestination(
-                          icon: Icon(Icons.home_outlined),
-                          selectedIcon: Icon(Icons.home),
-                          label: Text('Home'),
+                          icon: const Icon(Icons.home_outlined),
+                          selectedIcon: const Icon(Icons.home),
+                          label: Text(l10n?.navHome ?? 'Home'),
                         ),
                         NavigationRailDestination(
-                          icon: Icon(Icons.people_outlined),
-                          selectedIcon: Icon(Icons.people),
-                          label: Text('Contacts'),
+                          icon: const Icon(Icons.people_outlined),
+                          selectedIcon: const Icon(Icons.people),
+                          label: Text(l10n?.navContacts ?? 'Contacts'),
                         ),
                         NavigationRailDestination(
-                          icon: Icon(Icons.business_outlined),
-                          selectedIcon: Icon(Icons.business),
-                          label: Text('Companies'),
+                          icon: const Icon(Icons.business_outlined),
+                          selectedIcon: const Icon(Icons.business),
+                          label: Text(l10n?.navCompanies ?? 'Companies'),
                         ),
                         NavigationRailDestination(
-                          icon: Icon(Icons.task_outlined),
-                          selectedIcon: Icon(Icons.task),
-                          label: Text('Tasks'),
+                          icon: const Icon(Icons.task_outlined),
+                          selectedIcon: const Icon(Icons.task),
+                          label: Text(l10n?.navTasks ?? 'Tasks'),
                         ),
                         NavigationRailDestination(
-                          icon: Icon(Icons.apps_outlined),
-                          selectedIcon: Icon(Icons.apps),
-                          label: Text('More'),
+                          icon: const Icon(Icons.apps_outlined),
+                          selectedIcon: const Icon(Icons.apps),
+                          label: Text(l10n?.navMore ?? 'More'),
                         ),
                       ],
                     ),
@@ -109,12 +111,12 @@ class MainShell extends ConsumerWidget {
       bottomNavigationBar: NavigationBar(
         selectedIndex: selectedIndex,
         onDestinationSelected: (int index) => _onItemTapped(index, context),
-        destinations: const [
-          NavigationDestination(icon: Icon(Icons.home), label: 'Home'),
-          NavigationDestination(icon: Icon(Icons.people), label: 'Contacts'),
-          NavigationDestination(icon: Icon(Icons.business), label: 'Companies'),
-          NavigationDestination(icon: Icon(Icons.task), label: 'Tasks'),
-          NavigationDestination(icon: Icon(Icons.apps), label: 'More'),
+        destinations: [
+          NavigationDestination(icon: const Icon(Icons.home), label: l10n?.navHome ?? 'Home'),
+          NavigationDestination(icon: const Icon(Icons.people), label: l10n?.navContacts ?? 'Contacts'),
+          NavigationDestination(icon: const Icon(Icons.business), label: l10n?.navCompanies ?? 'Companies'),
+          NavigationDestination(icon: const Icon(Icons.task), label: l10n?.navTasks ?? 'Tasks'),
+          NavigationDestination(icon: const Icon(Icons.apps), label: l10n?.navMore ?? 'More'),
         ],
       ),
     );

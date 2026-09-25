@@ -1,7 +1,7 @@
 import 'dart:async';
-
+import 'package:flutter/foundation.dart';
 import 'package:pocketcrm/core/di/metadata_provider.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:pocketcrm/core/utils/storage_service.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
@@ -30,19 +30,15 @@ Box<String> hiveStorageBox(HiveStorageBoxRef ref) {
 
 @Riverpod(keepAlive: true)
 StorageService storageService(StorageServiceRef ref) {
-  const secure = FlutterSecureStorage(
-    aOptions: AndroidOptions(encryptedSharedPreferences: true),
-  );
+  final secure = StorageService.createSecureStorage();
   final box = ref.watch(hiveStorageBoxProvider);
   return StorageService(secure, box);
 }
 
 @Riverpod(keepAlive: true)
 AuthService authService(AuthServiceRef ref) {
-  const secure = FlutterSecureStorage(
-    aOptions: AndroidOptions(encryptedSharedPreferences: true),
-  );
-  return AuthService(secure);
+  final storage = ref.watch(storageServiceProvider);
+  return AuthService(storage);
 }
 
 @Riverpod(keepAlive: true)
@@ -52,9 +48,7 @@ CaptchaService captchaService(CaptchaServiceRef ref) {
 
 @Riverpod(keepAlive: true)
 Future<String> authMethod(AuthMethodRef ref) async {
-  const storage = FlutterSecureStorage(
-    aOptions: AndroidOptions(encryptedSharedPreferences: true),
-  );
+  final storage = ref.watch(storageServiceProvider);
   return await storage.read(key: 'auth_method') ?? 'api_key';
 }
 
@@ -69,7 +63,7 @@ Future<bool> isDemoMode(IsDemoModeRef ref) async {
 Future<CRMRepository> crmRepository(CrmRepositoryRef ref) async {
   final storage = ref.watch(storageServiceProvider);
 
-  final instanceUrl = await const FlutterSecureStorage(aOptions: AndroidOptions(encryptedSharedPreferences: true)).read(key: 'instance_url');
+  final instanceUrl = await storage.read(key: 'instance_url');
   if (instanceUrl == null) {
     throw Exception('Instance URL not found');
   }
@@ -132,11 +126,11 @@ Future<CRMRepository> crmRepository(CrmRepositoryRef ref) async {
           .toList();
     }
 
-    print('DEBUG CUSTOM FIELDS MAP (PERSON): ${customFieldsMap['person']}');
-    print('DEBUG CUSTOM FIELDS MAP (COMPANY): ${customFieldsMap['company']}');
+    debugPrint('DEBUG CUSTOM FIELDS MAP (PERSON): ${customFieldsMap['person']}');
+    debugPrint('DEBUG CUSTOM FIELDS MAP (COMPANY): ${customFieldsMap['company']}');
 
   } catch (e) {
-    print('Error loading metadata for custom fields: $e');
+    debugPrint('Error loading metadata for custom fields: $e');
   }
 
   final customHttpClient = TimeoutHttpClient(
@@ -150,9 +144,7 @@ Future<CRMRepository> crmRepository(CrmRepositoryRef ref) async {
 
   final authLink = AuthLink(
     getToken: () async {
-      final token = await const FlutterSecureStorage(
-        aOptions: AndroidOptions(encryptedSharedPreferences: true),
-      ).read(key: 'api_token');
+      final token = await storage.read(key: 'api_token');
       return token != null ? 'Bearer $token' : null;
     },
   );
@@ -168,11 +160,11 @@ Future<CRMRepository> crmRepository(CrmRepositoryRef ref) async {
 
   return TwentyConnector(
     client: client,
+    storageService: storage,
     authService: authService,
     customFields: customFieldsMap,
     onTokenRefreshed: () {
-      // AuthService writes tokens directly to FlutterSecureStorage,
-      // bypassing StorageService's in-memory cache. We must clear
+      // Force cache invalidation to ensure fresh token is read.
       // the cache so AuthLink reads the fresh token.
       storage.invalidateCache(keys: [
         'api_token',
@@ -593,9 +585,7 @@ class TaskContacts extends _$TaskContacts {
 
 @Riverpod(keepAlive: true)
 Future<String> currentUserName(CurrentUserNameRef ref) async {
-  final storage = FlutterSecureStorage(
-    aOptions: const AndroidOptions(encryptedSharedPreferences: true),
-  );
+  final storage = ref.watch(storageServiceProvider);
   final authMethod = await storage.read(key: 'auth_method');
   if (authMethod == 'email') {
     final firstName = await storage.read(key: 'user_first_name') ?? '';

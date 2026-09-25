@@ -174,17 +174,17 @@ class StorageService {
     if (!kDebugMode) return;
     try {
       final all = await _secureStorage.readAll();
-      print('=== StorageService: secure storage dump ===');
+      debugPrint('=== StorageService: secure storage dump ===');
       if (all.isEmpty) {
-        print('  (vuoto)');
+        debugPrint('  (vuoto)');
       } else {
         for (final e in all.entries) {
-          print('  ${e.key} = ${_masked(e.key, e.value)}');
+          debugPrint('  ${e.key} = ${_masked(e.key, e.value)}');
         }
       }
-      print('===========================================');
+      debugPrint('===========================================');
     } catch (e) {
-      print('StorageService: impossibile leggere secure storage: $e');
+      debugPrint('StorageService: impossibile leggere secure storage: $e');
     }
   }
 
@@ -210,16 +210,16 @@ class StorageService {
   /// Stampa tutto il contenuto di Hive (solo debug)
   void debugDumpHive() {
     if (!kDebugMode) return;
-    print('=== StorageService: Hive dump ===');
+    debugPrint('=== StorageService: Hive dump ===');
     if (_box.isEmpty) {
-      print('  (vuoto)');
+      debugPrint('  (vuoto)');
     } else {
       for (final key in _box.keys) {
         final value = _box.get(key as String);
-        print('  $key = ${_masked(key, value)}');
+        debugPrint('  $key = ${_masked(key, value)}');
       }
     }
-    print('=================================');
+    debugPrint('=================================');
   }
 
   // ---------------------------------------------------------------------------
@@ -227,11 +227,11 @@ class StorageService {
   // ---------------------------------------------------------------------------
 
   void _log(String msg) {
-    if (kDebugMode) print('StorageService: $msg');
+    if (kDebugMode) debugPrint('StorageService: $msg');
   }
 
   void _logWarn(String msg) {
-    if (kDebugMode) print('StorageService: ⚠️  $msg');
+    if (kDebugMode) debugPrint('StorageService: ⚠️  $msg');
   }
 
   /// Maschera il valore delle chiavi sensibili nei log

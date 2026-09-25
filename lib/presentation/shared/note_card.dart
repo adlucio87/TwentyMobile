@@ -35,7 +35,7 @@ class NoteCard extends StatelessWidget {
                     Text(
                       note.createdAt!.toLocal().toString().split('.')[0],
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
+                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4),
                       ),
                     ),
                   ],

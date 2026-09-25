@@ -1,4 +1,4 @@
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:pocketcrm/core/di/providers.dart';
 import 'package:pocketcrm/core/network/custom_http_client.dart';
@@ -10,9 +10,7 @@ part 'metadata_provider.g.dart';
 
 @Riverpod(keepAlive: true)
 Future<MetadataConnector> metadataConnector(MetadataConnectorRef ref) async {
-  const storage = FlutterSecureStorage(
-    aOptions: AndroidOptions(encryptedSharedPreferences: true),
-  );
+  final storage = ref.watch(storageServiceProvider);
 
   final instanceUrl = await storage.read(key: 'instance_url');
   final token = await storage.read(key: 'api_token');
@@ -47,6 +45,7 @@ Future<MetadataConnector> metadataConnector(MetadataConnectorRef ref) async {
 
   return MetadataConnector(
     client: client,
+    storageService: storage,
     authService: ref.watch(authServiceProvider),
   );
 }

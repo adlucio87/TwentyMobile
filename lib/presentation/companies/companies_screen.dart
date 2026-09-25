@@ -159,7 +159,7 @@ class _CompaniesScreenState extends ConsumerState<CompaniesScreen> {
                         width: 48,
                         height: 48,
                         decoration: BoxDecoration(
-                          color: bgColor.withOpacity(0.2),
+                          color: bgColor.withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(10),
                           image: company.logoUrl != null && company.logoUrl!.isNotEmpty
                               ? DecorationImage(
@@ -209,7 +209,7 @@ class _CompaniesScreenState extends ConsumerState<CompaniesScreen> {
                                 size: 12,
                                 color: Theme.of(
                                   context,
-                                ).colorScheme.onSurface.withOpacity(0.6),
+                                ).colorScheme.onSurface.withValues(alpha: 0.6),
                               ),
                               const SizedBox(width: 4),
                               Text(
@@ -224,7 +224,7 @@ class _CompaniesScreenState extends ConsumerState<CompaniesScreen> {
                                 size: 12,
                                 color: Theme.of(
                                   context,
-                                ).colorScheme.onSurface.withOpacity(0.6),
+                                ).colorScheme.onSurface.withValues(alpha: 0.6),
                               ),
                               const SizedBox(width: 4),
                               Text(
@@ -242,7 +242,7 @@ class _CompaniesScreenState extends ConsumerState<CompaniesScreen> {
                         ),
                       ],
                     ),
-                    trailing: Icon(Icons.chevron_right, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3)),
+                    trailing: Icon(Icons.chevron_right, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3)),
                   ),
                 ));
               },

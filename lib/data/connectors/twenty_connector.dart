@@ -1,7 +1,13 @@
-import 'dart:convert';
 import 'dart:ui' show VoidCallback;
 import 'package:graphql_flutter/graphql_flutter.dart';
-import 'package:gql/language.dart' show parseString;
+import 'package:pocketcrm/core/auth/auth_service.dart';
+import 'package:pocketcrm/core/utils/storage_service.dart';
+import 'package:pocketcrm/data/connectors/base_graphql_connector.dart';
+import 'package:pocketcrm/data/repositories/twenty_company_repository.dart';
+import 'package:pocketcrm/data/repositories/twenty_contact_repository.dart';
+import 'package:pocketcrm/data/repositories/twenty_note_repository.dart';
+import 'package:pocketcrm/data/repositories/twenty_task_repository.dart';
+import 'package:pocketcrm/data/repositories/twenty_workflow_repository.dart';
 import 'package:pocketcrm/domain/models/company.dart';
 import 'package:pocketcrm/domain/models/contact.dart';
 import 'package:pocketcrm/domain/models/note.dart';
@@ -9,588 +15,85 @@ import 'package:pocketcrm/domain/models/task.dart';
 import 'package:pocketcrm/domain/models/workflow.dart';
 import 'package:pocketcrm/domain/models/workflow_run.dart';
 import 'package:pocketcrm/domain/models/workspace_member.dart';
-import 'package:pocketcrm/shared/widgets/phone_input_field.dart';
-import 'package:pocketcrm/core/data/country_codes.dart';
 import 'package:pocketcrm/domain/repositories/crm_repository.dart';
-import 'package:pocketcrm/core/network/custom_http_client.dart';
-import 'package:sentry_flutter/sentry_flutter.dart';
-import 'package:pocketcrm/core/auth/auth_service.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
+/// Concrete implementation of [CRMRepository] for Twenty CRM.
+///
+/// Refactored into domain-specific repositories:
+/// - [TwentyContactRepository] for contacts and people queries/mutations
+/// - [TwentyCompanyRepository] for companies and workspace members
+/// - [TwentyNoteRepository] for notes and blocknote mutations
+/// - [TwentyTaskRepository] for tasks and target assignments
+/// - [TwentyWorkflowRepository] for workflows and runs
+///
+/// Shared GraphQL transport, authentication refresh, retry logic, and error handling
+/// are managed by [BaseGraphQLConnector].
 class TwentyConnector implements CRMRepository {
-  final GraphQLClient client;
-  final AuthService? authService;
-  final VoidCallback? onTokenRefreshed;
-  final Map<String, List<String>> customFields;
-  String? _currentMemberId;
+  final BaseGraphQLConnector _base;
+  late final TwentyContactRepository _contacts;
+  late final TwentyCompanyRepository _companies;
+  late final TwentyNoteRepository _notes;
+  late final TwentyTaskRepository _tasks;
+  late final TwentyWorkflowRepository _workflows;
 
-  /// Mutex for token refresh — prevents concurrent refresh attempts
-  Future<bool>? _refreshFuture;
-
-  TwentyConnector({required this.client, this.authService, this.onTokenRefreshed, this.customFields = const {}});
-
-  /// Returns the current workspace member's ID, caching it for the session.
-  /// Returns null for API key auth (show all tasks) — only filters for email auth.
-  Future<String?> _getCurrentMemberId() async {
-    if (_currentMemberId != null) return _currentMemberId;
-
-    // Only filter by assignee for email/password auth.
-    // API key users see all tasks.
-    const storage = FlutterSecureStorage(
-      aOptions: AndroidOptions(encryptedSharedPreferences: true),
-    );
-    final authMethod = await storage.read(key: 'auth_method') ?? 'api_key';
-    if (authMethod != 'email') return null;
-
-    const String query = r'''
-      query Me {
-        workspaceMembers(first: 1) {
-          edges {
-            node {
-              id
-            }
-          }
-        }
-      }
-    ''';
-    final options = QueryOptions(
-      document: parseString(query),
-      fetchPolicy: FetchPolicy.networkOnly,
-    );
-    final result = await _queryWithRefresh(options);
-    final edges = result.data?['workspaceMembers']?['edges'] as List?;
-    if (edges != null && edges.isNotEmpty) {
-      _currentMemberId = edges.first['node']?['id'] as String?;
-    }
-    return _currentMemberId;
+  TwentyConnector({
+    required GraphQLClient client,
+    required StorageService storageService,
+    AuthService? authService,
+    VoidCallback? onTokenRefreshed,
+    Map<String, List<String>> customFields = const {},
+  }) : _base = BaseGraphQLConnector(
+          client: client,
+          storageService: storageService,
+          authService: authService,
+          onTokenRefreshed: onTokenRefreshed,
+          customFields: customFields,
+        ) {
+    _contacts = TwentyContactRepository(_base);
+    _companies = TwentyCompanyRepository(_base);
+    _notes = TwentyNoteRepository(_base);
+    _tasks = TwentyTaskRepository(_base);
+    _workflows = TwentyWorkflowRepository(_base);
   }
 
-  /// Checks whether the exception is a network timeout.
-  bool _isTimeout(OperationException exception) {
-    final linkException = exception.linkException;
-    if (linkException == null) return false;
-    return linkException.toString().contains('TimeoutException');
-  }
+  // ── Exposed sub-repositories ──
+  BaseGraphQLConnector get baseConnector => _base;
+  TwentyContactRepository get contactRepository => _contacts;
+  TwentyCompanyRepository get companyRepository => _companies;
+  TwentyNoteRepository get noteRepository => _notes;
+  TwentyTaskRepository get taskRepository => _tasks;
+  TwentyWorkflowRepository get workflowRepository => _workflows;
 
-  Future<QueryResult> _queryWithRefresh(QueryOptions options) async {
-    // Proactively refresh if we know the token is expired
-    if (authService != null && await authService!.isTokenExpired()) {
-      await _tryRefresh();
-    }
+  // ── Backward-compatibility getters ──
+  GraphQLClient get client => _base.client;
+  AuthService? get authService => _base.authService;
+  StorageService get storageService => _base.storageService;
+  VoidCallback? get onTokenRefreshed => _base.onTokenRefreshed;
+  Map<String, List<String>> get customFields => _base.customFields;
 
-    QueryResult result = await client.query(options);
+  static Future<bool> testConnection(String baseUrl, String apiToken) =>
+      BaseGraphQLConnector.testConnection(baseUrl, apiToken);
 
-    // Retry once on timeout (covers flaky network after foreground resume)
-    if (result.hasException && _isTimeout(result.exception!)) {
-      result = await client.query(options);
-    }
-
-    if (result.hasException && _isUnauthenticated(result.exception!)) {
-      final isRefreshed = await _tryRefresh();
-      if (isRefreshed) {
-        result = await client.query(options);
-      }
-    }
-    return result;
-  }
-
-  Future<QueryResult> _mutateWithRefresh(MutationOptions options) async {
-    // Proactively refresh if we know the token is expired
-    if (authService != null && await authService!.isTokenExpired()) {
-      await _tryRefresh();
-    }
-
-    QueryResult result = await client.mutate(options);
-
-    // Retry once on timeout (covers flaky network after foreground resume)
-    if (result.hasException && _isTimeout(result.exception!)) {
-      result = await client.mutate(options);
-    }
-
-    if (result.hasException && _isUnauthenticated(result.exception!)) {
-      final isRefreshed = await _tryRefresh();
-      if (isRefreshed) {
-        result = await client.mutate(options);
-      }
-    }
-    return result;
-  }
-
-  bool _isUnauthenticated(OperationException exception) {
-    // Check GraphQL error codes and messages
-    if (exception.graphqlErrors.any((e) {
-      final code = e.extensions?['code']?.toString().toUpperCase() ?? '';
-      final msg = e.message.toLowerCase();
-      return code == 'UNAUTHENTICATED' ||
-          msg.contains('unauthenticated') ||
-          msg.contains('token has expired') ||
-          msg.contains('token expired') ||
-          msg.contains('expired token') ||
-          msg.contains('jwt expired') ||
-          msg.contains('invalid token');
-    })) {
-      return true;
-    }
-    // Check link-level exceptions (HTTP 401)
-    final linkException = exception.linkException;
-    if (linkException is ServerException && linkException.parsedResponse?.response['status'] == 401) {
-      return true;
-    }
-    // Fallback: check raw exception string
-    final exStr = exception.toString().toLowerCase();
-    if (exStr.contains('401') || 
-        exStr.contains('unauthenticated') ||
-        exStr.contains('token has expired') ||
-        exStr.contains('token expired') ||
-        exStr.contains('jwt expired')) {
-      return true;
-    }
-    return false;
-  }
-
-  /// Attempts to refresh the auth token. Uses a mutex so only one refresh
-  /// runs at a time — concurrent callers wait for the same result.
-  Future<bool> _tryRefresh() async {
-    if (authService == null) return false;
-
-    // If a refresh is already in progress, wait for that one's result
-    if (_refreshFuture != null) {
-      return _refreshFuture!;
-    }
-
-    _refreshFuture = _doRefresh();
-    try {
-      return await _refreshFuture!;
-    } finally {
-      _refreshFuture = null;
-    }
-  }
-
-  Future<bool> _doRefresh() async {
-    const storage = FlutterSecureStorage(
-      aOptions: AndroidOptions(encryptedSharedPreferences: true),
-    );
-    final authMethod = await storage.read(key: 'auth_method') ?? 'api_key';
-
-    if (authMethod != 'email') return false; // API keys don't need refresh
-
-    final isSuccess = await authService!.refreshAccessToken();
-    if (isSuccess) {
-      // Notify caller to invalidate any caches (e.g. StorageService in-memory cache)
-      onTokenRefreshed?.call();
-    }
-    return isSuccess;
-  }
-
-  void _handleResultException(QueryResult result) {
-    if (!result.hasException) return;
-
-    final exception = result.exception!;
-    final linkException = exception.linkException;
-
-    // Log exception to Sentry (fire and forget)
-    try {
-      Sentry.captureException(
-        exception,
-        stackTrace: StackTrace.current,
-        hint: Hint.withMap({'operation': result.context.toString()}),
-      );
-    } catch (_) {}
-
-    // Check if this is an auth error that survived the refresh attempt
-    if (_isUnauthenticated(exception)) {
-      throw Exception('Token has expired.');
-    }
-
-    if (linkException != null) {
-      final errorStr = linkException.toString();
-      if (errorStr.contains('SocketException') ||
-          errorStr.contains('NetworkError') ||
-          errorStr.contains('Connection closed')) {
-        throw Exception(
-          'It seems there\'s no internet connection. Please check your settings.',
-        );
-      }
-      if (errorStr.contains('Connection refused') ||
-          errorStr.contains('404') ||
-          errorStr.contains('Network unreachable')) {
-        throw Exception(
-          'The CRM endpoint is unreachable. Please verify the URL in settings.',
-        );
-      }
-      if (errorStr.contains('TimeoutException')) {
-        throw Exception(
-          'The server took too long to respond. Please try again later.',
-        );
-      }
-      throw Exception('Connection error: $errorStr');
-    }
-
-    if (exception.graphqlErrors.isNotEmpty) {
-      final error = exception.graphqlErrors.first;
-      final msg = error.message.toLowerCase();
-      if (msg.contains('unauthorized') || msg.contains('forbidden')) {
-        throw Exception(
-          'Session expired or invalid token. Please reconnect in settings.',
-        );
-      }
-      if (msg.contains('cannot be executed as a single request') ||
-          msg.contains('query is too complex') ||
-          msg.contains('complexity limit')) {
-        throw Exception(
-          'Your Twenty instance has restrictive query limits. '
-          'Please update Twenty to the latest version, or contact your server administrator '
-          'to increase the GraphQL query complexity limit.',
-        );
-      }
-      throw Exception(error.message);
-    }
-
-    throw Exception(
-      'An unexpected error occurred while communicating with the server.',
-    );
-  }
-
-  static Future<bool> testConnection(String baseUrl, String apiToken) async {
-    const String query = r'''
-      query Me {
-        workspaceMembers(first: 1) {
-          edges {
-            node {
-              name { firstName lastName }
-            }
-          }
-        }
-      }
-    ''';
-
-    final customHttpClient = TimeoutHttpClient(
-      timeoutDuration: const Duration(seconds: 30),
-    );
-
-    final tempLink = HttpLink(
-      '$baseUrl/graphql',
-      defaultHeaders: {'Authorization': 'Bearer $apiToken'},
-      httpClient: customHttpClient,
-    );
-
-    final tempClient = GraphQLClient(
-      link: tempLink,
-      cache: GraphQLCache(),
-      queryRequestTimeout: const Duration(seconds: 30),
-    );
-
-    final QueryResult result = await tempClient.query(
-      QueryOptions(
-        document: parseString(query),
-        fetchPolicy: FetchPolicy.networkOnly,
-      ),
-    );
-
-    if (result.hasException) {
-      final exception = result.exception!;
-      if (exception.graphqlErrors.isNotEmpty) {
-        final error = exception.graphqlErrors.first;
-        final msg = error.message.toLowerCase();
-
-        if (msg.contains('unauthorized') || msg.contains('forbidden')) {
-          throw Exception('Invalid API Token');
-        }
-
-        // If the server rejects the query due to complexity limits, it means
-        // the URL and the Token are actually valid (auth succeeded!).
-        // So we can safely consider the connection successful.
-        if (msg.contains('cannot be executed as a single request') ||
-            msg.contains('query is too complex') ||
-            msg.contains('complexity limit')) {
-          return true;
-        }
-
-        throw Exception(error.message);
-      }
-
-      if (exception.linkException != null) {
-        final linkError = exception.linkException.toString();
-        if (linkError.contains('404')) {
-          throw Exception('URL not found. Verify your Instance URL.');
-        }
-        if (linkError.contains('Connection refused') ||
-            linkError.contains('SocketException')) {
-          throw Exception('Server unreachable. Check your internet or URL.');
-        }
-        throw Exception('Network error: $linkError');
-      }
-
-      throw Exception('Something went wrong: ${exception.toString()}');
-    }
-
-    final edges = result.data?['workspaceMembers']?['edges'] as List?;
-    if (edges == null || edges.isEmpty) {
-      throw Exception('Connected, but no access to workspace.');
-    }
-
-    return true;
-  }
-
+  // ── Auth & Profile ──
   @override
-  Future<List<WorkspaceMember>> getWorkspaceMembers() async {
-    const String query = r'''
-      query GetWorkspaceMembers {
-        workspaceMembers(first: 100) {
-          edges {
-            node {
-              id
-              name {
-                firstName
-                lastName
-              }
-            }
-          }
-        }
-      }
-    ''';
-    final options = QueryOptions(
-      document: parseString(query),
-      fetchPolicy: FetchPolicy.networkOnly,
-    );
-    final result = await _queryWithRefresh(options);
-    _handleResultException(result);
-    final edges = result.data?['workspaceMembers']?['edges'] as List?;
-    if (edges == null) return [];
-    return edges
-        .map((e) => WorkspaceMember.fromTwenty(e['node'] as Map<String, dynamic>))
-        .toList();
-  }
+  Future<String> getCurrentUserName() => _companies.getCurrentUserName();
 
-  @override
-  Future<String> getCurrentUserName() async {
-    const String query = r'''
-      query Me {
-        workspaceMembers(first: 1) {
-          edges {
-            node {
-              name { firstName lastName }
-            }
-          }
-        }
-      }
-    ''';
-    final QueryOptions options = QueryOptions(document: parseString(query));
-    final QueryResult result = await _queryWithRefresh(options);
-
-    final edges = result.data?['workspaceMembers']?['edges'] as List?;
-    if (edges == null || edges.isEmpty) return '';
-
-    final name = edges.first['node']?['name'];
-    if (name == null) return '';
-    return '${name['firstName']} ${name['lastName']}'.trim();
-  }
-
+  // ── Contacts ──
   @override
   Future<({List<Contact> contacts, String? endCursor, bool hasNextPage})>
-  getContacts({String? search, int pageSize = 20, String? after}) async {
-    final String query = '''
-      query GetPeople(\$filter: PersonFilterInput, \$first: Int, \$after: String) {
-        people(filter: \$filter, first: \$first, after: \$after, orderBy: { createdAt: DescNullsLast }) {
-          edges {
-            node {
-              id
-              name { firstName lastName }
-              emails { primaryEmail }
-              phones { primaryPhoneNumber primaryPhoneCallingCode }
-              avatarUrl
-              company { id name }
-              createdAt
-              updatedAt
-              ${customFields['person']?.join('\n              ') ?? ''}
-
-            }
-          }
-          pageInfo { hasNextPage endCursor }
-        }
-      }
-    ''';
-
-    Map<String, dynamic>? filter;
-    if (search != null && search.isNotEmpty) {
-      filter = {
-        'or': [
-          {
-            'name': {
-              'firstName': {'ilike': '%$search%'},
-            },
-          },
-          {
-            'name': {
-              'lastName': {'ilike': '%$search%'},
-            },
-          },
-        ],
-      };
-    }
-
-    final QueryOptions options = QueryOptions(
-      document: parseString(query),
-      variables: {
-        'first': pageSize,
-        if (filter != null) 'filter': filter,
-        if (after != null) 'after': after,
-      },
-      fetchPolicy: FetchPolicy.networkOnly,
-    );
-
-    final QueryResult result = await _queryWithRefresh(options);
-    _handleResultException(result);
-
-    final data = result.data?['people'];
-    final edges = data?['edges'] as List? ?? [];
-    final pageInfo = data?['pageInfo'] as Map<String, dynamic>? ?? {};
-
-    final contacts = edges
-        .map((e) => Contact.fromTwenty(e['node'] as Map<String, dynamic>))
-        .toList();
-
-    return (
-      contacts: contacts,
-      endCursor: pageInfo['endCursor'] as String?,
-      hasNextPage: pageInfo['hasNextPage'] as bool? ?? false,
-    );
-  }
+      getContacts({String? search, int pageSize = 20, String? after}) =>
+          _contacts.getContacts(search: search, pageSize: pageSize, after: after);
 
   @override
-  Future<Contact> getContactById(String id) async {
-    final String query = '''
-      query GetPersonById(\$id: UUID!) {
-        people(filter: { id: { eq: \$id } }) {
-          edges {
-            node {
-              id
-              name { firstName lastName }
-              emails { primaryEmail additionalEmails }
-              phones { primaryPhoneNumber primaryPhoneCallingCode additionalPhones }
-              avatarUrl
-              city
-              jobTitle
-
-              company { id name }
-              createdAt
-              updatedAt
-              ${customFields['person']?.join('\n              ') ?? ''}
-
-            }
-          }
-        }
-      }
-    ''';
-
-    final QueryOptions options = QueryOptions(
-      document: parseString(query),
-      variables: {'id': id},
-      fetchPolicy: FetchPolicy.networkOnly,
-    );
-
-    final QueryResult result = await _queryWithRefresh(options);
-    _handleResultException(result);
-
-    final edges = result.data?['people']?['edges'] as List?;
-    if (edges == null || edges.isEmpty) throw Exception('Contact not found');
-
-    return Contact.fromTwenty(edges.first['node'] as Map<String, dynamic>);
-  }
+  Future<Contact> getContactById(String id) => _contacts.getContactById(id);
 
   @override
-  Future<List<Contact>> getContactsByCompany(String companyId) async {
-    final String query = '''
-      query GetCompanyPeople(\$filter: PersonFilterInput) {
-        people(filter: \$filter, orderBy: { createdAt: DescNullsLast }) {
-          edges {
-            node {
-              id
-              name { firstName lastName }
-              emails { primaryEmail }
-              phones { primaryPhoneNumber primaryPhoneCallingCode }
-              avatarUrl
-
-              company { id name }
-              createdAt
-              updatedAt
-              ${customFields['person']?.join('\n              ') ?? ''}
-
-            }
-          }
-        }
-      }
-    ''';
-
-    final QueryOptions options = QueryOptions(
-      document: parseString(query),
-      variables: {
-        'filter': {
-          'companyId': {'eq': companyId},
-        },
-      },
-      fetchPolicy: FetchPolicy.networkOnly,
-    );
-
-    final QueryResult result = await _queryWithRefresh(options);
-    _handleResultException(result);
-
-    final edges = result.data?['people']?['edges'] as List?;
-    if (edges == null) return [];
-
-    return edges
-        .map((e) => Contact.fromTwenty(e['node'] as Map<String, dynamic>))
-        .toList();
-  }
+  Future<List<Contact>> getContactsByCompany(String companyId) =>
+      _contacts.getContactsByCompany(companyId);
 
   @override
-  Future<List<Contact>> getContactsByTask(String taskId) async {
-    const String query = r'''
-      query GetTaskTargets($filter: TaskTargetFilterInput) {
-        taskTargets(filter: $filter) {
-          edges {
-            node {
-              targetPerson {
-                id
-                name { firstName lastName }
-                emails { primaryEmail }
-                phones { primaryPhoneNumber primaryPhoneCallingCode }
-                avatarUrl
-                company { id name }
-                createdAt
-                updatedAt
-              }
-            }
-          }
-        }
-      }
-    ''';
-
-    final QueryOptions options = QueryOptions(
-      document: parseString(query),
-      variables: {
-        'filter': {
-          'taskId': {'eq': taskId},
-        },
-      },
-      fetchPolicy: FetchPolicy.networkOnly,
-    );
-
-    final QueryResult result = await _queryWithRefresh(options);
-    _handleResultException(result);
-
-    final edges = result.data?['taskTargets']?['edges'] as List?;
-    if (edges == null) return [];
-
-    return edges
-        .where((e) => e['node']?['targetPerson'] != null)
-        .map(
-          (e) => Contact.fromTwenty(
-            e['node']['targetPerson'] as Map<String, dynamic>,
-          ),
-        )
-        .toList();
-  }
+  Future<List<Contact>> getContactsByTask(String taskId) =>
+      _contacts.getContactsByTask(taskId);
 
   @override
   Future<Contact> createContact({
@@ -598,49 +101,13 @@ class TwentyConnector implements CRMRepository {
     required String lastName,
     String? email,
     String? phone,
-  }) async {
-    const String mutation = r'''
-      mutation CreatePerson($input: PersonCreateInput!) {
-        createPerson(data: $input) {
-          id
-          name { firstName lastName }
-          emails { primaryEmail }
-        }
-      }
-    ''';
-
-    String? phoneCountryCode;
-    if (phone != null) {
-      final parsed = PhoneInputField.parseE164(phone);
-      final match = countryCodes.where((c) => c.dialCode == parsed.$1).toList();
-      if (match.isNotEmpty) {
-        phoneCountryCode = match.first.isoCode;
-      }
-    }
-
-    final input = {
-      'name': {'firstName': firstName, 'lastName': lastName},
-      if (email != null) 'emails': {'primaryEmail': email},
-      if (phone != null)
-        'phones': {
-          'primaryPhoneNumber': phone,
-          if (phoneCountryCode != null)
-            'primaryPhoneCountryCode': phoneCountryCode,
-        },
-    };
-
-    final MutationOptions options = MutationOptions(
-      document: parseString(mutation),
-      variables: {'input': input},
-    );
-
-    final QueryResult result = await _mutateWithRefresh(options);
-    _handleResultException(result);
-
-    return Contact.fromTwenty(
-      result.data?['createPerson'] as Map<String, dynamic>,
-    );
-  }
+  }) =>
+      _contacts.createContact(
+        firstName: firstName,
+        lastName: lastName,
+        email: email,
+        phone: phone,
+      );
 
   @override
   Future<Contact> updateContact(
@@ -652,118 +119,36 @@ class TwentyConnector implements CRMRepository {
     String? companyId,
     bool clearCompany = false,
     Map<String, dynamic>? customFields,
-  }) async {
-    const String mutation = r'''
-      mutation UpdatePerson($id: UUID!, $input: PersonUpdateInput!) {
-        updatePerson(id: $id, data: $input) {
-          id
-          name { firstName lastName }
-          emails { primaryEmail }
-          phones { primaryPhoneNumber primaryPhoneCallingCode }
-          avatarUrl
-          company { id name }
-        }
-      }
-    ''';
-
-    final input = <String, dynamic>{};
-    if (firstName != null || lastName != null) {
-      input['name'] = {
-        if (firstName != null) 'firstName': firstName,
-        if (lastName != null) 'lastName': lastName,
-      };
-    }
-    if (email != null) {
-      input['emails'] = {'primaryEmail': email};
-    }
-    if (phone != null) {
-      String? phoneCountryCode;
-      final parsed = PhoneInputField.parseE164(phone);
-      final match = countryCodes.where((c) => c.dialCode == parsed.$1).toList();
-      if (match.isNotEmpty) {
-        phoneCountryCode = match.first.isoCode;
-      }
-
-      input['phones'] = {
-        'primaryPhoneNumber': phone,
-        if (phoneCountryCode != null)
-          'primaryPhoneCountryCode': phoneCountryCode,
-      };
-    }
-    if (clearCompany) {
-      input['companyId'] = null;
-    } else if (companyId != null) {
-      input['companyId'] = companyId;
-    }
-
-    if (customFields != null && customFields.isNotEmpty) {
-      input.addAll(customFields);
-    }
-
-    final MutationOptions options = MutationOptions(
-      document: parseString(mutation),
-      variables: {'id': id, 'input': input},
-    );
-
-    final QueryResult result = await _mutateWithRefresh(options);
-    _handleResultException(result);
-
-    return Contact.fromTwenty(
-      result.data?['updatePerson'] as Map<String, dynamic>,
-    );
-  }
+  }) =>
+      _contacts.updateContact(
+        id,
+        firstName: firstName,
+        lastName: lastName,
+        email: email,
+        phone: phone,
+        companyId: companyId,
+        clearCompany: clearCompany,
+        customFields: customFields,
+      );
 
   @override
-  Future<void> deleteContact(String id) async {
-    const String mutation = r'''
-      mutation DeletePerson($id: UUID!) {
-        deletePerson(id: $id) { id }
-      }
-    ''';
-
-    final MutationOptions options = MutationOptions(
-      document: parseString(mutation),
-      variables: {'id': id},
-    );
-
-    final QueryResult result = await _mutateWithRefresh(options);
-    _handleResultException(result);
-  }
+  Future<void> deleteContact(String id) => _contacts.deleteContact(id);
 
   @override
-  Future<Company> createCompany({
-    required String name,
-    String? domainName,
-  }) async {
-    const String mutation = r'''
-      mutation CreateCompany($input: CompanyCreateInput!) {
-        createCompany(data: $input) {
-          id
-          name
-          domainName { primaryLinkUrl }
-          createdAt
-        }
-      }
-    ''';
+  Future<List<Contact>> getRecentContacts({int limit = 5}) =>
+      _contacts.getRecentContacts(limit: limit);
 
-    final input = <String, dynamic>{'name': name};
-    if (domainName != null && domainName.isNotEmpty) {
-      input['domainName'] = {'primaryLinkUrl': domainName};
-    }
+  // ── Companies ──
+  @override
+  Future<List<Company>> getCompanies({String? search, int page = 1}) =>
+      _companies.getCompanies(search: search, page: page);
 
-    final MutationOptions options = MutationOptions(
-      document: parseString(mutation),
-      variables: {'input': input},
-    );
+  @override
+  Future<Company> getCompanyById(String id) => _companies.getCompanyById(id);
 
-    final QueryResult result = await _mutateWithRefresh(options);
-    _handleResultException(result);
-
-    final data = result.data?['createCompany'];
-    if (data == null) throw Exception('Failed to create company');
-
-    return Company.fromTwenty(data as Map<String, dynamic>);
-  }
+  @override
+  Future<Company> createCompany({required String name, String? domainName}) =>
+      _companies.createCompany(name: name, domainName: domainName);
 
   @override
   Future<Company> updateCompany(
@@ -771,596 +156,62 @@ class TwentyConnector implements CRMRepository {
     String? name,
     String? domainName,
     Map<String, dynamic>? customFields,
-  }) async {
-    const String mutation = r'''
-      mutation UpdateCompany($id: UUID!, $input: CompanyUpdateInput!) {
-        updateCompany(id: $id, data: $input) {
-          id
-          name
-          domainName { primaryLinkUrl }
-          createdAt
-        }
-      }
-    ''';
-
-    final input = <String, dynamic>{};
-    if (name != null) input['name'] = name;
-    if (domainName != null) {
-      // Support clearing domain by providing empty string
-      input['domainName'] = domainName.isEmpty
-          ? null
-          : {'primaryLinkUrl': domainName};
-    }
-
-    if (customFields != null && customFields.isNotEmpty) {
-      input.addAll(customFields);
-    }
-
-    final MutationOptions options = MutationOptions(
-      document: parseString(mutation),
-      variables: {'id': id, 'input': input},
-    );
-
-    final QueryResult result = await _mutateWithRefresh(options);
-    _handleResultException(result);
-
-    return Company.fromTwenty(
-      result.data?['updateCompany'] as Map<String, dynamic>,
-    );
-  }
+  }) =>
+      _companies.updateCompany(
+        id,
+        name: name,
+        domainName: domainName,
+        customFields: customFields,
+      );
 
   @override
-  Future<void> deleteCompany(String id) async {
-    const String mutation = r'''
-      mutation DeleteCompany($id: UUID!) {
-        deleteCompany(id: $id) { id }
-      }
-    ''';
-
-    final MutationOptions options = MutationOptions(
-      document: parseString(mutation),
-      variables: {'id': id},
-    );
-
-    final QueryResult result = await _mutateWithRefresh(options);
-    _handleResultException(result);
-  }
+  Future<void> deleteCompany(String id) => _companies.deleteCompany(id);
 
   @override
-  Future<List<Company>> getCompanies({String? search, int page = 1}) async {
-    final String query = '''
-      query GetCompanies(\$filter: CompanyFilterInput, \$first: Int) {
-        companies(filter: \$filter, first: \$first, orderBy: { createdAt: DescNullsLast }) {
-          edges {
-            node {
-              id
-              name
-              domainName { primaryLinkUrl }
-              employees
-              createdAt
-              ${customFields['company']?.join('\n              ') ?? ''}
+  Future<List<WorkspaceMember>> getWorkspaceMembers() =>
+      _companies.getWorkspaceMembers();
 
-            }
-          }
-        }
-      }
-    ''';
-
-    Map<String, dynamic>? filter;
-    if (search != null && search.isNotEmpty) {
-      filter = {
-        'or': [
-          {
-            'name': {'like': '%$search%'},
-          },
-          {
-            'domainName': {
-              'primaryLinkUrl': {'like': '%$search%'},
-            },
-          },
-        ],
-      };
-    }
-
-    final QueryOptions options = QueryOptions(
-      document: parseString(query),
-      variables: {'first': 20, if (filter != null) 'filter': filter},
-      fetchPolicy: FetchPolicy.networkOnly,
-    );
-
-    final QueryResult result = await _queryWithRefresh(options);
-    _handleResultException(result);
-
-    final edges = result.data?['companies']?['edges'] as List?;
-    if (edges == null) return [];
-
-    return edges
-        .map((e) => Company.fromTwenty(e['node'] as Map<String, dynamic>))
-        .toList();
-  }
+  // ── Notes ──
+  @override
+  Future<List<Note>> getNotesByContact(String contactId) =>
+      _notes.getNotesByContact(contactId);
 
   @override
-  Future<Company> getCompanyById(String id) async {
-    final String query = '''
-      query GetCompanyById(\$id: UUID!) {
-        companies(filter: { id: { eq: \$id } }) {
-          edges {
-            node {
-              id
-              name
-              domainName { primaryLinkUrl }
-              employees
-              createdAt
-              ${customFields['company']?.join('\n              ') ?? ''}
-
-            }
-          }
-        }
-      }
-    ''';
-
-    final QueryOptions options = QueryOptions(
-      document: parseString(query),
-      variables: {'id': id},
-      fetchPolicy: FetchPolicy.networkOnly,
-    );
-
-    final QueryResult result = await _queryWithRefresh(options);
-    _handleResultException(result);
-
-    final edges = result.data?['companies']?['edges'] as List?;
-    if (edges == null || edges.isEmpty) throw Exception('Company not found');
-
-    return Company.fromTwenty(edges.first['node'] as Map<String, dynamic>);
-  }
-
-  @override
-  Future<List<Note>> getNotesByCompany(String companyId) async {
-    const String query = r'''
-      query GetNotesByCompany($companyId: UUID!) {
-        noteTargets(filter: { targetCompanyId: { eq: $companyId } },
-                    orderBy: { createdAt: DescNullsLast }) {
-          edges {
-            node {
-              note { id bodyV2 { blocknote } createdAt updatedAt }
-            }
-          }
-        }
-      }
-    ''';
-
-    final QueryOptions options = QueryOptions(
-      document: parseString(query),
-      variables: {'companyId': companyId},
-      fetchPolicy: FetchPolicy.networkOnly,
-    );
-
-    final QueryResult result = await _queryWithRefresh(options);
-    _handleResultException(result);
-
-    final edges = result.data?['noteTargets']?['edges'] as List?;
-    if (edges == null) return [];
-
-    return edges
-        .map((e) {
-          final node = e['node'];
-          if (node == null || node['note'] == null) return null;
-          return Note.fromTwenty(node['note'] as Map<String, dynamic>);
-        })
-        .where((e) => e != null)
-        .cast<Note>()
-        .toList();
-  }
-
-  @override
-  Future<List<Note>> getNotesByContact(String contactId) async {
-    const String query = r'''
-      query GetNotesByPerson($personId: UUID!) {
-        noteTargets(filter: { targetPersonId: { eq: $personId } },
-                    orderBy: { createdAt: DescNullsLast }) {
-          edges {
-            node {
-              note { id bodyV2 { blocknote } createdAt updatedAt }
-            }
-          }
-        }
-      }
-    ''';
-
-    final QueryOptions options = QueryOptions(
-      document: parseString(query),
-      variables: {'personId': contactId},
-      fetchPolicy: FetchPolicy.networkOnly,
-    );
-
-    final QueryResult result = await _queryWithRefresh(options);
-    _handleResultException(result);
-
-    final edges = result.data?['noteTargets']?['edges'] as List?;
-    if (edges == null) return [];
-
-    return edges
-        .map((e) {
-          final node = e['node'];
-          if (node == null || node['note'] == null) return null;
-          return Note.fromTwenty(node['note'] as Map<String, dynamic>);
-        })
-        .where((e) => e != null)
-        .cast<Note>()
-        .toList();
-  }
+  Future<List<Note>> getNotesByCompany(String companyId) =>
+      _notes.getNotesByCompany(companyId);
 
   @override
   Future<Note> createNote({
     required String contactId,
     required String body,
-    DateTime? dueAt, // Kept in interface but ignored for GraphQL Note
-  }) async {
-    const String mutation = r'''
-      mutation CreateNote($input: NoteCreateInput!) {
-        createNote(data: $input) { id bodyV2 { blocknote } createdAt }
-      }
-    ''';
-
-    final blockNodeJson = jsonEncode([
-      {
-        "type": "paragraph",
-        "content": [
-          {"type": "text", "text": body, "styles": {}},
-        ],
-      },
-    ]);
-
-    final input = <String, dynamic>{
-      'bodyV2': {'blocknote': blockNodeJson},
-    };
-
-    final MutationOptions options = MutationOptions(
-      document: parseString(mutation),
-      variables: {'input': input},
-    );
-
-    final QueryResult result = await _mutateWithRefresh(options);
-    _handleResultException(result);
-
-    final data = result.data?['createNote'];
-    final note = Note.fromTwenty(data as Map<String, dynamic>);
-
-    const String targetMutation = r'''
-      mutation CreateNoteTarget($input: NoteTargetCreateInput!) {
-        createNoteTarget(data: $input) { id }
-      }
-    ''';
-    final targetInput = {'noteId': note.id, 'targetPersonId': contactId};
-    final MutationOptions targetOptions = MutationOptions(
-      document: parseString(targetMutation),
-      variables: {'input': targetInput},
-    );
-    final targetResult = await _mutateWithRefresh(targetOptions);
-    if (targetResult.hasException) {
-      print(
-        'Warning: Failed to link note to contact: ${targetResult.exception}',
-      );
-    }
-
-    return note;
-  }
+    DateTime? dueAt,
+  }) =>
+      _notes.createNote(contactId: contactId, body: body, dueAt: dueAt);
 
   @override
   Future<Note> updateNote(
     String id, {
     required String body,
-    DateTime? dueAt, // Kept in interface but ignored for GraphQL Note
-  }) async {
-    const String mutation = r'''
-      mutation UpdateNote($id: UUID!, $input: NoteUpdateInput!) {
-        updateNote(id: $id, data: $input) { id bodyV2 { blocknote } createdAt }
-      }
-    ''';
-
-    final blockNodeJson = jsonEncode([
-      {
-        "type": "paragraph",
-        "content": [
-          {"type": "text", "text": body, "styles": {}},
-        ],
-      },
-    ]);
-
-    final input = <String, dynamic>{
-      'bodyV2': {'blocknote': blockNodeJson},
-    };
-
-    final MutationOptions options = MutationOptions(
-      document: parseString(mutation),
-      variables: {'id': id, 'input': input},
-    );
-
-    final QueryResult result = await _mutateWithRefresh(options);
-    _handleResultException(result);
-
-    return Note.fromTwenty(result.data?['updateNote'] as Map<String, dynamic>);
-  }
+    DateTime? dueAt,
+  }) =>
+      _notes.updateNote(id, body: body, dueAt: dueAt);
 
   @override
-  Future<void> deleteNote(String id) async {
-    const String mutation = r'''
-      mutation DeleteNote($id: UUID!) {
-        deleteNote(id: $id) { id }
-      }
-    ''';
+  Future<void> deleteNote(String id) => _notes.deleteNote(id);
 
-    final MutationOptions options = MutationOptions(
-      document: parseString(mutation),
-      variables: {'id': id},
-    );
-
-    final QueryResult result = await _mutateWithRefresh(options);
-    _handleResultException(result);
-  }
+  // ── Tasks ──
+  @override
+  Future<List<Task>> getTasks({bool? completed}) =>
+      _tasks.getTasks(completed: completed);
 
   @override
-  Future<List<Task>> getOverdueTasks() async {
-    final now = DateTime.now();
-    final startOfToday = DateTime(now.year, now.month, now.day);
-    final memberId = await _getCurrentMemberId();
-
-    final conditions = [
-      '{ dueAt: { lt: "${startOfToday.toIso8601String()}" } }',
-      '{ status: { neq: DONE } }',
-      if (memberId != null) '{ assigneeId: { eq: "$memberId" } }',
-    ];
-
-    final String query =
-        '''
-      query GetOverdueTasks {
-        tasks(
-          first: 20
-          filter: {
-            and: [
-              ${conditions.join('\n              ')}
-            ]
-          }
-          orderBy: { dueAt: AscNullsLast }
-        ) {
-          edges { node { 
-            id title status dueAt 
-            taskTargets { edges { node {
-              targetPersonId targetPerson { id name { firstName lastName } }
-              targetCompanyId targetCompany { id name }
-              targetOpportunityId targetOpportunity { id name }
-            } } }
-          } }
-        }
-      }
-    ''';
-
-    final options = QueryOptions(
-      document: parseString(query),
-      fetchPolicy: FetchPolicy.networkOnly,
-    );
-
-    final result = await _queryWithRefresh(options);
-
-    if (result.hasException) {
-      throw Exception(result.exception.toString());
-    }
-
-    final edges = result.data?['tasks']?['edges'] as List?;
-    if (edges == null) return [];
-
-    return edges
-        .map((e) => Task.fromTwenty(e['node'] as Map<String, dynamic>))
-        .toList();
-  }
+  Future<List<Task>> getOverdueTasks() => _tasks.getOverdueTasks();
 
   @override
-  Future<List<Task>> getTodayTasks() async {
-    final now = DateTime.now();
-    final startOfToday = DateTime(now.year, now.month, now.day);
-    final endOfToday = startOfToday.add(const Duration(days: 1));
-    final memberId = await _getCurrentMemberId();
-
-    final conditions = [
-      '{ dueAt: { gte: "${startOfToday.toIso8601String()}" } }',
-      '{ dueAt: { lt: "${endOfToday.toIso8601String()}" } }',
-      '{ status: { neq: DONE } }',
-      if (memberId != null) '{ assigneeId: { eq: "$memberId" } }',
-    ];
-
-    final String query =
-        '''
-      query GetTodayTasks {
-        tasks(
-          first: 20
-          filter: {
-            and: [
-              ${conditions.join('\n              ')}
-            ]
-          }
-          orderBy: { dueAt: AscNullsLast }
-        ) {
-          edges { node { 
-            id title status dueAt 
-            taskTargets { edges { node {
-              targetPersonId targetPerson { id name { firstName lastName } }
-              targetCompanyId targetCompany { id name }
-              targetOpportunityId targetOpportunity { id name }
-            } } }
-          } }
-        }
-      }
-    ''';
-
-    final options = QueryOptions(
-      document: parseString(query),
-      fetchPolicy: FetchPolicy.networkOnly,
-    );
-
-    final result = await _queryWithRefresh(options);
-
-    if (result.hasException) {
-      throw Exception(result.exception.toString());
-    }
-
-    final edges = result.data?['tasks']?['edges'] as List?;
-    if (edges == null) return [];
-
-    return edges
-        .map((e) => Task.fromTwenty(e['node'] as Map<String, dynamic>))
-        .toList();
-  }
+  Future<List<Task>> getTodayTasks() => _tasks.getTodayTasks();
 
   @override
-  Future<List<Task>> getTomorrowTasks() async {
-    final now = DateTime.now();
-    final startOfTomorrow = DateTime(
-      now.year,
-      now.month,
-      now.day,
-    ).add(const Duration(days: 1));
-    final endOfTomorrow = startOfTomorrow.add(const Duration(days: 1));
-    final memberId = await _getCurrentMemberId();
-
-    final conditions = [
-      '{ dueAt: { gte: "${startOfTomorrow.toIso8601String()}" } }',
-      '{ dueAt: { lt: "${endOfTomorrow.toIso8601String()}" } }',
-      '{ status: { neq: DONE } }',
-      if (memberId != null) '{ assigneeId: { eq: "$memberId" } }',
-    ];
-
-    final String query =
-        '''
-      query GetTomorrowTasks {
-        tasks(
-          first: 20
-          filter: {
-            and: [
-              ${conditions.join('\n              ')}
-            ]
-          }
-          orderBy: { dueAt: AscNullsLast }
-        ) {
-          edges { node { 
-            id title status dueAt 
-            taskTargets { edges { node {
-              targetPersonId targetPerson { id name { firstName lastName } }
-              targetCompanyId targetCompany { id name }
-              targetOpportunityId targetOpportunity { id name }
-            } } }
-          } }
-        }
-      }
-    ''';
-
-    final options = QueryOptions(
-      document: parseString(query),
-      fetchPolicy: FetchPolicy.networkOnly,
-    );
-
-    final result = await _queryWithRefresh(options);
-
-    if (result.hasException) {
-      throw Exception(result.exception.toString());
-    }
-
-    final edges = result.data?['tasks']?['edges'] as List?;
-    if (edges == null) return [];
-
-    return edges
-        .map((e) => Task.fromTwenty(e['node'] as Map<String, dynamic>))
-        .toList();
-  }
-
-  @override
-  Future<List<Contact>> getRecentContacts({int limit = 5}) async {
-    const String query = r'''
-      query GetRecentContacts($first: Int!) {
-        people(
-          first: $first
-          orderBy: { updatedAt: DescNullsLast }
-        ) {
-          edges { node {
-            id
-            name { firstName lastName }
-            
-            emails { primaryEmail }
-            company { name }
-            updatedAt
-          } }
-        }
-      }
-    ''';
-
-    final options = QueryOptions(
-      document: parseString(query),
-      variables: {'first': limit},
-      fetchPolicy: FetchPolicy.networkOnly,
-    );
-
-    final result = await _queryWithRefresh(options);
-    _handleResultException(result);
-
-    final edges = result.data?['people']?['edges'] as List?;
-    if (edges == null) return [];
-
-    return edges
-        .map((e) => Contact.fromTwenty(e['node'] as Map<String, dynamic>))
-        .toList();
-  }
-
-  @override
-  Future<List<Task>> getTasks({bool? completed}) async {
-    const String query = r'''
-      query GetTasks($filter: TaskFilterInput) {
-        tasks(filter: $filter, orderBy: { dueAt: AscNullsLast }) {
-          edges {
-            node {
-              id title bodyV2 { blocknote } status dueAt createdAt
-              taskTargets { edges { node {
-                targetPersonId targetPerson { id name { firstName lastName } }
-                targetCompanyId targetCompany { id name }
-                targetOpportunityId targetOpportunity { id name }
-              } } }
-            }
-          }
-        }
-      }
-    ''';
-
-    final memberId = await _getCurrentMemberId();
-
-    final List<Map<String, dynamic>> conditions = [];
-    if (completed != null) {
-      conditions.add({'status': {'eq': completed ? 'DONE' : 'TODO'}});
-    }
-    if (memberId != null) {
-      conditions.add({'assigneeId': {'eq': memberId}});
-    }
-
-    Map<String, dynamic>? filter;
-    if (conditions.isNotEmpty) {
-      filter = conditions.length == 1
-          ? conditions.first
-          : {'and': conditions};
-    }
-
-    final QueryOptions options = QueryOptions(
-      document: parseString(query),
-      variables: {if (filter != null) 'filter': filter},
-      fetchPolicy: FetchPolicy.networkOnly,
-    );
-
-    final QueryResult result = await _queryWithRefresh(options);
-    _handleResultException(result);
-
-    final edges = result.data?['tasks']?['edges'] as List?;
-    if (edges == null) return [];
-
-    return edges
-        .map((e) => Task.fromTwenty(e['node'] as Map<String, dynamic>))
-        .toList();
-  }
+  Future<List<Task>> getTomorrowTasks() => _tasks.getTomorrowTasks();
 
   @override
   Future<Task> createTask({
@@ -1369,69 +220,14 @@ class TwentyConnector implements CRMRepository {
     DateTime? dueAt,
     String? contactId,
     String? assigneeId,
-  }) async {
-    const String mutation = r'''
-      mutation CreateTask($input: TaskCreateInput!) {
-        createTask(data: $input) { id title status bodyV2 { blocknote } dueAt createdAt assigneeId }
-      }
-    ''';
-
-    final input = <String, dynamic>{'title': title};
-    
-    // Assign automatically if not provided explicitly, but only for email auth (currentMemberId exists)
-    final targetAssigneeId = assigneeId ?? await _getCurrentMemberId();
-    if (targetAssigneeId != null) {
-      input['assigneeId'] = targetAssigneeId;
-    }
-    if (body != null) {
-      final blockNodeJson = jsonEncode([
-        {
-          "type": "paragraph",
-          "content": [
-            {"type": "text", "text": body, "styles": {}},
-          ],
-        },
-      ]);
-      input['bodyV2'] = {'blocknote': blockNodeJson};
-    }
-    if (dueAt != null) {
-      final utcDueAt = dueAt.toUtc();
-      input['dueAt'] = "${utcDueAt.toIso8601String().split('.')[0]}Z";
-    }
-
-    final MutationOptions options = MutationOptions(
-      document: parseString(mutation),
-      variables: {'input': input},
-    );
-
-    final QueryResult result = await _mutateWithRefresh(options);
-    _handleResultException(result);
-
-    if (contactId != null) {
-      final taskId = result.data?['createTask']?['id'];
-      if (taskId != null) {
-        const String targetMutation = r'''
-          mutation CreateTaskTarget($input: TaskTargetCreateInput!) {
-            createTaskTarget(data: $input) { id }
-          }
-        ''';
-        final targetInput = {'taskId': taskId, 'targetPersonId': contactId};
-        final MutationOptions targetOptions = MutationOptions(
-          document: parseString(targetMutation),
-          variables: {'input': targetInput},
-        );
-        final targetResult = await _mutateWithRefresh(targetOptions);
-        if (targetResult.hasException) {
-          print(
-            'Warning: Failed to link task to contact: ${targetResult.exception}',
-          );
-        }
-      }
-    }
-    final data = result.data?['createTask'];
-
-    return Task.fromTwenty(data);
-  }
+  }) =>
+      _tasks.createTask(
+        title: title,
+        body: body,
+        dueAt: dueAt,
+        contactId: contactId,
+        assigneeId: assigneeId,
+      );
 
   @override
   Future<Task> updateTask(
@@ -1442,231 +238,24 @@ class TwentyConnector implements CRMRepository {
     bool clearDueDate = false,
     bool? completed,
     String? assigneeId,
-  }) async {
-    const String mutation = r'''
-      mutation UpdateTask($id: UUID!, $input: TaskUpdateInput!) {
-        updateTask(id: $id, data: $input) { id title status bodyV2 { blocknote } dueAt createdAt assigneeId }
-      }
-    ''';
-
-    final input = <String, dynamic>{};
-    if (title != null) input['title'] = title;
-    if (assigneeId != null) input['assigneeId'] = assigneeId;
-    if (completed != null) {
-      input['status'] = completed ? 'DONE' : 'TODO';
-    }
-    if (body != null) {
-      final blockNodeJson = jsonEncode([
-        {
-          "type": "paragraph",
-          "content": [
-            {"type": "text", "text": body, "styles": {}},
-          ],
-        },
-      ]);
-      input['bodyV2'] = {'blocknote': blockNodeJson};
-    }
-    if (clearDueDate) {
-      input['dueAt'] = null;
-    } else if (dueAt != null) {
-      final utcDueAt = dueAt.toUtc();
-      input['dueAt'] = "${utcDueAt.toIso8601String().split('.')[0]}Z";
-    }
-
-    // In a real scenario we'd want to also be able to clear dueAt.
-    // For now we just send what is provided.
-
-    final MutationOptions options = MutationOptions(
-      document: parseString(mutation),
-      variables: {'id': id, 'input': input},
-    );
-
-    final QueryResult result = await _mutateWithRefresh(options);
-    _handleResultException(result);
-
-    final data = result.data?['updateTask'];
-
-    return Task.fromTwenty(data);
-  }
+  }) =>
+      _tasks.updateTask(
+        id,
+        title: title,
+        body: body,
+        dueAt: dueAt,
+        clearDueDate: clearDueDate,
+        completed: completed,
+        assigneeId: assigneeId,
+      );
 
   @override
-  Future<void> deleteTask(String id) async {
-    const String mutation = r'''
-      mutation DeleteTask($id: UUID!) {
-        deleteTask(id: $id) { id }
-      }
-    ''';
+  Future<void> deleteTask(String id) => _tasks.deleteTask(id);
 
-    final MutationOptions options = MutationOptions(
-      document: parseString(mutation),
-      variables: {'id': id},
-    );
-
-    final QueryResult result = await _mutateWithRefresh(options);
-    if (result.hasException) throw Exception(result.exception.toString());
-  }
-
-  // ──────────────────────────────────────────────────────────────────────────
-  // Workflows
-  // ──────────────────────────────────────────────────────────────────────────
-
+  // ── Workflows ──
   @override
-  Future<List<Workflow>> getManualWorkflows({required String objectType}) async {
-    const String query = r'''
-      query GetManualWorkflows {
-        workflows(
-          filter: {
-            statuses: { containsAny: [ACTIVE] }
-          }
-        ) {
-          edges {
-            node {
-              id
-              name
-              versions(filter: { status: { eq: ACTIVE } }) {
-                edges {
-                  node {
-                    id
-                    trigger
-                    steps
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    ''';
-
-    final QueryOptions options = QueryOptions(
-      document: parseString(query),
-      fetchPolicy: FetchPolicy.networkOnly,
-    );
-
-    final QueryResult result = await _queryWithRefresh(options);
-
-    // Workflows may require admin permissions — return empty list gracefully
-    if (result.hasException) {
-      final errorMsg = result.exception?.graphqlErrors.firstOrNull?.message ?? '';
-      if (errorMsg.toLowerCase().contains('permission')) {
-        print('Warning: No permission to access workflows. Returning empty list.');
-        return [];
-      }
-      _handleResultException(result);
-    }
-
-    final rawWorkflows = result.data?['workflows'];
-    print('[Workflow Debug] raw workflows type: ${rawWorkflows.runtimeType}');
-    print('[Workflow Debug] raw workflows: $rawWorkflows');
-
-    List? edges;
-    if (rawWorkflows is Map<String, dynamic>) {
-      final rawEdges = rawWorkflows['edges'];
-      if (rawEdges is List) {
-        edges = rawEdges;
-      }
-    } else if (rawWorkflows is List) {
-      edges = rawWorkflows;
-    }
-
-    if (edges == null) return [];
-    final workflows = <Workflow>[];
-
-    for (final edge in edges) {
-      try {
-        Map<String, dynamic>? node;
-        if (edge is Map<String, dynamic> && edge.containsKey('node')) {
-          node = edge['node'] as Map<String, dynamic>?;
-        } else if (edge is Map<String, dynamic>) {
-          node = edge;
-        }
-        if (node == null) { print('[Workflow Debug] Skipped: node is null'); continue; }
-
-        print('[Workflow Debug] Processing workflow: ${node['name']} (${node['id']})');
-
-        // Check if this workflow has an active version with a MANUAL trigger
-        final versionsRaw = node['versions'];
-        print('[Workflow Debug] versions type: ${versionsRaw.runtimeType}, value: $versionsRaw');
-        List? versions;
-        if (versionsRaw is Map<String, dynamic>) {
-          final edgesRaw = versionsRaw['edges'];
-          if (edgesRaw is List) {
-            versions = edgesRaw;
-          }
-        } else if (versionsRaw is List) {
-          versions = versionsRaw;
-        }
-        if (versions == null || versions.isEmpty) { print('[Workflow Debug] Skipped: no versions found'); continue; }
-
-        final firstVersion = versions.first;
-        print('[Workflow Debug] firstVersion type: ${firstVersion.runtimeType}');
-        final Map<String, dynamic>? versionNode;
-        if (firstVersion is Map<String, dynamic> && firstVersion.containsKey('node')) {
-          versionNode = firstVersion['node'] as Map<String, dynamic>?;
-        } else if (firstVersion is Map<String, dynamic>) {
-          versionNode = firstVersion;
-        } else {
-          print('[Workflow Debug] Skipped: firstVersion not a Map');
-          continue;
-        }
-        if (versionNode == null) { print('[Workflow Debug] Skipped: versionNode is null'); continue; }
-
-        // trigger can be a Map or a JSON string
-        dynamic triggerRaw = versionNode['trigger'];
-        print('[Workflow Debug] trigger type: ${triggerRaw.runtimeType}, value: $triggerRaw');
-        Map<String, dynamic>? trigger;
-        if (triggerRaw is Map<String, dynamic>) {
-          trigger = triggerRaw;
-        }
-        if (trigger == null) { print('[Workflow Debug] Skipped: trigger is not a Map'); continue; }
-
-        // Only include workflows with MANUAL trigger type
-        final triggerType = (trigger['type'] as String? ?? '').toUpperCase();
-        print('[Workflow Debug] triggerType: $triggerType');
-        if (triggerType != 'MANUAL') { print('[Workflow Debug] Skipped: triggerType is not MANUAL'); continue; }
-
-        // Check if the trigger's objectType matches the requested one
-        final settings = trigger['settings'] as Map<String, dynamic>?;
-        print('[Workflow Debug] settings: $settings');
-        var triggerObjectType = '';
-        if (settings != null) {
-          final availability = settings['availability'] as Map<String, dynamic>?;
-          triggerObjectType = settings['objectType'] as String? ?? '';
-          if (triggerObjectType.isEmpty && availability != null) {
-            triggerObjectType = availability['objectNameSingular'] as String? ?? '';
-          }
-        }
-
-        print('[Workflow Debug] triggerObjectType: "$triggerObjectType" vs requested: "$objectType"');
-
-        final normTrigger = triggerObjectType.toLowerCase();
-        final normRequested = objectType.toLowerCase();
-        bool isMatch = normTrigger == normRequested;
-        
-        // Treat 'person' and 'contact' as interchangeable
-        if ((normTrigger == 'person' || normTrigger == 'contact') &&
-            (normRequested == 'person' || normRequested == 'contact')) {
-          isMatch = true;
-        }
-
-        if (!isMatch) {
-          print('[Workflow Debug] Skipped: objectType mismatch ("$triggerObjectType" vs "$objectType")');
-          continue;
-        }
-
-
-        print('[Workflow Debug] ✅ Workflow passed all filters, adding: ${node['name']}');
-        workflows.add(Workflow.fromTwenty(node));
-      } catch (e, stack) {
-        print('[Workflow Debug] Error parsing workflow edge: $e');
-        print('[Workflow Debug] Edge data: $edge');
-        print('[Workflow Debug] Stack: $stack');
-        continue;
-      }
-    }
-
-    return workflows;
-  }
+  Future<List<Workflow>> getManualWorkflows({required String objectType}) =>
+      _workflows.getManualWorkflows(objectType: objectType);
 
   @override
   Future<({bool success, String? workflowRunId, String? error})>
@@ -1674,127 +263,13 @@ class TwentyConnector implements CRMRepository {
     required String workflowId,
     required String recordId,
     Map<String, dynamic>? payload,
-  }) async {
-    const String mutation = r'''
-      mutation RunWorkflowVersion($input: RunWorkflowVersionInput!) {
-        runWorkflowVersion(input: $input) {
-          workflowRunId
-        }
-      }
-    ''';
-
-    final input = <String, dynamic>{
-      'workflowVersionId': workflowId,
-      'payload': <String, dynamic>{
-        'recordId': recordId,
-        if (payload != null) ...payload,
-      },
-    };
-
-    print('[Workflow Debug] triggerWorkflow input: $input');
-
-    final MutationOptions options = MutationOptions(
-      document: parseString(mutation),
-      variables: {'input': input},
-    );
-
-    try {
-      final QueryResult result = await _mutateWithRefresh(options);
-
-      if (result.hasException) {
-        print('[Workflow Debug] Exception: ${result.exception}');
-        final errorMsg = result.exception?.graphqlErrors.isNotEmpty == true
-            ? result.exception!.graphqlErrors.first.message
-            : result.exception?.linkException?.toString() ??
-                'Unknown error occurred';
-        final userError = errorMsg.toLowerCase().contains('forbidden')
-            ? 'Forbidden: Workflow execution may require email/password login instead of API key.'
-            : errorMsg;
-        return (success: false, workflowRunId: null, error: userError);
-      }
-
-      print('[Workflow Debug] Result data: ${result.data}');
-      final data = result.data?['runWorkflowVersion'];
-      final runId = data?['workflowRunId'] as String?;
-
-      return (success: true, workflowRunId: runId, error: null);
-    } catch (e) {
-      return (
-        success: false,
-        workflowRunId: null,
-        error: e.toString().replaceAll('Exception: ', ''),
-      );
-    }
-  }
+  }) =>
+          _workflows.triggerWorkflow(
+            workflowId: workflowId,
+            recordId: recordId,
+            payload: payload,
+          );
 
   @override
-  Future<List<WorkflowRun>> getWorkflowRuns() async {
-    const String query = r'''
-      query GetWorkflowRuns {
-        workflowRuns(
-          orderBy: { createdAt: DescNullsLast }
-        ) {
-          edges {
-            node {
-              id
-              status
-              createdAt
-              workflowVersion {
-                id
-                workflow {
-                  id
-                  name
-                }
-              }
-            }
-          }
-        }
-      }
-    ''';
-
-    final QueryOptions options = QueryOptions(
-      document: parseString(query),
-      fetchPolicy: FetchPolicy.networkOnly,
-    );
-
-    try {
-      final QueryResult result = await _queryWithRefresh(options);
-      
-      if (result.hasException) {
-        print('Error fetching workflow runs: ${result.exception}');
-        return [];
-      }
-
-      final rawRuns = result.data?['workflowRuns'];
-      List? edges;
-      if (rawRuns is Map<String, dynamic>) {
-        edges = rawRuns['edges'] as List?;
-      } else if (rawRuns is List) {
-        edges = rawRuns;
-      }
-
-      if (edges == null) return [];
-
-      final runs = <WorkflowRun>[];
-      for (final edge in edges) {
-        try {
-          Map<String, dynamic>? node;
-          if (edge is Map<String, dynamic> && edge.containsKey('node')) {
-            node = edge['node'] as Map<String, dynamic>?;
-          } else if (edge is Map<String, dynamic>) {
-            node = edge;
-          }
-          if (node != null) {
-            runs.add(WorkflowRun.fromJson(node));
-          }
-        } catch (e) {
-          print('Error parsing workflow run: $e');
-        }
-      }
-      return runs;
-    } catch (e) {
-      print('Exception in getWorkflowRuns: $e');
-      return [];
-    }
-  }
+  Future<List<WorkflowRun>> getWorkflowRuns() => _workflows.getWorkflowRuns();
 }

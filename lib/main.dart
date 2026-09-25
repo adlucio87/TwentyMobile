@@ -15,6 +15,8 @@ import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:pocketcrm/core/config/app_config.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:pocketcrm/l10n/app_localizations.dart';
+import 'package:pocketcrm/core/localization/locale_provider.dart';
 
 Future<void> main() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
@@ -58,15 +60,21 @@ Future<void> main() async {
         await NotificationService().initialize();
 
         final appDocDir = await getApplicationSupportDirectory();
-        if (kDebugMode) print('Hive storage path: ${appDocDir.path}');
+        if (kDebugMode) debugPrint('Hive storage path: ${appDocDir.path}');
         Hive.init(appDocDir.path);
 
         final box = await Hive.openBox<String>('app_storage');
         if (kDebugMode) {
-          print('Hive box keys at startup: ${box.keys.toList()}');
+          debugPrint('Hive box keys at startup: ${box.keys.toList()}');
         }
 
-        await initializeDateFormatting('it_IT', null);
+        await Future.wait([
+          initializeDateFormatting('en', null),
+          initializeDateFormatting('it', null),
+          initializeDateFormatting('fr', null),
+          initializeDateFormatting('de', null),
+          initializeDateFormatting('hi', null),
+        ]);
 
         runApp(
           ProviderScope(
@@ -76,8 +84,8 @@ Future<void> main() async {
         );
       } catch (e, stack) {
         if (kDebugMode) {
-          print('Fatal error during initialization: $e');
-          print(stack);
+          debugPrint('Fatal error during initialization: $e');
+          debugPrint(stack.toString());
         }
         // In case of error, still try to run the app to show an error or the UI
         runApp(
@@ -142,6 +150,9 @@ class _PocketCRMAppState extends ConsumerState<PocketCRMApp> {
       theme: AppTheme.light(),
       darkTheme: AppTheme.dark(),
       themeMode: ref.watch(themeModeProvider),
+      locale: ref.watch(localeProvider),
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
       routerConfig: router,
       debugShowCheckedModeBanner: false,
     );

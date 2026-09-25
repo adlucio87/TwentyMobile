@@ -48,7 +48,8 @@ TwentyMobile is a native mobile application developed with **Flutter** that serv
     - *Relations:* Searchable lookup pickers for linked contacts and companies.
     - *Full Name, Emails, Phones, Links, Addresses:* Multi-field composite inputs that structure data precisely as expected by the Twenty CRM schema.
 - **UI/UX & Localization:**
-  - Configuration and onboarding interface entirely in **English**.
+  - Multi-language support with translations available in **English (US/UK), Italian, French, German, and Hindi**.
+  - Users can switch languages directly from the Settings menu.
   - Robust adaptive layouts for software keyboard handling (preventing unintended rebuilds and text selections).
   - Automatic cache invalidation on user change to ensure the integrity of displayed data.
 
@@ -90,15 +91,18 @@ PocketCRM supports running Twenty CRM manual workflows directly from the contact
 ## 🏛 Architecture and Project Structure
 
 The architecture follows **Domain-Driven Design (DDD)** principles combined with a **Feature-First** approach in the presentation layer. The app uses the **Connector Pattern** to abstract calls to the source CRM.
-An abstract `CRMRepository` interface is implemented by `TwentyConnector` (the GraphQL client for Twenty CRM). This allows for future expansions to other CRMs without modifying business logic or the UI.
+An abstract `CRMRepository` interface is implemented by `TwentyConnector` (acting as a Facade that delegates to specific domain repositories like `TwentyContactRepository`, `TwentyCompanyRepository`, etc.). This allows for future expansions to other CRMs without modifying business logic or the UI.
 
 The structure inside `lib/` is organized by feature:
 
 ```text
 lib/
-├── core/                           # Global dependency injection (Riverpod), Router, Theme, Utils, Notifications
-├── domain/                         # Core data models (Contact, Company, Note, Task, Workflow, DynamicRecord), Repository interfaces
-├── data/                           # GraphQL implementation (TwentyConnector, DynamicObjectConnector), local storage Hive/SecureStorage
+├── core/                           # Global DI (Riverpod), Router, Theme, StorageService, Auth, Localization
+├── domain/                         # Core data models (Contact, Company, Task...), Repository interfaces (`CRMRepository`)
+├── data/                           # Infrastructure and Implementation
+│   ├── connectors/                 # BaseGraphQLConnector, TwentyConnector (Facade), DynamicObjectConnector
+│   ├── repositories/               # Domain-specific repositories (Contact, Company, Task, Note, Workflow)
+│   └── graphql/                    # Centralized GraphQL queries (crm_queries.dart, auth_mutations.dart)
 ├── presentation/                   # UI Layer (Feature-First)
 │   ├── onboarding/                 # Initial setup and Demo access
 │   ├── home/                       # Dashboard 

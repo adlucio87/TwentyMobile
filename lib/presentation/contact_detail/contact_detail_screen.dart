@@ -235,7 +235,7 @@ class _ContactDetailScreenState extends ConsumerState<ContactDetailScreen> {
         children: [
           CircleAvatar(
             radius: 56,
-            backgroundColor: bgColor.withOpacity(0.2),
+            backgroundColor: bgColor.withValues(alpha: 0.2),
             backgroundImage:
                 contact.avatarUrl != null && contact.avatarUrl!.isNotEmpty
                 ? CachedNetworkImageProvider(contact.avatarUrl!)
@@ -266,7 +266,7 @@ class _ContactDetailScreenState extends ConsumerState<ContactDetailScreen> {
             Text(
               contact.companyName!,
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
               ),
             ),
           ],
@@ -279,7 +279,7 @@ class _ContactDetailScreenState extends ConsumerState<ContactDetailScreen> {
                   leading: Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: Colors.blue.withOpacity(0.1),
+                      color: Colors.blue.withValues(alpha: 0.1),
                       shape: BoxShape.circle,
                     ),
                     child: const Icon(
@@ -319,7 +319,7 @@ class _ContactDetailScreenState extends ConsumerState<ContactDetailScreen> {
                   leading: Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: Colors.green.withOpacity(0.1),
+                      color: Colors.green.withValues(alpha: 0.1),
                       shape: BoxShape.circle,
                     ),
                     child: const Icon(
@@ -383,7 +383,7 @@ class _ContactDetailScreenState extends ConsumerState<ContactDetailScreen> {
                       leading: Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.tertiary.withOpacity(0.1),
+                          color: Theme.of(context).colorScheme.tertiary.withValues(alpha: 0.1),
                           shape: BoxShape.circle,
                         ),
                         child: Icon(

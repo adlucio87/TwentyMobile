@@ -32,7 +32,7 @@ class CustomObjectsScreen extends ConsumerWidget {
                   ),
                   Switch(
                     value: isFiltered,
-                    onChanged: (val) => ref.read(customObjectsFilterProvider.notifier).state = val,
+                    onChanged: (val) => ref.read(customObjectsFilterProvider.notifier).setFilter(val),
                   ),
                 ],
               );

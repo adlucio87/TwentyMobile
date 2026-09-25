@@ -31,6 +31,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
   cupertino_icons: ^1.0.8
   graphql_flutter: ^5.1.0
   flutter_riverpod: ^2.5.0
@@ -38,9 +40,8 @@ dependencies:
   go_router: ^13.0.0
   flutter_secure_storage: ^9.0.0
   hive_flutter: ^1.1.0
-  dio: ^5.4.0
   cached_network_image: ^3.3.0
-  intl: ^0.19.0
+  intl: ^0.20.2
   flutter_local_notifications: ^17.0.0
   freezed_annotation: ^2.4.0
   json_annotation: ^4.8.0
@@ -82,10 +83,7 @@ dev_dependencies:
 
 # The following section is specific to Flutter packages.
 flutter:
-
-  # The following line ensures that the Material Icons font is
-  # included with your application, so that you can use the icons in
-  # the material Icons class.
+  generate: true
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:

@@ -15,12 +15,14 @@ import 'package:pocketcrm/presentation/contacts/contacts_screen.dart';
 import 'package:pocketcrm/presentation/tasks/tasks_screen.dart';
 import 'package:pocketcrm/presentation/shared/error_state_widget.dart';
 import 'package:pocketcrm/shared/widgets/constrained_content.dart';
+import 'package:pocketcrm/l10n/app_localizations.dart';
 
 class TodayScreen extends ConsumerWidget {
   const TodayScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final todayState = ref.watch(todayNotifierProvider);
 
     return Scaffold(
@@ -30,22 +32,22 @@ class TodayScreen extends ConsumerWidget {
         spacing: 3,
         childPadding: const EdgeInsets.all(5),
         spaceBetweenChildren: 4,
-        tooltip: 'Add',
+        tooltip: l10n?.add ?? 'Add',
         heroTag: 'speed-dial-hero-tag',
         elevation: 8.0,
         animationCurve: Curves.easeOutCubic,
         isOpenOnStart: false,
-        label: const Text('New'),
+        label: Text(l10n?.newAction ?? 'New'),
         children: [
           SpeedDialChild(
             child: const Icon(Icons.document_scanner),
             backgroundColor: Theme.of(context).colorScheme.tertiaryContainer,
             foregroundColor: Theme.of(context).colorScheme.onTertiaryContainer,
-            label: 'Scan business card',
+            label: l10n?.scanBusinessCard ?? 'Scan business card',
             onTap: () {
               if (!PlatformUtils.supportsScan) {
-                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                  content: Text('📱 Only available on iPhone and Android'),
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  content: Text(l10n?.onlyMobileScan ?? '📱 Only available on iPhone and Android'),
                 ));
                 return;
               }
@@ -57,7 +59,7 @@ class TodayScreen extends ConsumerWidget {
             child: const Icon(Icons.person_add),
             backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
             foregroundColor: Theme.of(context).colorScheme.onSecondaryContainer,
-            label: 'New contact',
+            label: l10n?.newContact ?? 'New contact',
             onTap: () => showModalBottomSheet(
               context: context,
               isScrollControlled: true,
@@ -71,7 +73,7 @@ class TodayScreen extends ConsumerWidget {
             child: const Icon(Icons.add_task),
             backgroundColor: Theme.of(context).colorScheme.primaryContainer,
             foregroundColor: Theme.of(context).colorScheme.onPrimaryContainer,
-            label: 'New quick task',
+            label: l10n?.newQuickTask ?? 'New quick task',
             onTap: () => showModalBottomSheet(
               context: context,
               isScrollControlled: true,
@@ -96,7 +98,7 @@ class TodayScreen extends ConsumerWidget {
                 IconButton(
                   icon: const Icon(Icons.settings),
                   onPressed: () => context.push('/settings'),
-                  tooltip: 'Settings',
+                  tooltip: l10n?.settings ?? 'Settings',
                 ),
               ],
               flexibleSpace: LayoutBuilder(
@@ -114,16 +116,17 @@ class TodayScreen extends ConsumerWidget {
 
                       final now = DateTime.now();
                       final hour = now.hour;
-                      String greeting = "Good morning 👋  ";
+                      String greeting = l10n?.greetingMorning ?? "Good morning 👋  ";
                       if (hour >= 12 && hour < 18) {
-                        greeting = "Good afternoon 👋  ";
+                        greeting = l10n?.greetingAfternoon ?? "Good afternoon 👋  ";
                       } else if (hour >= 18 && hour < 24) {
-                        greeting = "Good evening 👋  ";
+                        greeting = l10n?.greetingEvening ?? "Good evening 👋  ";
                       } else if (hour >= 0 && hour < 5) {
-                        greeting = "Still awake? 👋  ";
+                        greeting = l10n?.greetingNight ?? "Still awake? 👋  ";
                       }
 
-                      final dateFormat = DateFormat('EEEE, d MMMM y', 'en_US');
+                      final localeStr = Localizations.localeOf(context).toString();
+                      final dateFormat = DateFormat('EEEE, d MMMM y', localeStr);
                       final dateString = dateFormat.format(now);
                       final formattedDate = dateString.replaceFirst(dateString[0], dateString[0].toUpperCase());
 
@@ -155,7 +158,7 @@ class TodayScreen extends ConsumerWidget {
                                         Text(
                                           formattedDate,
                                           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                                           ),
                                         ),
                                         if (userName.isNotEmpty) ...[
@@ -163,7 +166,7 @@ class TodayScreen extends ConsumerWidget {
                                           Text(
                                             userName,
                                             style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.45),
+                                              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.45),
                                             ),
                                           ),
                                         ],
@@ -244,7 +247,7 @@ class TodayScreen extends ConsumerWidget {
                   delegate: SliverChildListDelegate([
                     if (hasOverdue) ...[
                       SectionHeader(
-                        title: "Overdue",
+                        title: l10n?.overdueTasks ?? "Overdue",
                         count: data.overdueTasks.length,
                         countColor: Theme.of(context).colorScheme.error,
                       ),
@@ -252,7 +255,7 @@ class TodayScreen extends ConsumerWidget {
                     ],
 
                     SectionHeader(
-                      title: "Today",
+                      title: l10n?.todayTasks ?? "Today",
                       count: data.todayTasks.length,
                     ),
                     if (hasToday)
@@ -260,11 +263,11 @@ class TodayScreen extends ConsumerWidget {
                     else
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                        child: Text("No tasks for today 🎉", style: Theme.of(context).textTheme.bodyMedium),
+                        child: Text(l10n?.noTasksToday ?? "No tasks for today 🎉", style: Theme.of(context).textTheme.bodyMedium),
                       ),
 
                     if (hasTomorrow) ...[
-                      const SectionHeader(title: "Tomorrow"),
+                      SectionHeader(title: l10n?.tomorrowTasks ?? "Tomorrow"),
                       ...data.tomorrowTasks.take(3).map((t) => Opacity(
                         opacity: 0.7,
                         child: TaskTodayCard(task: t),
@@ -277,7 +280,7 @@ class TodayScreen extends ConsumerWidget {
                     ],
 
                     if (hasRecent) ...[
-                      const SectionHeader(title: "Recent"),
+                      SectionHeader(title: l10n?.recentContacts ?? "Recent"),
                       RecentContactsRow(contacts: data.recentContacts),
                     ],
 

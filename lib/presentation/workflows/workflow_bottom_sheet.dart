@@ -179,7 +179,7 @@ class _WorkflowBottomSheetState extends ConsumerState<WorkflowBottomSheet> {
             ),
             Container(
               decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.05),
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
                 borderRadius: BorderRadius.circular(20),
               ),
               padding: const EdgeInsets.all(2),
@@ -197,7 +197,7 @@ class _WorkflowBottomSheetState extends ConsumerState<WorkflowBottomSheet> {
                         boxShadow: _currentTab == _SheetTab.workflows
                             ? [
                                 BoxShadow(
-                                  color: Colors.black.withOpacity(0.05),
+                                  color: Colors.black.withValues(alpha: 0.05),
                                   blurRadius: 4,
                                   offset: const Offset(0, 2),
                                 )
@@ -211,7 +211,7 @@ class _WorkflowBottomSheetState extends ConsumerState<WorkflowBottomSheet> {
                           fontWeight: FontWeight.w600,
                           color: _currentTab == _SheetTab.workflows
                               ? Theme.of(context).colorScheme.primary
-                              : Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                              : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                         ),
                       ),
                     ),
@@ -231,7 +231,7 @@ class _WorkflowBottomSheetState extends ConsumerState<WorkflowBottomSheet> {
                         boxShadow: _currentTab == _SheetTab.history
                             ? [
                                 BoxShadow(
-                                  color: Colors.black.withOpacity(0.05),
+                                  color: Colors.black.withValues(alpha: 0.05),
                                   blurRadius: 4,
                                   offset: const Offset(0, 2),
                                 )
@@ -245,7 +245,7 @@ class _WorkflowBottomSheetState extends ConsumerState<WorkflowBottomSheet> {
                           fontWeight: FontWeight.w600,
                           color: _currentTab == _SheetTab.history
                               ? Theme.of(context).colorScheme.primary
-                              : Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                              : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                         ),
                       ),
                     ),
@@ -309,8 +309,8 @@ class _WorkflowBottomSheetState extends ConsumerState<WorkflowBottomSheet> {
             height: 40,
             decoration: BoxDecoration(
               color: hasUnsupportedRequired
-                  ? Colors.amber.withOpacity(0.1)
-                  : primaryColor.withOpacity(0.1),
+                  ? Colors.amber.withValues(alpha: 0.1)
+                  : primaryColor.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
             child: Icon(
@@ -324,7 +324,7 @@ class _WorkflowBottomSheetState extends ConsumerState<WorkflowBottomSheet> {
             style: TextStyle(
               fontWeight: FontWeight.w600,
               color: hasUnsupportedRequired
-                  ? Theme.of(context).colorScheme.onSurface.withOpacity(0.6)
+                  ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6)
                   : null,
             ),
           ),
@@ -339,7 +339,7 @@ class _WorkflowBottomSheetState extends ConsumerState<WorkflowBottomSheet> {
                   : Theme.of(context)
                       .colorScheme
                       .onSurface
-                      .withOpacity(0.5),
+                      .withValues(alpha: 0.5),
             ),
           ),
           trailing: trailingIcon,
@@ -390,7 +390,7 @@ class _WorkflowBottomSheetState extends ConsumerState<WorkflowBottomSheet> {
             color: Theme.of(context)
                 .colorScheme
                 .onSurface
-                .withOpacity(0.25),
+                .withValues(alpha: 0.25),
           ),
           const SizedBox(height: 20),
           Text(
@@ -407,7 +407,7 @@ class _WorkflowBottomSheetState extends ConsumerState<WorkflowBottomSheet> {
                   color: Theme.of(context)
                       .colorScheme
                       .onSurface
-                      .withOpacity(0.5),
+                      .withValues(alpha: 0.5),
                 ),
             textAlign: TextAlign.center,
           ),
@@ -557,7 +557,7 @@ class _WorkflowBottomSheetState extends ConsumerState<WorkflowBottomSheet> {
                 color: Theme.of(context)
                     .colorScheme
                     .primary
-                    .withOpacity(0.06),
+                    .withValues(alpha: 0.06),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Row(
@@ -576,7 +576,7 @@ class _WorkflowBottomSheetState extends ConsumerState<WorkflowBottomSheet> {
                         color: Theme.of(context)
                             .colorScheme
                             .onSurface
-                            .withOpacity(0.7),
+                            .withValues(alpha: 0.7),
                       ),
                     ),
                   ),
@@ -591,7 +591,7 @@ class _WorkflowBottomSheetState extends ConsumerState<WorkflowBottomSheet> {
             padding: const EdgeInsets.all(10),
             margin: const EdgeInsets.only(bottom: 12),
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.error.withOpacity(0.1),
+              color: Theme.of(context).colorScheme.error.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Row(
@@ -709,7 +709,7 @@ class _WorkflowBottomSheetState extends ConsumerState<WorkflowBottomSheet> {
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
-                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
                   ),
                 ),
                 IconButton(
@@ -749,27 +749,27 @@ class _WorkflowBottomSheetState extends ConsumerState<WorkflowBottomSheet> {
 
     switch (run.status.toUpperCase()) {
       case 'COMPLETED':
-        statusBgColor = Colors.green.withOpacity(0.1);
+        statusBgColor = Colors.green.withValues(alpha: 0.1);
         statusTextColor = Colors.green;
         statusIcon = Icons.check_circle_outline;
         break;
       case 'RUNNING':
-        statusBgColor = Colors.blue.withOpacity(0.1);
+        statusBgColor = Colors.blue.withValues(alpha: 0.1);
         statusTextColor = Colors.blue;
         statusIcon = Icons.sync;
         break;
       case 'FAILED':
-        statusBgColor = Colors.red.withOpacity(0.1);
+        statusBgColor = Colors.red.withValues(alpha: 0.1);
         statusTextColor = Colors.red;
         statusIcon = Icons.error_outline;
         break;
       case 'STOPPED':
-        statusBgColor = Colors.orange.withOpacity(0.1);
+        statusBgColor = Colors.orange.withValues(alpha: 0.1);
         statusTextColor = Colors.orange;
         statusIcon = Icons.cancel_outlined;
         break;
       default:
-        statusBgColor = Colors.grey.withOpacity(0.1);
+        statusBgColor = Colors.grey.withValues(alpha: 0.1);
         statusTextColor = Colors.grey;
         statusIcon = Icons.help_outline;
     }
@@ -787,7 +787,7 @@ class _WorkflowBottomSheetState extends ConsumerState<WorkflowBottomSheet> {
               width: 36,
               height: 36,
               decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primary.withOpacity(0.08),
+                color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.08),
                 shape: BoxShape.circle,
               ),
               child: Icon(
@@ -813,7 +813,7 @@ class _WorkflowBottomSheetState extends ConsumerState<WorkflowBottomSheet> {
                     'ID: ${run.id.length > 8 ? run.id.substring(0, 8) : run.id}... • $timeStr',
                     style: TextStyle(
                       fontSize: 11,
-                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
                     ),
                   ),
                 ],
@@ -877,7 +877,7 @@ class _WorkflowBottomSheetState extends ConsumerState<WorkflowBottomSheet> {
             color: Theme.of(context)
                 .colorScheme
                 .onSurface
-                .withOpacity(0.25),
+                .withValues(alpha: 0.25),
           ),
           const SizedBox(height: 20),
           Text(
@@ -894,7 +894,7 @@ class _WorkflowBottomSheetState extends ConsumerState<WorkflowBottomSheet> {
                   color: Theme.of(context)
                       .colorScheme
                       .onSurface
-                      .withOpacity(0.5),
+                      .withValues(alpha: 0.5),
                 ),
             textAlign: TextAlign.center,
           ),

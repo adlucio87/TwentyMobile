@@ -63,12 +63,12 @@ class TaskCard extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
       decoration: BoxDecoration(
         color: isOverdue && !isCompleted
-            ? theme.colorScheme.error.withOpacity(0.08)
+            ? theme.colorScheme.error.withValues(alpha: 0.08)
             : theme.cardColor,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
           color: isOverdue && !isCompleted
-              ? theme.colorScheme.error.withOpacity(0.3)
+              ? theme.colorScheme.error.withValues(alpha: 0.3)
               : theme.dividerColor,
         ),
       ),
@@ -226,7 +226,7 @@ class TaskCard extends StatelessWidget {
               Icon(
                 Icons.notifications_active,
                 size: 13,
-                color: theme.colorScheme.onSurfaceVariant.withOpacity(0.5),
+                color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
               ),
             ],
           ],

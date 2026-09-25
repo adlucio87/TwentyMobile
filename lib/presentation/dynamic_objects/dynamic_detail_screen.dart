@@ -166,7 +166,7 @@ class DynamicDetailScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final recordAsync = ref.watch(
-      dynamicRecordDetailProvider((objectType: objectType, id: id)),
+      dynamicRecordDetailProvider(objectType: objectType, id: id),
     );
     final metadataAsync = ref.watch(workspaceMetadataProvider);
     final prefs = ref.watch(dynamicFieldPrefsProvider(objectType));
@@ -211,7 +211,7 @@ class DynamicDetailScreen extends ConsumerWidget {
             title: 'Loading error',
             message: err.toString(),
             onRetry: () => ref.invalidate(
-              dynamicRecordDetailProvider((objectType: objectType, id: id)),
+              dynamicRecordDetailProvider(objectType: objectType, id: id),
             ),
           ),
         ),

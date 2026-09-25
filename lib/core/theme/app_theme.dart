@@ -191,8 +191,8 @@ class AppTheme {
     titleMedium: GoogleFonts.inter(fontSize: 17, fontWeight: FontWeight.w600, color: primary),
     titleSmall: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w500, color: primary),
     bodyLarge: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w400, color: primary),
-    bodyMedium: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w400, color: secondary.withOpacity(0.6)),
-    bodySmall: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w400, color: secondary.withOpacity(0.45)),
+    bodyMedium: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w400, color: secondary.withValues(alpha: 0.6)),
+    bodySmall: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w400, color: secondary.withValues(alpha: 0.45)),
     labelLarge: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w500, color: primary),
     labelSmall: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w400, color: secondary),
   );

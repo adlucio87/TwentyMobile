@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pocketcrm/core/di/auth_state.dart';
@@ -46,16 +47,13 @@ class AppLifecycleHandler with WidgetsBindingObserver {
 
     _isRefreshing = true;
     try {
-      print('[AppLifecycleHandler] Token expired, attempting refresh...');
+      debugPrint('[AppLifecycleHandler] Token expired, attempting refresh...');
       final refreshed = await authService.refreshAccessToken();
 
       if (refreshed) {
-        print('[AppLifecycleHandler] Token refreshed successfully, reloading data...');
+        debugPrint('[AppLifecycleHandler] Token refreshed successfully, reloading data...');
         
-        // CRITICAL: AuthService writes new tokens directly to FlutterSecureStorage,
-        // but StorageService has its own in-memory cache with the OLD token.
-        // We MUST clear that cache before any provider reads the token.
-        final storage = _ref.read(storageServiceProvider);
+        // Force cache invalidation to be safe
         storage.invalidateCache(keys: [
           'api_token',
           'refresh_token',
@@ -70,7 +68,7 @@ class AppLifecycleHandler with WidgetsBindingObserver {
         _ref.invalidate(todayNotifierProvider);
         _ref.invalidate(workspaceMembersProvider);
       } else {
-        print('[AppLifecycleHandler] Token refresh failed, forcing re-authentication...');
+        debugPrint('[AppLifecycleHandler] Token refresh failed, forcing re-authentication...');
         // Check if 2FA is pending — the router will handle the redirect
         final pending2fa = await storage.read(key: 'pending_2fa_login_token');
         if (pending2fa != null) {
@@ -83,7 +81,7 @@ class AppLifecycleHandler with WidgetsBindingObserver {
         }
       }
     } catch (e) {
-      print('[AppLifecycleHandler] Error during token refresh: $e');
+      debugPrint('[AppLifecycleHandler] Error during token refresh: $e');
       // On unexpected errors, force re-authentication
       _ref.read(authStateProvider.notifier).logout();
     } finally {

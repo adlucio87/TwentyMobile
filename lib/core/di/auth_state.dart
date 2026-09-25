@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:pocketcrm/core/di/providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -7,11 +8,11 @@ part 'auth_state.g.dart';
 class AuthState extends _$AuthState {
   @override
   Future<bool> build() async {
-    print('AuthState: build started');
+    debugPrint('AuthState: build started');
     final storage = ref.read(storageServiceProvider);
     final token = await storage.read(key: 'api_token');
     final url = await storage.read(key: 'instance_url');
-    print('AuthState: read token -> ${token != null}, url -> ${url != null}');
+    debugPrint('AuthState: read token -> ${token != null}, url -> ${url != null}');
     return token != null && url != null;
   }
 

@@ -165,7 +165,7 @@ class _ContactsScreenState extends ConsumerState<ContactsScreen> {
                       ),
                       leading: CircleAvatar(
                         radius: 24,
-                        backgroundColor: bgColor.withOpacity(0.2),
+                        backgroundColor: bgColor.withValues(alpha: 0.2),
                         backgroundImage:
                             (contact.avatarUrl != null &&
                                 contact.avatarUrl!.isNotEmpty)
@@ -200,7 +200,7 @@ class _ContactsScreenState extends ConsumerState<ContactsScreen> {
                         size: 20,
                         color: Theme.of(
                           context,
-                        ).colorScheme.onSurface.withOpacity(0.3),
+                        ).colorScheme.onSurface.withValues(alpha: 0.3),
                       ),
                       onTap: () => context.push('/contacts/${contact.id}'),
                     ),
@@ -302,11 +302,11 @@ class AddContactSheetState extends ConsumerState<AddContactSheet> {
                                   fc.PermissionType.read,
                                 ) ==
                                 fc.PermissionStatus.granted) {
-                              final contactId = await fc.FlutterContacts.native
+                              final pickedContact = await fc.FlutterContacts.native
                                   .showPicker();
-                              if (contactId != null) {
+                              if (pickedContact != null && pickedContact.id != null) {
                                 final contact = await fc.FlutterContacts.get(
-                                  contactId,
+                                  pickedContact.id!,
                                   properties: {
                                     fc.ContactProperty.name,
                                     fc.ContactProperty.phone,
