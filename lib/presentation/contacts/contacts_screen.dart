@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'dart:io' show Platform;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pocketcrm/core/di/providers.dart';
@@ -324,6 +325,7 @@ class AddContactSheetState extends ConsumerState<AddContactSheet> {
                                       fc.ContactProperty.phone,
                                       fc.ContactProperty.email,
                                     },
+                                    androidLookup: Platform.isAndroid,
                                   ) ?? pickedContact;
                                 }
 
@@ -344,10 +346,11 @@ class AddContactSheetState extends ConsumerState<AddContactSheet> {
 
                                   final loadedContact = contact;
                                   if (loadedContact != null && loadedContact.phones.isNotEmpty) {
-                                    final phone = loadedContact.phones.firstWhere(
-                                      (p) => p.number.trim().isNotEmpty,
+                                    final phoneObj = loadedContact.phones.firstWhere(
+                                      (p) => p.number.trim().isNotEmpty || (p.normalizedNumber?.trim().isNotEmpty ?? false),
                                       orElse: () => loadedContact.phones.first,
-                                    ).number.trim();
+                                    );
+                                    final phone = phoneObj.number.trim().isNotEmpty ? phoneObj.number.trim() : (phoneObj.normalizedNumber?.trim() ?? '');
                                     _phoneController.text = phone;
                                   }
                                   if (loadedContact != null && loadedContact.emails.isNotEmpty) {
