@@ -153,7 +153,7 @@ class _ScanCardScreenState extends ConsumerState<ScanCardScreen> {
         AndroidUiSettings(
           toolbarTitle: 'Crop business card',
           toolbarColor: Colors.black,
-          statusBarColor: Colors.black,
+          statusBarLight: false,
           toolbarWidgetColor: Colors.white,
           initAspectRatio: CropAspectRatioPreset.ratio16x9,
           lockAspectRatio: true,

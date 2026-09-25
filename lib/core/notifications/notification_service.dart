@@ -67,7 +67,7 @@ class NotificationService {
 
     try {
       await _plugin.initialize(
-        initSettings,
+        settings: initSettings,
         onDidReceiveNotificationResponse: _onNotificationTapped,
         onDidReceiveBackgroundNotificationResponse: _onNotificationTappedBackground,
       );
@@ -132,154 +132,171 @@ class NotificationService {
 
   // Schedula notifica per un task
   Future<void> scheduleTaskReminder(Task task) async {
-    if (task.dueAt == null) return;
-    if (task.dueAt!.hour == 0 && task.dueAt!.minute == 0) return; // solo data, nessuna notifica
-    if (task.dueAt!.isBefore(DateTime.now())) return; // non schedula passati
-    if (task.completed == true) return;
+    try {
+      if (task.dueAt == null) return;
+      if (task.dueAt!.hour == 0 && task.dueAt!.minute == 0) return; // solo data, nessuna notifica
+      if (task.dueAt!.isBefore(DateTime.now())) return; // non schedula passati
+      if (task.completed == true) return;
 
-    final prefs = await SharedPreferences.getInstance();
-    final notificationsEnabled = prefs.getBool('notifications_enabled') ?? true;
-    if (!notificationsEnabled) return;
+      final prefs = await SharedPreferences.getInstance();
+      final notificationsEnabled = prefs.getBool('notifications_enabled') ?? true;
+      if (!notificationsEnabled) return;
 
-    final advanceMinutes = prefs.getInt('reminder_advance_minutes') ?? 30;
+      final advanceMinutes = prefs.getInt('reminder_advance_minutes') ?? 30;
 
-    // Notifica anticipata
-    final reminderTime = task.dueAt!.subtract(Duration(minutes: advanceMinutes));
-    if (reminderTime.isAfter(DateTime.now())) {
-      final tzReminderTime = tz.TZDateTime.from(reminderTime, tz.local);
+      // Notifica anticipata
+      final reminderTime = task.dueAt!.subtract(Duration(minutes: advanceMinutes));
+      if (reminderTime.isAfter(DateTime.now())) {
+        final tzReminderTime = tz.TZDateTime.from(reminderTime, tz.local);
 
+        await _plugin.zonedSchedule(
+          id: _taskToNotificationId(task.id),
+          title: '⏰ Task expiring in $advanceMinutes min',
+          body: task.title,
+          scheduledDate: tzReminderTime,
+          notificationDetails: NotificationDetails(
+            android: AndroidNotificationDetails(
+              _taskChannelId,
+              _taskChannelName,
+              importance: Importance.high,
+              priority: Priority.high,
+              styleInformation: BigTextStyleInformation(
+                task.title,
+              ),
+            ),
+            iOS: const DarwinNotificationDetails(
+              presentAlert: true,
+              presentBadge: true,
+              presentSound: true,
+            ),
+            macOS: const DarwinNotificationDetails(
+              presentAlert: true,
+              presentBadge: true,
+              presentSound: true,
+            ),
+          ),
+          androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+          payload: task.id, // usato per navigare al task al tap
+        );
+      }
+
+      // Schedula anche notifica esatta all'ora del task
       await _plugin.zonedSchedule(
-        _taskToNotificationId(task.id),
-        '⏰ Task expiring in $advanceMinutes min',
-        task.title,
-        tzReminderTime,
-        NotificationDetails(
+        id: _taskToNotificationId(task.id) + 1,
+        title: '🔔 Task overdue now',
+        body: task.title,
+        scheduledDate: tz.TZDateTime.from(task.dueAt!, tz.local),
+        notificationDetails: const NotificationDetails(
           android: AndroidNotificationDetails(
             _taskChannelId,
             _taskChannelName,
-            importance: Importance.high,
-            priority: Priority.high,
-            styleInformation: BigTextStyleInformation(
-              task.title,
-            ),
+            importance: Importance.max,
+            priority: Priority.max,
           ),
-          iOS: const DarwinNotificationDetails(
+          iOS: DarwinNotificationDetails(
             presentAlert: true,
             presentBadge: true,
             presentSound: true,
           ),
-          macOS: const DarwinNotificationDetails(
-            presentAlert: true,
-            presentBadge: true,
-            presentSound: true,
-          ),
+          macOS: DarwinNotificationDetails(),
         ),
         androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-        payload: task.id, // usato per navigare al task al tap
-        uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
+        payload: task.id,
       );
+    } catch (e) {
+      if (kDebugMode) debugPrint('Notification scheduleTaskReminder failed: $e');
     }
-
-    // Schedula anche notifica esatta all'ora del task
-    await _plugin.zonedSchedule(
-      _taskToNotificationId(task.id) + 1,
-      '🔔 Task overdue now',
-      task.title,
-      tz.TZDateTime.from(task.dueAt!, tz.local),
-      NotificationDetails(
-        android: AndroidNotificationDetails(
-          _taskChannelId,
-          _taskChannelName,
-          importance: Importance.max,
-          priority: Priority.max,
-        ),
-        iOS: const DarwinNotificationDetails(
-          presentAlert: true,
-          presentBadge: true,
-          presentSound: true,
-        ),
-        macOS: const DarwinNotificationDetails(),
-      ),
-      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-      payload: task.id,
-      uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
-    );
   }
 
   // Cancella notifica per un task (quando completato o eliminato)
   Future<void> cancelTaskReminder(String taskId) async {
-    await _plugin.cancel(_taskToNotificationId(taskId));
-    await _plugin.cancel(_taskToNotificationId(taskId) + 1);
+    try {
+      await _plugin.cancel(id: _taskToNotificationId(taskId));
+      await _plugin.cancel(id: _taskToNotificationId(taskId) + 1);
+    } catch (e) {
+      if (kDebugMode) debugPrint('Notification cancelTaskReminder failed: $e');
+    }
   }
 
   // Cancella tutte le notifiche
   Future<void> cancelAll() async {
-    await _plugin.cancelAll();
+    try {
+      await _plugin.cancelAll();
+    } catch (e) {
+      if (kDebugMode) debugPrint('Notification cancelAll failed: $e');
+    }
   }
 
   // Sincronizza tutte le notifiche con i task attuali
   Future<void> syncTaskNotifications(List<Task> tasks) async {
-    // Cancella tutte le notifiche esistenti
-    await _plugin.cancelAll();
+    try {
+      // Cancella tutte le notifiche esistenti
+      await cancelAll();
 
-    final prefs = await SharedPreferences.getInstance();
+      final prefs = await SharedPreferences.getInstance();
 
-    // Reschedula solo i task futuri non completati
-    for (final task in tasks) {
-      if (task.dueAt != null &&
-          task.dueAt!.isAfter(DateTime.now()) &&
-          task.completed != true) {
+      // Reschedula solo i task futuri non completati
+      for (final task in tasks) {
+        if (task.dueAt != null &&
+            task.dueAt!.isAfter(DateTime.now()) &&
+            task.completed != true) {
 
-        // Verifica se la notifica è attiva localmente per questo task (di base sì)
-        final isNotifEnabled = prefs.getBool('task_notif_${task.id}') ?? true;
-        if (isNotifEnabled) {
-          await scheduleTaskReminder(task);
+          // Verifica se la notifica è attiva localmente per questo task (di base sì)
+          final isNotifEnabled = prefs.getBool('task_notif_${task.id}') ?? true;
+          if (isNotifEnabled) {
+            await scheduleTaskReminder(task);
+          }
         }
       }
+    } catch (e) {
+      if (kDebugMode) debugPrint('Notification syncTaskNotifications failed: $e');
     }
   }
 
   // Notifica overdue giornaliera (alle 9:00 se ci sono task scaduti)
   Future<void> scheduleOvernightSummary(int overdueCount) async {
-    if (overdueCount == 0) {
-      await _plugin.cancel(999999); // cancella se non ci sono scaduti
-      return;
-    }
+    try {
+      if (overdueCount == 0) {
+        await _plugin.cancel(id: 999999); // cancella se non ci sono scaduti
+        return;
+      }
 
-    final prefs = await SharedPreferences.getInstance();
-    final notificationsEnabled = prefs.getBool('notifications_enabled') ?? true;
-    if (!notificationsEnabled) return;
+      final prefs = await SharedPreferences.getInstance();
+      final notificationsEnabled = prefs.getBool('notifications_enabled') ?? true;
+      if (!notificationsEnabled) return;
 
-    final now = DateTime.now();
-    var scheduledTime = DateTime(now.year, now.month, now.day, 9, 0);
-    if (scheduledTime.isBefore(now)) {
-      scheduledTime = scheduledTime.add(const Duration(days: 1));
-    }
+      final now = DateTime.now();
+      var scheduledTime = DateTime(now.year, now.month, now.day, 9, 0);
+      if (scheduledTime.isBefore(now)) {
+        scheduledTime = scheduledTime.add(const Duration(days: 1));
+      }
 
-    await _plugin.zonedSchedule(
-      999999,
-      '📋 $overdueCount overdue task${overdueCount == 1 ? '' : 's'}',
-      'You have tasks that require your attention',
-      tz.TZDateTime.from(scheduledTime, tz.local),
-      NotificationDetails(
-        android: AndroidNotificationDetails(
-          _overdueChannelId,
-          _overdueChannelName,
-          importance: Importance.high,
-          priority: Priority.high,
+      await _plugin.zonedSchedule(
+        id: 999999,
+        title: '📋 $overdueCount overdue task${overdueCount == 1 ? '' : 's'}',
+        body: 'You have tasks that require your attention',
+        scheduledDate: tz.TZDateTime.from(scheduledTime, tz.local),
+        notificationDetails: const NotificationDetails(
+          android: AndroidNotificationDetails(
+            _overdueChannelId,
+            _overdueChannelName,
+            importance: Importance.high,
+            priority: Priority.high,
+          ),
+          iOS: DarwinNotificationDetails(
+            presentAlert: true,
+            presentBadge: true,
+            presentSound: true,
+          ),
+          macOS: DarwinNotificationDetails(),
         ),
-        iOS: const DarwinNotificationDetails(
-          presentAlert: true,
-          presentBadge: true,
-          presentSound: true,
-        ),
-        macOS: const DarwinNotificationDetails(),
-      ),
-      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-      matchDateTimeComponents: DateTimeComponents.time, // ripeti ogni giorno
-      payload: 'overdue',
-      uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
-    );
+        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+        matchDateTimeComponents: DateTimeComponents.time, // ripeti ogni giorno
+        payload: 'overdue',
+      );
+    } catch (e) {
+      if (kDebugMode) debugPrint('Notification scheduleOvernightSummary failed: $e');
+    }
   }
 
   // Converti task ID stringa in int per notifica

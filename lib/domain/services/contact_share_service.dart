@@ -41,10 +41,12 @@ class ContactShareService {
         name: '$filename.vcf',
       );
 
-      await Share.shareXFiles(
-        [xFile],
-        text: 'Share contact',
-        sharePositionOrigin: sharePositionOrigin,
+      await SharePlus.instance.share(
+        ShareParams(
+          files: [xFile],
+          text: 'Share contact',
+          sharePositionOrigin: sharePositionOrigin,
+        ),
       );
     } catch (e) {
       rethrow;

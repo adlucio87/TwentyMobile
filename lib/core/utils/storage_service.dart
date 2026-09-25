@@ -9,9 +9,9 @@ class StorageService {
 
   static const _sensitiveKeys = {'api_token', 'instance_url'};
 
-  // Android options consigliate per evitare problemi comuni
+  // Android options con migrazione automatica da legacy cipher e reset on error
   static const _androidOptions = AndroidOptions(
-    encryptedSharedPreferences: true,
+    resetOnError: true,
   );
 
   StorageService(this._secureStorage, this._box);

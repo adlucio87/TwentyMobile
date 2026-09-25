@@ -17,6 +17,11 @@ subprojects {
 }
 subprojects {
     project.evaluationDependsOn(":app")
+    project.configurations.configureEach {
+        if (name == "compileOnly") {
+            project.dependencies.add(name, "androidx.concurrent:concurrent-futures:1.1.0")
+        }
+    }
 }
 
 tasks.register<Delete>("clean") {
