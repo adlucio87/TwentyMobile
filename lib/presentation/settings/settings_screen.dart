@@ -11,6 +11,7 @@ import 'package:go_router/go_router.dart';
 import 'package:pocketcrm/shared/widgets/constrained_content.dart';
 import 'package:pocketcrm/l10n/app_localizations.dart';
 import 'package:pocketcrm/core/localization/locale_provider.dart';
+import 'package:pocketcrm/core/config/app_config.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
@@ -25,6 +26,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   bool _iosContactsSupported = false;
   bool _iosContactsEnabled = false;
   bool _isSyncingIos = false;
+  bool _errorReportingEnabled = true;
 
   @override
   void initState() {
@@ -42,6 +44,16 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       _iosContactsSupported = iosSupported;
       _iosContactsEnabled =
           prefs.getBool(iosContactsProviderEnabledPrefKey) ?? false;
+      _errorReportingEnabled =
+          prefs.getBool(AppConfig.errorReportingPrefKey) ?? true;
+    });
+  }
+
+  Future<void> _saveErrorReportingEnabled(bool value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(AppConfig.errorReportingPrefKey, value);
+    setState(() {
+      _errorReportingEnabled = value;
     });
   }
 
@@ -372,6 +384,27 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   : null,
             ),
           ),
+          if (AppConfig.errorReportingBuildEnabled) ...[
+            const SizedBox(height: 32),
+            const Text(
+              'Privacy',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 16),
+            ListTile(
+              title: const Text('Send crash reports'),
+              subtitle: const Text(
+                'Sends crash and error reports to the developer (GlitchTip). Takes effect after restarting the app.',
+              ),
+              trailing: Switch(
+                value: _errorReportingEnabled,
+                onChanged: _saveErrorReportingEnabled,
+              ),
+            ),
+          ],
           if (_iosContactsSupported) ...[
             const SizedBox(height: 32),
             Text(
