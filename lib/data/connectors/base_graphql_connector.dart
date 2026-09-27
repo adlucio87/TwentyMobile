@@ -177,12 +177,20 @@ class BaseGraphQLConnector {
     final exception = result.exception!;
     final linkException = exception.linkException;
 
-    // Log exception to Sentry (fire and forget)
+    // Log to Sentry (fire and forget). Only error codes and the link error
+    // type are sent: server messages can echo field values of CRM records
+    // (e.g. duplicate or validation errors), and those must not leave the
+    // user's own server.
     try {
+      final codes = exception.graphqlErrors
+          .map((e) => e.extensions?['code']?.toString() ?? 'UNKNOWN')
+          .toSet()
+          .join(',');
       Sentry.captureException(
-        exception,
+        GraphQLFailure(
+          'graphql=[$codes] link=${linkException?.runtimeType ?? 'none'}',
+        ),
         stackTrace: StackTrace.current,
-        hint: Hint.withMap({'operation': result.context.toString()}),
       );
     } catch (_) {}
 
@@ -317,4 +325,13 @@ class BaseGraphQLConnector {
 
     return true;
   }
+}
+
+/// Content-free stand-in for an [OperationException] in error reports.
+class GraphQLFailure implements Exception {
+  final String summary;
+  GraphQLFailure(this.summary);
+
+  @override
+  String toString() => 'GraphQLFailure($summary)';
 }
