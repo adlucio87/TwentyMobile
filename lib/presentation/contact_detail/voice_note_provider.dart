@@ -87,8 +87,14 @@ class VoiceNoteNotifier extends _$VoiceNoteNotifier {
             );
           }
         },
-        listenMode: ListenMode.dictation,
-        pauseFor: const Duration(seconds: 120),
+        // onDevice: audio never leaves the phone. Without it iOS sends the
+        // recording to Apple's dictation servers. Devices or languages without
+        // on-device support report an error instead of falling back.
+        listenOptions: SpeechListenOptions(
+          listenMode: ListenMode.dictation,
+          onDevice: true,
+          pauseFor: const Duration(seconds: 120),
+        ),
       );
     } catch (e) {
       state = state.copyWith(
