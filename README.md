@@ -131,8 +131,8 @@ lib/
 
 To start the project locally:
 
-1. Ensure you have the Flutter SDK installed.
-2. Pull the packages:
+1. Ensure you have the Flutter SDK (3.10+) installed.
+2. Pull dependencies:
    ```bash
    flutter pub get
    ```
@@ -140,15 +140,48 @@ To start the project locally:
    ```bash
    dart run build_runner build --delete-conflicting-outputs
    ```
-4. Launch the app on a simulator (having thoroughly tested the layout widgets):
+4. Run unit and widget tests:
+   ```bash
+   flutter test
+   ```
+5. Launch the app on a simulator or physical device:
    ```bash
    flutter run
    ```
 
-5. Build the app bundle for Android App Store release:
+## 🏗 Building for Release (Production)
+
+Store builds correspond to official Git tags (e.g. `v1.0.15`). The version and build number are defined in `pubspec.yaml` (`version: X.Y.Z+BUILD`).
+
+### 🤖 Android (Google Play Store)
+Ensure release signing credentials are configured in `android/key.properties`, then generate the signed Android App Bundle:
+```bash
+flutter build appbundle --release
+```
+The output file is generated at:
+`build/app/outputs/bundle/release/app-release.aab`
+
+### 🍎 iOS (App Store / TestFlight)
+1. Verify CocoaPods and native dependencies are up to date:
    ```bash
-   flutter build appbundle --release
+   cd ios && pod install && cd ..
    ```
+   *(Note: The minimum iOS deployment target is iOS 15.5).*
+2. Build the signed iOS App Store archive and `.ipa` package:
+   ```bash
+   flutter build ipa --release
+   ```
+The output IPA is placed at:
+`build/ios/ipa/TwentyMobile.ipa`
+
+You can distribute the `.ipa` using **Apple Transporter** or via the CLI:
+```bash
+xcrun altool --upload-app --type ios -f build/ios/ipa/TwentyMobile.ipa --apiKey <KEY_ID> --apiIssuer <ISSUER_ID>
+```
+
+## 🗺 Roadmap
+For upcoming features, privacy controls, UI enhancements, and future plans, check out the [ROADMAP.md](ROADMAP.md).
 
 ## 📄 License
 TwentyMobile is an open-source project distributed under the **AGPL-3.0** license.
+
