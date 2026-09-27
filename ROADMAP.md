@@ -34,6 +34,12 @@ Based on our runtime network audit and community feedback for self-hosted instan
 - [ ] **Voice Note Recording Visualizer Fix**:
   - Resolve an issue in the recording bottom sheet (`VoiceNoteSheet`) where the animated microphone/waveform indicator renders improperly (appearing as a narrow vertical line on certain iOS/Android viewports).
   - Add a modern audio waveform or circular pulsing indicator with proper width constraints.
+- [ ] **App Icon Harmonization & Android Adaptive Icon**:
+  - **Unify Icon Branding**: Align the iOS and Android application icons (currently split between `assets/images/logo.png` and `assets/images/logo_ios.png`) to ensure a single, consistent visual identity across both platforms and stores.
+  - **Modern Android Adaptive Icon (Material You / Android 13+)**:
+    - Configure proper `adaptive_icon_background` and `adaptive_icon_foreground` in `flutter_launcher_icons`.
+    - Enlarge and properly scale the foreground emblem with safe zone margins so the icon doesn't look clipped, squashed, or too small inside adaptive shapes (circle, squircle, pebble).
+    - Match the background treatment and premium aesthetics of the iOS app icon.
 - [ ] **Dynamic Objects Enhancements**:
   - Expand dynamic field support for complex nested relations and multi-select enum arrays.
   - Field reordering and visibility presets syncable across devices or stored per workspace.
