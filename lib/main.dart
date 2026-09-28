@@ -89,8 +89,17 @@ Future<void> main() async {
       options.dsn = AppConfig.glitchtipDsn;
       options.tracesSampleRate = 1.0;
       options.debug = false;
+      // Native UI breadcrumbs (view controllers, keyboard, screenshots) say
+      // nothing about app errors but describe what the user did.
+      options.enableAutoNativeBreadcrumbs = false;
+      // Console breadcrumbs carry the app's own log lines, which include
+      // server error messages and can therefore contain CRM field values.
+      options.beforeBreadcrumb = (breadcrumb, hint) =>
+          breadcrumb?.category == 'console' ? null : breadcrumb;
       // Filter out non-fatal network errors that spam GlitchTip
       options.beforeSend = (event, hint) {
+        // The SDK fills user.id with the installation ID; not needed to fix crashes.
+        event.user = null;
         final exceptions = event.exceptions;
         if (exceptions != null && exceptions.isNotEmpty) {
           final errorValue = exceptions.first.value ?? '';
