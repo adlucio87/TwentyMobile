@@ -182,6 +182,9 @@ xcrun altool --upload-app --type ios -f build/ios/ipa/TwentyMobile.ipa --apiKey 
 ## 🗺 Roadmap
 For upcoming features, privacy controls, UI enhancements, and future plans, check out the [ROADMAP.md](ROADMAP.md).
 
+## 🛡️ Security & Privacy Audit
+TwentyMobile is designed with data sovereignty for self-hosted CRM instances. For a detailed breakdown of all runtime network endpoints, proxy verification, and hardening options, see [doc/SECURITY_AUDIT.md](doc/SECURITY_AUDIT.md).
+
 ## 📄 License
 TwentyMobile is an open-source project distributed under the **AGPL-3.0** license.
 
