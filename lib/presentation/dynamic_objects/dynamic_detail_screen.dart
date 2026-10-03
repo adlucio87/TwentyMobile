@@ -13,6 +13,7 @@ import 'package:pocketcrm/shared/widgets/constrained_content.dart';
 import 'package:pocketcrm/domain/models/dynamic_field_prefs.dart';
 import 'package:pocketcrm/core/di/dynamic_preferences_provider.dart';
 import 'package:pocketcrm/presentation/dynamic_objects/dynamic_form_screen.dart';
+import 'package:pocketcrm/presentation/shared/edit_fields_sheet.dart';
 
 /// Generic detail screen for any dynamic object record
 class DynamicDetailScreen extends ConsumerWidget {
@@ -197,7 +198,11 @@ class DynamicDetailScreen extends ConsumerWidget {
             icon: const Icon(Icons.tune),
             onPressed: () {
               if (objectMetadata != null) {
-                _showEditFieldsSheet(context, ref, objectMetadata);
+                showEditFieldsSheet(
+                  context,
+                  objectType: objectMetadata.nameSingular,
+                  metadata: objectMetadata,
+                );
               }
             },
           ),
@@ -471,117 +476,6 @@ class _FieldTile extends StatelessWidget {
         const SizedBox(width: 8),
         Text(value),
       ],
-    );
-  }
-}
-
-void _showEditFieldsSheet(BuildContext context, WidgetRef ref, ObjectMetadata metadata) {
-  showModalBottomSheet(
-    context: context,
-    isScrollControlled: true,
-    builder: (context) {
-      return _EditFieldsSheet(
-        objectType: metadata.nameSingular,
-        metadata: metadata,
-      );
-    },
-  );
-}
-
-class _EditFieldsSheet extends ConsumerStatefulWidget {
-  final String objectType;
-  final ObjectMetadata metadata;
-
-  const _EditFieldsSheet({required this.objectType, required this.metadata});
-
-  @override
-  ConsumerState<_EditFieldsSheet> createState() => _EditFieldsSheetState();
-}
-
-class _EditFieldsSheetState extends ConsumerState<_EditFieldsSheet> {
-  late List<String> _currentOrder;
-
-  @override
-  void initState() {
-    super.initState();
-    final prefs = ref.read(dynamicFieldPrefsProvider(widget.objectType));
-    
-    // Build initial order: ordered fields first, then unordered fields alphabetically
-    const hiddenInternalFields = {'id', 'name', 'createdAt', 'updatedAt', 'deletedAt', '__typename'};
-    final allFields = widget.metadata.fields
-        .where((f) => f.isActive && !hiddenInternalFields.contains(f.name) && !f.name.toLowerCase().contains('search') && !f.name.toLowerCase().contains('position'))
-        .map((f) => f.name)
-        .toList();
-        
-    final ordered = prefs.orderedFields.where((f) => allFields.contains(f)).toList();
-    final unordered = allFields.where((f) => !ordered.contains(f)).toList()..sort();
-    
-    _currentOrder = [...ordered, ...unordered];
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final prefs = ref.watch(dynamicFieldPrefsProvider(widget.objectType));
-
-    return DraggableScrollableSheet(
-      initialChildSize: 0.8,
-      minChildSize: 0.5,
-      maxChildSize: 0.95,
-      expand: false,
-      builder: (context, scrollController) {
-        return Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Row(
-                children: [
-                  const Text('Edit Fields', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                  const Spacer(),
-                  IconButton(
-                    icon: const Icon(Icons.close),
-                    onPressed: () => Navigator.pop(context),
-                  ),
-                ],
-              ),
-            ),
-            const Divider(height: 1),
-            Expanded(
-              child: ReorderableListView.builder(
-                scrollController: scrollController,
-                itemCount: _currentOrder.length,
-                onReorder: (oldIndex, newIndex) {
-                  setState(() {
-                    if (oldIndex < newIndex) newIndex -= 1;
-                    final item = _currentOrder.removeAt(oldIndex);
-                    _currentOrder.insert(newIndex, item);
-                  });
-                  ref.read(dynamicFieldPrefsProvider(widget.objectType).notifier).updateOrder(_currentOrder);
-                },
-                itemBuilder: (context, index) {
-                  final fieldName = _currentOrder[index];
-                  final field = widget.metadata.fields.firstWhere((f) => f.name == fieldName);
-                  final isHidden = prefs.hiddenFields.contains(fieldName);
-                  
-                  return ListTile(
-                    key: ValueKey(fieldName),
-                    leading: const Icon(Icons.drag_handle, color: Colors.grey),
-                    title: Text(field.label ?? field.name, style: TextStyle(color: isHidden ? Colors.grey : null)),
-                    trailing: IconButton(
-                      icon: Icon(
-                        isHidden ? Icons.visibility_off : Icons.visibility,
-                        color: isHidden ? Colors.grey : Theme.of(context).colorScheme.primary,
-                      ),
-                      onPressed: () {
-                        ref.read(dynamicFieldPrefsProvider(widget.objectType).notifier).toggleVisibility(fieldName);
-                      },
-                    ),
-                  );
-                },
-              ),
-            ),
-          ],
-        );
-      },
     );
   }
 }

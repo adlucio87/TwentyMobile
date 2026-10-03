@@ -269,7 +269,23 @@ class AppLocalizationsDe extends AppLocalizations {
   String get personalAccount => 'Persönliches Konto';
 
   @override
-  String get apiKeyAdmin => 'API-Schlüssel-Admin';
+  String get apiKeyAdmin => 'API-Schlüssel';
+
+  @override
+  String get customFields => 'Eigene Felder';
+
+  @override
+  String get editFields => 'Felder anpassen';
+
+  @override
+  String get iAm => 'Ich bin';
+
+  @override
+  String get iAmNotSet => 'Nicht gewählt — tippen zum Auswählen';
+
+  @override
+  String get iAmHint =>
+      'Hinter einem API-Schlüssel steht kein Benutzer. Wähle, wer du bist, damit Begrüßung und „meine Aufgaben“ stimmen.';
 
   @override
   String get changeLoginMethod => 'Anmeldemethode ändern';

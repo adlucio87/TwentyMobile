@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:gql/language.dart' show printNode;
 import 'package:mockito/mockito.dart';
 import 'package:mockito/annotations.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
@@ -143,6 +144,28 @@ void main() {
 
       // Only the tasks query should be made, no 'Me' query.
       verify(mockClient.query(any)).called(1);
+    });
+
+    test('auth_method == api_key uses the member picked under "I am" and never runs the Me query', () async {
+      when(mockStorageService.read(key: 'auth_method')).thenAnswer((_) async => 'api_key');
+      when(mockStorageService.read(key: 'api_key_member_id')).thenAnswer((_) async => 'member-picked');
+
+      final docs = <String>[];
+      when(mockClient.query(any)).thenAnswer((invocation) async {
+        final options = invocation.positionalArguments[0] as QueryOptions;
+        docs.add(printNode(options.document));
+        return QueryResult(
+          source: QueryResultSource.network,
+          options: options,
+          data: {'tasks': {'edges': []}},
+        );
+      });
+
+      await connector.getOverdueTasks();
+
+      expect(docs, hasLength(1));
+      expect(docs.single, contains('member-picked'));
+      expect(docs.single, isNot(contains('workspaceMembers')));
     });
 
     test('first call with auth_method == email executes Me query and caches result', () async {

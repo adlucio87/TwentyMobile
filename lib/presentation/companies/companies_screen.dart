@@ -28,13 +28,29 @@ class CompaniesScreen extends ConsumerStatefulWidget {
 class _CompaniesScreenState extends ConsumerState<CompaniesScreen> {
   bool _isSearching = false;
   final TextEditingController _searchController = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
   Timer? _debounce;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_onScroll);
+  }
 
   @override
   void dispose() {
     _searchController.dispose();
     _debounce?.cancel();
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
     super.dispose();
+  }
+
+  void _onScroll() {
+    final pos = _scrollController.position;
+    if (pos.pixels >= pos.maxScrollExtent - 200) {
+      ref.read(companiesProvider.notifier).loadMore();
+    }
   }
 
   void _onSearchChanged(String query) {
@@ -105,13 +121,26 @@ class _CompaniesScreenState extends ConsumerState<CompaniesScreen> {
               ),
             );
           }
+          final notifier = ref.read(companiesProvider.notifier);
           return RefreshIndicator(
             onRefresh: () async => ref.refresh(companiesProvider.future),
             child: ListView.separated(
+              controller: _scrollController,
+              physics: const AlwaysScrollableScrollPhysics(),
               padding: const EdgeInsets.symmetric(vertical: 8),
-              itemCount: companies.length,
+              itemCount: companies.length + 1, // +1 for footer
               separatorBuilder: (context, index) => const SizedBox(height: 8),
               itemBuilder: (context, index) {
+                // Footer: spinner while more pages exist (same as the contacts list)
+                if (index == companies.length) {
+                  if (notifier.hasNextPage) {
+                    return const Padding(
+                      padding: EdgeInsets.all(16),
+                      child: Center(child: CircularProgressIndicator()),
+                    );
+                  }
+                  return const SizedBox.shrink();
+                }
                 final company = companies[index];
                 final bgColor = ColorUtils.avatarColor(company.name);
                 return SwipeActionWrapper(

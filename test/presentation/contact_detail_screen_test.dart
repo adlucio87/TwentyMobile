@@ -11,6 +11,7 @@ import 'package:pocketcrm/presentation/shared/skeleton_loading.dart';
 import 'package:pocketcrm/presentation/shared/error_state_widget.dart';
 
 import '../core/di/providers_test.mocks.dart';
+import '../data/connectors/twenty_connector_test.mocks.dart';
 
 void main() {
   group('ContactDetailScreen Tests', () {
@@ -24,6 +25,8 @@ void main() {
       return ProviderScope(
         overrides: [
           crmRepositoryProvider.overrideWith((ref) => Future.value(mockCRMRepository)),
+          // The custom-field section reads the stored field choice (see edit_fields_sheet.dart).
+          storageServiceProvider.overrideWithValue(MockStorageService()),
         ],
         child: MaterialApp(
           localizationsDelegates: const [

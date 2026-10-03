@@ -268,7 +268,23 @@ class AppLocalizationsHi extends AppLocalizations {
   String get personalAccount => 'व्यक्तिगत खाता';
 
   @override
-  String get apiKeyAdmin => 'API कुंजी व्यवस्थापक';
+  String get apiKeyAdmin => 'API कुंजी';
+
+  @override
+  String get customFields => 'कस्टम फ़ील्ड';
+
+  @override
+  String get editFields => 'फ़ील्ड संपादित करें';
+
+  @override
+  String get iAm => 'मैं हूँ';
+
+  @override
+  String get iAmNotSet => 'चुना नहीं गया — चुनने के लिए टैप करें';
+
+  @override
+  String get iAmHint =>
+      'API कुंजी के पीछे कोई उपयोगकर्ता नहीं होता। चुनें कि आप कौन हैं, ताकि अभिवादन और “मेरे कार्य” आपके हों।';
 
   @override
   String get changeLoginMethod => 'लॉगिन विधि बदलें';

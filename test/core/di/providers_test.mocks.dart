@@ -262,18 +262,44 @@ class MockCRMRepository extends _i1.Mock implements _i6.CRMRepository {
           as _i7.Future<void>);
 
   @override
-  _i7.Future<List<_i3.Company>> getCompanies({String? search, int? page = 1}) =>
+  _i7.Future<
+    ({List<_i3.Company> companies, String? endCursor, bool hasNextPage})
+  >
+  getCompanies({String? search, int? pageSize = 20, String? after}) =>
       (super.noSuchMethod(
             Invocation.method(#getCompanies, [], {
               #search: search,
-              #page: page,
+              #pageSize: pageSize,
+              #after: after,
             }),
-            returnValue: _i7.Future<List<_i3.Company>>.value(<_i3.Company>[]),
-            returnValueForMissingStub: _i7.Future<List<_i3.Company>>.value(
-              <_i3.Company>[],
-            ),
+            returnValue:
+                _i7.Future<
+                  ({
+                    List<_i3.Company> companies,
+                    String? endCursor,
+                    bool hasNextPage,
+                  })
+                >.value((
+                  companies: <_i3.Company>[],
+                  endCursor: null,
+                  hasNextPage: false,
+                )),
+            returnValueForMissingStub:
+                _i7.Future<
+                  ({
+                    List<_i3.Company> companies,
+                    String? endCursor,
+                    bool hasNextPage,
+                  })
+                >.value((
+                  companies: <_i3.Company>[],
+                  endCursor: null,
+                  hasNextPage: false,
+                )),
           )
-          as _i7.Future<List<_i3.Company>>);
+          as _i7.Future<
+            ({List<_i3.Company> companies, String? endCursor, bool hasNextPage})
+          >);
 
   @override
   _i7.Future<_i3.Company> getCompanyById(String? id) =>

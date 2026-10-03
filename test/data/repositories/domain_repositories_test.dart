@@ -81,10 +81,43 @@ void main() {
             },
           ));
 
-      final companies = await companyRepo.getCompanies();
-      expect(companies.length, 1);
-      expect(companies.first.name, 'Twenty Corp');
-      expect(companies.first.domainName, 'twenty.com');
+      final result = await companyRepo.getCompanies();
+      expect(result.companies.length, 1);
+      expect(result.companies.first.name, 'Twenty Corp');
+      expect(result.companies.first.domainName, 'twenty.com');
+    });
+
+    test('TwentyCompanyRepository pages with a cursor and searches case-insensitively', () async {
+      final companyRepo = TwentyCompanyRepository(baseConnector);
+
+      when(mockAuthService.isTokenExpired()).thenAnswer((_) async => false);
+      when(mockClient.query(any)).thenAnswer((_) async => QueryResult(
+            source: QueryResultSource.network,
+            options: QueryOptions(document: gql('')),
+            data: {
+              'companies': {
+                'edges': [
+                  {
+                    'node': {'id': 'company-21', 'name': 'Acme'},
+                  }
+                ],
+                'pageInfo': {'hasNextPage': true, 'endCursor': 'cur_21'},
+              }
+            },
+          ));
+
+      final result = await companyRepo.getCompanies(search: 'acme', after: 'cur_20');
+
+      expect(result.companies.single.id, 'company-21');
+      expect(result.hasNextPage, isTrue);
+      expect(result.endCursor, 'cur_21');
+
+      final options = verify(mockClient.query(captureAny)).captured.single as QueryOptions;
+      expect(options.variables['first'], 20);
+      expect(options.variables['after'], 'cur_20');
+      final or = (options.variables['filter'] as Map)['or'] as List;
+      expect(or[0], {'name': {'ilike': '%acme%'}});
+      expect(or[1], {'domainName': {'primaryLinkUrl': {'ilike': '%acme%'}}});
     });
 
     test('TwentyTaskRepository can be instantiated and used independently', () async {
