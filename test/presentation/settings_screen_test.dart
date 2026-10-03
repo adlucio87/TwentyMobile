@@ -56,14 +56,27 @@ void main() {
       expect(find.text('Change login method'), findsOneWidget);
     });
 
-    testWidgets('Renders API Key Admin badge when auth method is api_key', (WidgetTester tester) async {
+    testWidgets('Renders API Key badge and an unset "I am" row when auth method is api_key', (WidgetTester tester) async {
       await tester.pumpWidget(createWidgetUnderTest(
         authMethod: 'api_key',
         userName: '',
       ));
       await tester.pumpAndSettle();
 
-      expect(find.text('API Key Admin'), findsOneWidget);
+      expect(find.text('API Key'), findsOneWidget);
+      expect(find.byKey(const Key('settings_i_am_tile')), findsOneWidget);
+      expect(find.text('Not set — tap to choose'), findsOneWidget);
+    });
+
+    testWidgets('Shows the picked member in the "I am" row for api_key auth', (WidgetTester tester) async {
+      await tester.pumpWidget(createWidgetUnderTest(
+        authMethod: 'api_key',
+        userName: 'Mario Rossi',
+      ));
+      await tester.pumpAndSettle();
+
+      expect(find.text('I am'), findsOneWidget);
+      expect(find.text('Mario Rossi'), findsOneWidget);
     });
 
     testWidgets('Renders Theme section and Logout option', (WidgetTester tester) async {

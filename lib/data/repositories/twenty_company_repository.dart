@@ -111,7 +111,8 @@ class TwentyCompanyRepository {
     _base.handleResultException(result);
   }
 
-  Future<List<Company>> getCompanies({String? search, int page = 1}) async {
+  Future<({List<Company> companies, String? endCursor, bool hasNextPage})>
+  getCompanies({String? search, int pageSize = 20, String? after}) async {
     final String query = getCompaniesQuery(_base.customFields['company']?.join('\n              ') ?? '');
 
     Map<String, dynamic>? filter;
@@ -119,11 +120,11 @@ class TwentyCompanyRepository {
       filter = {
         'or': [
           {
-            'name': {'like': '%$search%'},
+            'name': {'ilike': '%$search%'},
           },
           {
             'domainName': {
-              'primaryLinkUrl': {'like': '%$search%'},
+              'primaryLinkUrl': {'ilike': '%$search%'},
             },
           },
         ],
@@ -132,19 +133,30 @@ class TwentyCompanyRepository {
 
     final QueryOptions options = QueryOptions(
       document: parseString(query),
-      variables: {'first': 20, if (filter != null) 'filter': filter},
+      variables: {
+        'first': pageSize,
+        if (filter != null) 'filter': filter,
+        if (after != null) 'after': after,
+      },
       fetchPolicy: FetchPolicy.networkOnly,
     );
 
     final QueryResult result = await _base.queryWithRefresh(options);
     _base.handleResultException(result);
 
-    final edges = result.data?['companies']?['edges'] as List?;
-    if (edges == null) return [];
+    final data = result.data?['companies'];
+    final edges = data?['edges'] as List? ?? [];
+    final pageInfo = data?['pageInfo'] as Map<String, dynamic>? ?? {};
 
-    return edges
+    final companies = edges
         .map((e) => Company.fromTwenty(e['node'] as Map<String, dynamic>))
         .toList();
+
+    return (
+      companies: companies,
+      endCursor: pageInfo['endCursor'] as String?,
+      hasNextPage: pageInfo['hasNextPage'] as bool? ?? false,
+    );
   }
 
   Future<Company> getCompanyById(String id) async {

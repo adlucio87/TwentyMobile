@@ -1,3 +1,4 @@
+import 'package:pocketcrm/data/connectors/base_graphql_connector.dart';
 import 'package:pocketcrm/core/utils/storage_service.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:pocketcrm/core/auth/two_factor_exception.dart';
@@ -344,6 +345,9 @@ class AuthService {
     await _storage.delete(key: 'auth_password');
     await _storage.delete(key: 'user_first_name');
     await _storage.delete(key: 'user_last_name');
+    // The member an API-key user picked under Settings → "I am" belongs to this login only.
+    await _storage.delete(key: BaseGraphQLConnector.apiKeyMemberIdKey);
+    await _storage.delete(key: BaseGraphQLConnector.apiKeyMemberNameKey);
     await _storage.delete(key: 'is_demo_mode');
     await _storage.delete(key: 'pending_2fa_login_token');
 

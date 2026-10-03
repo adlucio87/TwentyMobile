@@ -4,6 +4,7 @@ import 'package:pocketcrm/core/di/metadata_provider.dart';
 
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:pocketcrm/core/utils/storage_service.dart';
+import 'package:pocketcrm/data/connectors/base_graphql_connector.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:pocketcrm/core/network/custom_http_client.dart';
 import 'package:pocketcrm/data/connectors/twenty_connector.dart';
@@ -594,24 +595,66 @@ Future<String> currentUserName(CurrentUserNameRef ref) async {
     return '$firstName $lastName'.trim();
   }
 
-  final repo = await ref.watch(crmRepositoryProvider.future);
-  return repo.getCurrentUserName();
+  // API key: there is no user behind the key. Show the member picked under Settings → "I am",
+  // never the first member of the workspace (that was someone else's name).
+  return await storage.read(key: BaseGraphQLConnector.apiKeyMemberNameKey) ?? '';
 }
 
 @Riverpod(keepAlive: true)
 class Companies extends _$Companies {
+  String? _endCursor;
+  bool _hasNextPage = false;
+  bool _isLoadingMore = false;
+  String? _currentSearch;
+
   @override
   FutureOr<List<Company>> build() async {
+    _endCursor = null;
+    _hasNextPage = false;
+    _currentSearch = null;
     final repo = await ref.watch(crmRepositoryProvider.future);
-    return repo.getCompanies();
+    final result = await repo.getCompanies();
+    _endCursor = result.endCursor;
+    _hasNextPage = result.hasNextPage;
+    return result.companies;
   }
 
   Future<void> search(String query) async {
+    _endCursor = null;
+    _hasNextPage = false;
+    _currentSearch = query.isEmpty ? null : query;
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
-      final repo = await ref.watch(crmRepositoryProvider.future);
-      return repo.getCompanies(search: query);
+      final repo = await ref.read(crmRepositoryProvider.future);
+      final result = await repo.getCompanies(search: _currentSearch);
+      _endCursor = result.endCursor;
+      _hasNextPage = result.hasNextPage;
+      return result.companies;
     });
+  }
+
+  bool get hasNextPage => _hasNextPage;
+  bool get isLoadingMore => _isLoadingMore;
+
+  /// Loads the next page (cursor-based, same as [Contacts.loadMore]).
+  Future<void> loadMore() async {
+    if (_isLoadingMore || !_hasNextPage || _endCursor == null) return;
+    final current = state.value;
+    if (current == null) return;
+
+    _isLoadingMore = true;
+    try {
+      final repo = await ref.read(crmRepositoryProvider.future);
+      final result = await repo.getCompanies(
+        search: _currentSearch,
+        after: _endCursor,
+      );
+      _endCursor = result.endCursor;
+      _hasNextPage = result.hasNextPage;
+      state = AsyncValue.data([...current, ...result.companies]);
+    } finally {
+      _isLoadingMore = false;
+    }
   }
 
   Future<Company> addCompany({required String name, String? domainName}) async {

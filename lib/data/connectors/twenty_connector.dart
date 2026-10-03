@@ -140,8 +140,9 @@ class TwentyConnector implements CRMRepository {
 
   // ── Companies ──
   @override
-  Future<List<Company>> getCompanies({String? search, int page = 1}) =>
-      _companies.getCompanies(search: search, page: page);
+  Future<({List<Company> companies, String? endCursor, bool hasNextPage})>
+      getCompanies({String? search, int pageSize = 20, String? after}) =>
+          _companies.getCompanies(search: search, pageSize: pageSize, after: after);
 
   @override
   Future<Company> getCompanyById(String id) => _companies.getCompanyById(id);

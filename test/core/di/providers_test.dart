@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:mockito/annotations.dart';
 import 'package:pocketcrm/core/di/providers.dart';
+import 'package:pocketcrm/domain/models/company.dart';
 import 'package:pocketcrm/domain/models/contact.dart';
 import 'package:pocketcrm/domain/repositories/crm_repository.dart';
 
@@ -109,6 +110,46 @@ void main() {
 
       // State should remain unchanged
       expect(container.read(contactsProvider).value, initialContacts);
+    });
+  });
+
+  group('Companies Provider paging', () {
+    late MockCRMRepository mockCRMRepository;
+    late ProviderContainer container;
+
+    setUp(() {
+      mockCRMRepository = MockCRMRepository();
+      container = ProviderContainer(
+        overrides: [
+          crmRepositoryProvider.overrideWith((ref) => mockCRMRepository),
+          isDemoModeProvider.overrideWith((ref) => Future.value(false)),
+        ],
+      );
+    });
+
+    tearDown(() {
+      container.dispose();
+    });
+
+    test('loadMore appends the next page using the end cursor', () async {
+      final firstPage = List.generate(20, (i) => Company(id: 'c$i', name: 'Company $i'));
+      when(mockCRMRepository.getCompanies())
+          .thenAnswer((_) async => (companies: firstPage, endCursor: 'cur_20', hasNextPage: true));
+      when(mockCRMRepository.getCompanies(search: null, after: 'cur_20')).thenAnswer(
+          (_) async => (companies: [Company(id: 'c20', name: 'Company 20')], endCursor: 'cur_21', hasNextPage: false));
+
+      final first = await container.read(companiesProvider.future);
+      expect(first.length, 20);
+      expect(container.read(companiesProvider.notifier).hasNextPage, isTrue);
+
+      await container.read(companiesProvider.notifier).loadMore();
+
+      expect(container.read(companiesProvider).value!.length, 21);
+      expect(container.read(companiesProvider.notifier).hasNextPage, isFalse);
+
+      // No further request once the last page is reached.
+      await container.read(companiesProvider.notifier).loadMore();
+      verify(mockCRMRepository.getCompanies(search: null, after: 'cur_20')).called(1);
     });
   });
 }

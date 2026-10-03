@@ -1,4 +1,7 @@
 import 'package:pocketcrm/shared/widgets/custom_field_edit_dialog.dart';
+import 'package:pocketcrm/presentation/shared/edit_fields_sheet.dart';
+import 'package:pocketcrm/core/di/dynamic_preferences_provider.dart';
+import 'package:pocketcrm/domain/models/metadata/object_metadata.dart';
 import 'package:pocketcrm/domain/models/metadata/field_metadata.dart';
 import 'package:pocketcrm/core/di/metadata_provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -142,8 +145,9 @@ class _CompanyDetailScreenState extends ConsumerState<CompanyDetailScreen> {
     final l10n = AppLocalizations.of(context);
     final metadataAsync = ref.watch(workspaceMetadataProvider);
     List<FieldMetadata> companyFields = [];
+    ObjectMetadata? companyMetadata;
     if (metadataAsync.hasValue) {
-      final companyMetadata = metadataAsync.value!.where((e) => e.nameSingular.toLowerCase() == 'company').firstOrNull;
+      companyMetadata = metadataAsync.value!.where((e) => e.nameSingular.toLowerCase() == 'company').firstOrNull;
       if (companyMetadata != null) {
         const standardCompanyFields = {
           'id', 'name', 'domainName', 'createdAt', 'updatedAt', 'deletedAt', 'createdBy', 
@@ -160,6 +164,9 @@ class _CompanyDetailScreenState extends ConsumerState<CompanyDetailScreen> {
             .toList();
       }
     }
+    // The person can hide and reorder these fields (stored on the device, like for custom objects).
+    final companyFieldNames = companyFields.map((f) => f.name).toList();
+    companyFields = applyFieldPrefs(companyFields, ref.watch(dynamicFieldPrefsProvider('company')));
 
     return ConstrainedContent(
       child: SingleChildScrollView(
@@ -230,8 +237,23 @@ class _CompanyDetailScreenState extends ConsumerState<CompanyDetailScreen> {
                       style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
                     ),
                   ),
-                if (companyFields.isNotEmpty) ...[
+                if (companyFieldNames.isNotEmpty) ...[
                   const Divider(height: 1),
+                  ListTile(
+                    key: const Key('company_edit_fields'),
+                    dense: true,
+                    title: Text(l10n?.customFields ?? 'Custom fields'),
+                    trailing: IconButton(
+                      icon: const Icon(Icons.tune),
+                      tooltip: l10n?.editFields ?? 'Edit fields',
+                      onPressed: () => showEditFieldsSheet(
+                        context,
+                        objectType: 'company',
+                        metadata: companyMetadata!,
+                        candidateFieldNames: companyFieldNames,
+                      ),
+                    ),
+                  ),
                   ...companyFields.map((field) {
                     final value = company.customFields[field.name];
                     return ListTile(

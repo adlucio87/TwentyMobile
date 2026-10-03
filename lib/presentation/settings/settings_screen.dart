@@ -5,6 +5,9 @@ import 'package:pocketcrm/core/theme/theme_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:pocketcrm/core/notifications/notification_service.dart';
 import 'package:pocketcrm/core/di/providers.dart';
+import 'package:pocketcrm/data/connectors/base_graphql_connector.dart';
+import 'package:pocketcrm/domain/models/workspace_member.dart';
+import 'package:pocketcrm/presentation/home/today_provider.dart';
 import 'package:pocketcrm/domain/services/ios_contacts_provider_service.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:go_router/go_router.dart';
@@ -216,6 +219,24 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                           ),
                         ],
                       ),
+                      if (!isEmail) ...[
+                        const SizedBox(height: 8),
+                        // An API key has no user behind it: let the person say who they are, so the
+                        // greeting and "my tasks" are theirs and not the first workspace member's.
+                        ListTile(
+                          key: const Key('settings_i_am_tile'),
+                          contentPadding: EdgeInsets.zero,
+                          leading: const Icon(Icons.person_outline),
+                          title: Text(l10n?.iAm ?? 'I am'),
+                          subtitle: Text(
+                            (userNameAsync.valueOrNull ?? '').isNotEmpty
+                                ? userNameAsync.valueOrNull!
+                                : (l10n?.iAmNotSet ?? 'Not set — tap to choose'),
+                          ),
+                          trailing: const Icon(Icons.chevron_right),
+                          onTap: () => _chooseApiKeyMember(context, ref),
+                        ),
+                      ],
                       if (isEmail) ...[
                         const SizedBox(height: 16),
                         userNameAsync.when(
@@ -474,3 +495,43 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     );
   }
 }
+
+/// Lets an API-key user pick which workspace member they are (stored on the device only).
+Future<void> _chooseApiKeyMember(BuildContext context, WidgetRef ref) async {
+  final l10n = AppLocalizations.of(context);
+  final members = await ref.read(workspaceMembersProvider.future);
+  if (!context.mounted) return;
+  final picked = await showModalBottomSheet<WorkspaceMember>(
+    context: context,
+    showDragHandle: true,
+    builder: (context) => SafeArea(
+      child: ListView(
+        shrinkWrap: true,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+            child: Text(l10n?.iAmHint ??
+                'An API key has no user behind it. Choose who you are so the greeting and “my tasks” are yours.'),
+          ),
+          for (final m in members)
+            ListTile(
+              leading: const Icon(Icons.person),
+              title: Text('${m.firstName} ${m.lastName}'.trim()),
+              onTap: () => Navigator.of(context).pop(m),
+            ),
+        ],
+      ),
+    ),
+  );
+  if (picked == null) return;
+  final storage = ref.read(storageServiceProvider);
+  await storage.write(key: BaseGraphQLConnector.apiKeyMemberIdKey, value: picked.id);
+  await storage.write(
+    key: BaseGraphQLConnector.apiKeyMemberNameKey,
+    value: '${picked.firstName} ${picked.lastName}'.trim(),
+  );
+  ref.invalidate(currentUserNameProvider);
+  ref.invalidate(tasksProvider);
+  ref.invalidate(todayNotifierProvider);
+}
+

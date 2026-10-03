@@ -269,7 +269,23 @@ class AppLocalizationsIt extends AppLocalizations {
   String get personalAccount => 'Account Personale';
 
   @override
-  String get apiKeyAdmin => 'Amministratore API Key';
+  String get apiKeyAdmin => 'Chiave API';
+
+  @override
+  String get customFields => 'Campi personalizzati';
+
+  @override
+  String get editFields => 'Modifica campi';
+
+  @override
+  String get iAm => 'Io sono';
+
+  @override
+  String get iAmNotSet => 'Non impostato — tocca per scegliere';
+
+  @override
+  String get iAmHint =>
+      'Una chiave API non ha un utente. Scegli chi sei, così il saluto e «le mie attività» sono tuoi.';
 
   @override
   String get changeLoginMethod => 'Cambia metodo di accesso';

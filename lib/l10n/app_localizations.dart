@@ -624,8 +624,38 @@ abstract class AppLocalizations {
   /// No description provided for @apiKeyAdmin.
   ///
   /// In en, this message translates to:
-  /// **'API Key Admin'**
+  /// **'API Key'**
   String get apiKeyAdmin;
+
+  /// No description provided for @customFields.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom fields'**
+  String get customFields;
+
+  /// No description provided for @editFields.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit fields'**
+  String get editFields;
+
+  /// No description provided for @iAm.
+  ///
+  /// In en, this message translates to:
+  /// **'I am'**
+  String get iAm;
+
+  /// No description provided for @iAmNotSet.
+  ///
+  /// In en, this message translates to:
+  /// **'Not set — tap to choose'**
+  String get iAmNotSet;
+
+  /// No description provided for @iAmHint.
+  ///
+  /// In en, this message translates to:
+  /// **'An API key has no user behind it. Choose who you are so the greeting and “my tasks” are yours.'**
+  String get iAmHint;
 
   /// No description provided for @changeLoginMethod.
   ///

@@ -26,13 +26,24 @@ class BaseGraphQLConnector {
     this.customFields = const {},
   });
 
-  /// Returns the current workspace member's ID, caching it for the session.
-  /// Returns null for API key auth (show all tasks) — only filters for email auth.
-  Future<String?> getCurrentMemberId() async {
-    if (_currentMemberId != null) return _currentMemberId;
+  /// Storage key of the workspace member an API-key user picked under Settings → "I am".
+  static const apiKeyMemberIdKey = 'api_key_member_id';
 
+  /// Storage key of that member's display name.
+  static const apiKeyMemberNameKey = 'api_key_member_name';
+
+  /// Returns the current workspace member's ID, caching it for the session.
+  ///
+  /// An API key has no user behind it. For API key auth this returns the member the person picked
+  /// under Settings → "I am" (read on every call, so a change applies at once), or null if none was
+  /// picked — then all tasks are shown, as before.
+  Future<String?> getCurrentMemberId() async {
     final authMethod = await storageService.read(key: 'auth_method') ?? 'api_key';
-    if (authMethod != 'email') return null;
+    if (authMethod != 'email') {
+      return storageService.read(key: apiKeyMemberIdKey);
+    }
+
+    if (_currentMemberId != null) return _currentMemberId;
 
     const String query = r'''
       query Me {
