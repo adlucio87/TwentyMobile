@@ -41,6 +41,8 @@ void main() {
       verify(mockStorage.delete(key: 'auth_password')).called(1);
       verify(mockStorage.delete(key: 'user_first_name')).called(1);
       verify(mockStorage.delete(key: 'user_last_name')).called(1);
+      verify(mockStorage.delete(key: 'api_key_member_id')).called(1);
+      verify(mockStorage.delete(key: 'api_key_member_name')).called(1);
       verify(mockStorage.delete(key: 'is_demo_mode')).called(1);
       verify(mockStorage.delete(key: 'pending_2fa_login_token')).called(1);
       

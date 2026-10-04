@@ -268,7 +268,23 @@ class AppLocalizationsEn extends AppLocalizations {
   String get personalAccount => 'Personal Account';
 
   @override
-  String get apiKeyAdmin => 'API Key Admin';
+  String get apiKeyAdmin => 'API Key';
+
+  @override
+  String get customFields => 'Custom fields';
+
+  @override
+  String get editFields => 'Edit fields';
+
+  @override
+  String get iAm => 'I am';
+
+  @override
+  String get iAmNotSet => 'Not set — tap to choose';
+
+  @override
+  String get iAmHint =>
+      'An API key has no user behind it. Choose who you are so the greeting and “my tasks” are yours.';
 
   @override
   String get changeLoginMethod => 'Change login method';
@@ -860,7 +876,23 @@ class AppLocalizationsEnGb extends AppLocalizationsEn {
   String get personalAccount => 'Personal Account';
 
   @override
-  String get apiKeyAdmin => 'API Key Admin';
+  String get apiKeyAdmin => 'API Key';
+
+  @override
+  String get customFields => 'Custom fields';
+
+  @override
+  String get editFields => 'Edit fields';
+
+  @override
+  String get iAm => 'I am';
+
+  @override
+  String get iAmNotSet => 'Not set — tap to choose';
+
+  @override
+  String get iAmHint =>
+      'An API key has no user behind it. Choose who you are so the greeting and “my tasks” are yours.';
 
   @override
   String get changeLoginMethod => 'Change login method';

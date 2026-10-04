@@ -1,4 +1,7 @@
 import 'package:pocketcrm/shared/widgets/custom_field_edit_dialog.dart';
+import 'package:pocketcrm/presentation/shared/edit_fields_sheet.dart';
+import 'package:pocketcrm/core/di/dynamic_preferences_provider.dart';
+import 'package:pocketcrm/domain/models/metadata/object_metadata.dart';
 import 'package:pocketcrm/domain/models/metadata/field_metadata.dart';
 import 'package:pocketcrm/core/di/metadata_provider.dart';
 import 'dart:io' show Platform;
@@ -215,8 +218,9 @@ class _ContactDetailScreenState extends ConsumerState<ContactDetailScreen> {
     final bgColor = ColorUtils.avatarColor(contact.firstName);
     final metadataAsync = ref.watch(workspaceMetadataProvider);
     List<FieldMetadata> personFields = [];
+    ObjectMetadata? personMetadata;
     if (metadataAsync.hasValue) {
-      final personMetadata = metadataAsync.value!.where((e) => e.nameSingular.toLowerCase() == 'person').firstOrNull;
+      personMetadata = metadataAsync.value!.where((e) => e.nameSingular.toLowerCase() == 'person').firstOrNull;
       final totalFields = metadataAsync.value?.where((e) => e.nameSingular.toLowerCase() == 'person').firstOrNull?.fields.length ?? 0;
       final sessoField = metadataAsync.value?.where((e) => e.nameSingular.toLowerCase() == 'person').firstOrNull?.fields.where((f) => f.name.toLowerCase().contains('sess')).firstOrNull;
       if (personMetadata != null) {
@@ -234,6 +238,9 @@ class _ContactDetailScreenState extends ConsumerState<ContactDetailScreen> {
             .toList();
       }
     }
+    // The person can hide and reorder these fields (stored on the device, like for custom objects).
+    final personFieldNames = personFields.map((f) => f.name).toList();
+    personFields = applyFieldPrefs(personFields, ref.watch(dynamicFieldPrefsProvider('person')));
 
     return ConstrainedContent(
       child: SingleChildScrollView(
@@ -383,8 +390,23 @@ class _ContactDetailScreenState extends ConsumerState<ContactDetailScreen> {
                       style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
                     ),
                   ),
-                if (personFields.isNotEmpty) ...[
+                if (personFieldNames.isNotEmpty) ...[
                   const Divider(height: 1),
+                  ListTile(
+                    key: const Key('person_edit_fields'),
+                    dense: true,
+                    title: Text(l10n?.customFields ?? 'Custom fields'),
+                    trailing: IconButton(
+                      icon: const Icon(Icons.tune),
+                      tooltip: l10n?.editFields ?? 'Edit fields',
+                      onPressed: () => showEditFieldsSheet(
+                        context,
+                        objectType: 'person',
+                        metadata: personMetadata!,
+                        candidateFieldNames: personFieldNames,
+                      ),
+                    ),
+                  ),
                   ...personFields.map((field) {
                     final value = contact.customFields[field.name];
                     return ListTile(

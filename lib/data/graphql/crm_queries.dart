@@ -193,8 +193,8 @@ const String deleteCompanyMutation = r'''
     ''';
 
 String getCompaniesQuery(String customFields) => '''
-      query GetCompanies(\$filter: CompanyFilterInput, \$first: Int) {
-        companies(filter: \$filter, first: \$first, orderBy: { createdAt: DescNullsLast }) {
+      query GetCompanies(\$filter: CompanyFilterInput, \$first: Int, \$after: String) {
+        companies(filter: \$filter, first: \$first, after: \$after, orderBy: { createdAt: DescNullsLast }) {
           edges {
             node {
               id
@@ -204,6 +204,10 @@ String getCompaniesQuery(String customFields) => '''
               createdAt
               $customFields
             }
+          }
+          pageInfo {
+            endCursor
+            hasNextPage
           }
         }
       }

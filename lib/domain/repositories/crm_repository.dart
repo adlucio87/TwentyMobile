@@ -38,7 +38,11 @@ abstract class CRMRepository {
   Future<void> deleteContact(String id);
 
   // Companies
-  Future<List<Company>> getCompanies({String? search, int page = 1});
+  Future<({List<Company> companies, String? endCursor, bool hasNextPage})> getCompanies({
+    String? search,
+    int pageSize = 20,
+    String? after,
+  });
   Future<Company> getCompanyById(String id);
   Future<Company> createCompany({required String name, String? domainName});
   Future<Company> updateCompany(String id, {String? name, String? domainName, Map<String, dynamic>? customFields});

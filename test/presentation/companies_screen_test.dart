@@ -34,7 +34,7 @@ void main() {
       // Return a future that never completes to keep the UI in a loading state
       when(mockCRMRepository.getCompanies()).thenAnswer((_) async {
         await Future.delayed(const Duration(seconds: 1));
-        return [];
+        return (companies: <Company>[], endCursor: null, hasNextPage: false);
       });
 
       await tester.pumpWidget(createWidgetUnderTest());
@@ -50,7 +50,8 @@ void main() {
         Company(id: '2', name: 'Globex', domainName: 'globex.com'),
       ];
 
-      when(mockCRMRepository.getCompanies()).thenAnswer((_) async => companies);
+      when(mockCRMRepository.getCompanies())
+          .thenAnswer((_) async => (companies: companies, endCursor: null, hasNextPage: false));
 
       await tester.pumpWidget(createWidgetUnderTest());
       await tester.pumpAndSettle();
@@ -60,7 +61,8 @@ void main() {
     });
 
     testWidgets('Shows empty state when no companies exist', (WidgetTester tester) async {
-      when(mockCRMRepository.getCompanies()).thenAnswer((_) async => []);
+      when(mockCRMRepository.getCompanies())
+          .thenAnswer((_) async => (companies: <Company>[], endCursor: null, hasNextPage: false));
 
       await tester.pumpWidget(createWidgetUnderTest());
       await tester.pumpAndSettle();
@@ -70,7 +72,8 @@ void main() {
     });
 
     testWidgets('Search field is visible', (WidgetTester tester) async {
-      when(mockCRMRepository.getCompanies()).thenAnswer((_) async => []);
+      when(mockCRMRepository.getCompanies())
+          .thenAnswer((_) async => (companies: <Company>[], endCursor: null, hasNextPage: false));
 
       await tester.pumpWidget(createWidgetUnderTest());
       await tester.pumpAndSettle();
@@ -88,7 +91,8 @@ void main() {
         Company(id: '2', name: 'Globex', domainName: 'globex.com'),
       ];
 
-      when(mockCRMRepository.getCompanies()).thenAnswer((_) async => initialCompanies);
+      when(mockCRMRepository.getCompanies())
+          .thenAnswer((_) async => (companies: initialCompanies, endCursor: null, hasNextPage: false));
 
       await tester.pumpWidget(createWidgetUnderTest());
       await tester.pumpAndSettle();
@@ -97,7 +101,8 @@ void main() {
       expect(find.text('Globex'), findsNothing);
 
       // Change getCompanies to return refreshed data
-      when(mockCRMRepository.getCompanies()).thenAnswer((_) async => refreshedCompanies);
+      when(mockCRMRepository.getCompanies())
+          .thenAnswer((_) async => (companies: refreshedCompanies, endCursor: null, hasNextPage: false));
 
       // Perform pull to refresh
       await tester.drag(find.byType(ListView), const Offset(0, 300));
