@@ -10,43 +10,45 @@ class AuthMethodScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(title: const Text('Authentication')),
-      body: Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text(
-              'How do you want to connect?',
-              style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Choose how you want to access your Twenty CRM instance',
-              style: theme.textTheme.bodyLarge?.copyWith(
-                color: theme.colorScheme.onSurface.withValues(alpha: (0.6)),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                'How do you want to connect?',
+                style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
               ),
-            ),
-            const SizedBox(height: 32),
-            _buildMethodCard(
-              context,
-              title: 'Login with your account',
-              description: 'Use your email and password. You will only see data assigned to you.',
-              icon: Icons.person,
-              badgeText: 'Recommended',
-              badgeColor: Colors.green,
-              onTap: () => context.push('/onboarding/email'),
-            ),
-            const SizedBox(height: 16),
-            _buildMethodCard(
-              context,
-              title: 'Login with API Key',
-              description: 'Full workspace access. For administrators and owners.',
-              icon: Icons.key,
-              badgeText: 'Admin',
-              badgeColor: theme.colorScheme.primary,
-              onTap: () => context.push('/onboarding/token'),
-            ),
-          ],
+              const SizedBox(height: 8),
+              Text(
+                'Choose how you want to access your Twenty CRM instance',
+                style: theme.textTheme.bodyLarge?.copyWith(
+                  color: theme.colorScheme.onSurface.withValues(alpha: (0.6)),
+                ),
+              ),
+              const SizedBox(height: 32),
+              _buildMethodCard(
+                context,
+                title: 'Login with your account',
+                description: 'Use your email and password. You will only see data assigned to you.',
+                icon: Icons.person,
+                badgeText: 'Recommended',
+                badgeColor: Colors.green,
+                onTap: () => context.push('/onboarding/email'),
+              ),
+              const SizedBox(height: 16),
+              _buildMethodCard(
+                context,
+                title: 'Login with API Key',
+                description: 'Full workspace access. For administrators and owners.',
+                icon: Icons.key,
+                badgeText: 'Admin',
+                badgeColor: theme.colorScheme.primary,
+                onTap: () => context.push('/onboarding/token'),
+              ),
+            ],
+          ),
         ),
       ),
     );

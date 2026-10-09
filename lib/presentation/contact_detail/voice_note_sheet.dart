@@ -160,27 +160,31 @@ class _VoiceNoteSheetState extends ConsumerState<VoiceNoteSheet>
           style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 32),
-        Stack(
-          alignment: Alignment.center,
-          children: [
-            _buildPulseCircle(0.0),
-            _buildPulseCircle(0.2),
-            _buildPulseCircle(0.4),
-            Container(
-              width: 80,
-              height: 80,
-              decoration: const BoxDecoration(
-                color: Colors.red,
-                shape: BoxShape.circle,
+        SizedBox(
+          width: 200,
+          height: 200,
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              _buildPulseCircle(0.0),
+              _buildPulseCircle(0.2),
+              _buildPulseCircle(0.4),
+              Container(
+                width: 80,
+                height: 80,
+                decoration: const BoxDecoration(
+                  color: Colors.red,
+                  shape: BoxShape.circle,
+                ),
+                child: IconButton(
+                  icon: const Icon(Icons.stop, size: 40, color: Colors.white),
+                  onPressed: () {
+                    ref.read(voiceNoteNotifierProvider.notifier).stopRecording();
+                  },
+                ),
               ),
-              child: IconButton(
-                icon: const Icon(Icons.stop, size: 40, color: Colors.white),
-                onPressed: () {
-                  ref.read(voiceNoteNotifierProvider.notifier).stopRecording();
-                },
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
         const SizedBox(height: 32),
         Text(
