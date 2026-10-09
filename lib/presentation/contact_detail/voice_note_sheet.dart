@@ -154,7 +154,19 @@ class _VoiceNoteSheetState extends ConsumerState<VoiceNoteSheet>
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        const SizedBox(height: 32),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            IconButton(
+              icon: const Icon(Icons.close),
+              onPressed: () {
+                ref.read(voiceNoteNotifierProvider.notifier).reset();
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
         Text(
           l10n?.recording ?? 'Listening...',
           style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -236,12 +248,21 @@ class _VoiceNoteSheetState extends ConsumerState<VoiceNoteSheet>
   }
 
   Widget _buildTranscribingState(BuildContext context) {
-    return const Column(
+    return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        SizedBox(height: 64),
-        CircularProgressIndicator(),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            IconButton(
+              icon: const Icon(Icons.close),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
+        const CircularProgressIndicator(),
         SizedBox(height: 32),
         Text(
           'Transcribing...',
@@ -258,7 +279,19 @@ class _VoiceNoteSheetState extends ConsumerState<VoiceNoteSheet>
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          const SizedBox(height: 32),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              IconButton(
+                icon: const Icon(Icons.close),
+                onPressed: () {
+                  ref.read(voiceNoteNotifierProvider.notifier).reset();
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
           const Icon(Icons.warning_amber_rounded, size: 64, color: Colors.orange),
           const SizedBox(height: 16),
           const Text(
