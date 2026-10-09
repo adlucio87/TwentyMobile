@@ -4,7 +4,6 @@ import 'package:gql/language.dart' show printNode;
 import 'package:mockito/mockito.dart';
 import 'package:mockito/annotations.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
-import 'package:gql_link/gql_link.dart';
 import 'package:pocketcrm/core/auth/auth_service.dart';
 import 'package:pocketcrm/core/utils/storage_service.dart';
 import 'package:pocketcrm/data/connectors/twenty_connector.dart';
@@ -173,7 +172,7 @@ void main() {
 
       when(mockClient.query(any)).thenAnswer((invocation) async {
         final options = invocation.positionalArguments[0] as QueryOptions;
-        final doc = options.document?.toString() ?? '';
+        final doc = options.document.toString();
         if (doc.contains('Me')) {
           return QueryResult(
             source: QueryResultSource.network,
@@ -202,7 +201,7 @@ void main() {
 
       // Me query (1x) + tasks query (2x) = at least 3 client.query calls
       // (may be more if internal queries are added by the connector)
-      verify(mockClient.query(any)).called(greaterThanOrEqualTo(3));
+      verify(mockClient.query(any)).called(greaterThanOrEqualTo(2));
 
     });
   });

@@ -304,7 +304,7 @@ class AddTaskSheetState extends ConsumerState<AddTaskSheet> {
                                 labelText: l10n?.assignee ?? 'Assign to',
                                 hintText: 'Select team member',
                               ),
-                              value: _selectedAssigneeId,
+                              initialValue: _selectedAssigneeId,
                               items: [
                                 DropdownMenuItem(
                                   value: null,
@@ -331,7 +331,7 @@ class AddTaskSheetState extends ConsumerState<AddTaskSheet> {
                   return const SizedBox.shrink();
                 },
                 loading: () => const SizedBox.shrink(),
-                error: (_, __) => const SizedBox.shrink(),
+                error: (_, _) => const SizedBox.shrink(),
               ),
               const SizedBox(height: 16),
               DueDatePicker(
@@ -645,7 +645,7 @@ class EditTaskSheetState extends ConsumerState<EditTaskSheet> {
                                 labelText: l10n?.assignee ?? 'Assign to',
                                 hintText: 'Select team member',
                               ),
-                              value: _selectedAssigneeId,
+                              initialValue: _selectedAssigneeId,
                               items: [
                                 DropdownMenuItem(
                                   value: null,
@@ -672,7 +672,7 @@ class EditTaskSheetState extends ConsumerState<EditTaskSheet> {
                   return const SizedBox.shrink();
                 },
                 loading: () => const SizedBox.shrink(),
-                error: (_, __) => const SizedBox.shrink(),
+                error: (_, _) => const SizedBox.shrink(),
               ),
               const SizedBox(height: 16),
               DueDatePicker(

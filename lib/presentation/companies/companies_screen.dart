@@ -9,7 +9,6 @@ import 'package:pocketcrm/presentation/shared/empty_state_widget.dart';
 import 'package:pocketcrm/presentation/shared/error_state_widget.dart';
 import 'package:pocketcrm/core/utils/color_utils.dart';
 
-import 'package:pocketcrm/presentation/shared/company_picker_bottom_sheet.dart';
 import 'package:pocketcrm/domain/models/company.dart';
 import 'package:pocketcrm/presentation/shared/snackbar_helper.dart';
 import 'package:pocketcrm/core/utils/demo_utils.dart';
@@ -26,7 +25,7 @@ class CompaniesScreen extends ConsumerStatefulWidget {
 }
 
 class _CompaniesScreenState extends ConsumerState<CompaniesScreen> {
-  bool _isSearching = false;
+  final bool _isSearching = false;
   final TextEditingController _searchController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   Timer? _debounce;

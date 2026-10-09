@@ -244,7 +244,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                               ? Text(name, style: Theme.of(context).textTheme.titleMedium)
                               : const SizedBox.shrink(),
                           loading: () => const CircularProgressIndicator(),
-                          error: (_, __) => const SizedBox.shrink(),
+                          error: (_, _) => const SizedBox.shrink(),
                         ),
                       ],
                       const SizedBox(height: 16),
@@ -267,7 +267,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   );
                 },
                 loading: () => const CircularProgressIndicator(),
-                error: (_, __) => Text(l10n?.error ?? 'Error loading account data'),
+                error: (_, _) => Text(l10n?.error ?? 'Error loading account data'),
               );
             },
           ),

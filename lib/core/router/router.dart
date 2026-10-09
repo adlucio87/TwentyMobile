@@ -32,7 +32,7 @@ late GoRouter appRouterInstance;
 @riverpod
 GoRouter appRouter(AppRouterRef ref) {
   final authNotifier = ValueNotifier<int>(0);
-  ref.listen(authStateProvider, (_, __) {
+  ref.listen(authStateProvider, (_, _) {
     authNotifier.value++;
   });
   ref.onDispose(authNotifier.dispose);

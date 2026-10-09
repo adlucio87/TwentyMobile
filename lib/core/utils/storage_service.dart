@@ -237,8 +237,9 @@ class StorageService {
   /// Maschera il valore delle chiavi sensibili nei log
   String? _masked(String key, String? value) {
     if (value == null) return null;
-    if (_isSensitive(key))
+    if (_isSensitive(key)) {
       return '***${value.length > 4 ? value.substring(value.length - 4) : "****"}';
+    }
     return value;
   }
 }

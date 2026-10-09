@@ -5,7 +5,6 @@ import 'package:pocketcrm/core/di/providers.dart';
 import 'package:pocketcrm/core/di/auth_state.dart';
 import 'package:pocketcrm/core/config/demo_config.dart';
 import 'package:pocketcrm/presentation/shared/snackbar_helper.dart';
-import 'package:sentry_flutter/sentry_flutter.dart';
 
 class InstanceSetupScreen extends ConsumerStatefulWidget {
   const InstanceSetupScreen({super.key});

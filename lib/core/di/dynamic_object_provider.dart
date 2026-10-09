@@ -1,5 +1,4 @@
 import 'package:flutter/foundation.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:pocketcrm/core/di/providers.dart';
@@ -114,7 +113,7 @@ class DynamicObjectList extends _$DynamicObjectList {
       _hasMore = result.hasNextPage;
       final current = state.value ?? [];
       state = AsyncValue.data([...current, ...result.records]);
-    } catch (e, st) {
+    } catch (e) {
       // Don't replace state on loadMore error, keep existing data
       debugPrint('Error loading more: $e');
     } finally {

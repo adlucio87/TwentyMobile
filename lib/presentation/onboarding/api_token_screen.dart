@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 import 'package:pocketcrm/core/di/providers.dart';
 import 'package:pocketcrm/core/di/auth_state.dart';
 import 'package:pocketcrm/data/connectors/twenty_connector.dart';
-import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
 class ApiTokenScreen extends ConsumerStatefulWidget {

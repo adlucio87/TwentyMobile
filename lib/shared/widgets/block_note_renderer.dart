@@ -172,7 +172,7 @@ class BlockNoteRenderer extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: 4),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(8),
-            child: Image.network(url, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const SizedBox.shrink()),
+            child: Image.network(url, fit: BoxFit.cover, errorBuilder: (_, _, _) => const SizedBox.shrink()),
           ),
         );
 

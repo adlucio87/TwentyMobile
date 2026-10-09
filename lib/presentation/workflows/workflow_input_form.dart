@@ -263,7 +263,7 @@ class _WorkflowInputFormState extends State<WorkflowInputForm> {
       decoration: InputDecoration(
         labelText: isRequired ? '$label *' : label,
       ),
-      value: _values[field.fieldName] as String?,
+      initialValue: _values[field.fieldName] as String?,
       items: field.options.map((option) {
         return DropdownMenuItem<String>(
           value: option,

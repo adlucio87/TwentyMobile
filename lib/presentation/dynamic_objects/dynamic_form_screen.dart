@@ -15,10 +15,10 @@ class DynamicFormScreen extends ConsumerStatefulWidget {
   final DynamicRecord? existingRecord; // null if creating a new one
 
   const DynamicFormScreen({
-    Key? key,
+    super.key,
     required this.metadata,
     this.existingRecord,
-  }) : super(key: key);
+  });
 
   @override
   ConsumerState<DynamicFormScreen> createState() => _DynamicFormScreenState();

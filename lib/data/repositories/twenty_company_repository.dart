@@ -135,8 +135,8 @@ class TwentyCompanyRepository {
       document: parseString(query),
       variables: {
         'first': pageSize,
-        if (filter != null) 'filter': filter,
-        if (after != null) 'after': after,
+        'filter': ?filter,
+        'after': ?after,
       },
       fetchPolicy: FetchPolicy.networkOnly,
     );

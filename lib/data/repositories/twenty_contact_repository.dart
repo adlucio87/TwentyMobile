@@ -37,8 +37,8 @@ class TwentyContactRepository {
       document: parseString(query),
       variables: {
         'first': pageSize,
-        if (filter != null) 'filter': filter,
-        if (after != null) 'after': after,
+        'filter': ?filter,
+        'after': ?after,
       },
       fetchPolicy: FetchPolicy.networkOnly,
     );
@@ -155,8 +155,7 @@ class TwentyContactRepository {
       if (phone != null)
         'phones': {
           'primaryPhoneNumber': phone,
-          if (phoneCountryCode != null)
-            'primaryPhoneCountryCode': phoneCountryCode,
+          'primaryPhoneCountryCode': ?phoneCountryCode,
         },
     };
 
@@ -188,8 +187,8 @@ class TwentyContactRepository {
     final input = <String, dynamic>{};
     if (firstName != null || lastName != null) {
       input['name'] = {
-        if (firstName != null) 'firstName': firstName,
-        if (lastName != null) 'lastName': lastName,
+        'firstName': ?firstName,
+        'lastName': ?lastName,
       };
     }
     if (email != null) {
@@ -205,8 +204,7 @@ class TwentyContactRepository {
 
       input['phones'] = {
         'primaryPhoneNumber': phone,
-        if (phoneCountryCode != null)
-          'primaryPhoneCountryCode': phoneCountryCode,
+        'primaryPhoneCountryCode': ?phoneCountryCode,
       };
     }
     if (clearCompany) {

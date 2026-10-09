@@ -119,27 +119,28 @@ class AuthService {
     final expiresAt = tokens['accessOrWorkspaceAgnosticToken']['expiresAt'] as String;
 
     // Now fetch user info with the new access token
-    final authedClient = _createAuthenticatedClient(instanceUrl, accessToken);
+    final authedMetadataClient = _createAuthenticatedMetadataClient(instanceUrl, accessToken);
     String userFirstName = '';
     String userLastName = '';
+    String userMemberId = '';
     try {
       const meQuery = r'''
         query Me {
-          workspaceMembers(first: 1) {
-            edges {
-              node {
-                name { firstName lastName }
-              }
+          currentUser {
+            workspaceMember {
+              id
+              name { firstName lastName }
             }
           }
         }
       ''';
-      final meResult = await authedClient.query(
+      final meResult = await authedMetadataClient.query(
         QueryOptions(document: gql(meQuery)),
       );
-      final edges = meResult.data?['workspaceMembers']?['edges'] as List?;
-      if (edges != null && edges.isNotEmpty) {
-        final name = edges.first['node']?['name'];
+      final member = meResult.data?['currentUser']?['workspaceMember'];
+      if (member != null) {
+        userMemberId = member['id'] as String? ?? '';
+        final name = member['name'];
         if (name != null) {
           userFirstName = name['firstName'] as String? ?? '';
           userLastName = name['lastName'] as String? ?? '';
@@ -155,6 +156,7 @@ class AuthService {
     await _storage.write(key: 'auth_method', value: 'email');
     await _storage.write(key: 'auth_email', value: email);
     await _storage.write(key: 'auth_password', value: password);
+    await _storage.write(key: 'user_member_id', value: userMemberId);
     await _storage.write(key: 'user_first_name', value: userFirstName);
     await _storage.write(key: 'user_last_name', value: userLastName);
 
@@ -200,27 +202,28 @@ class AuthService {
     final expiresAt = tokens['accessOrWorkspaceAgnosticToken']['expiresAt'] as String;
 
     // Fetch user info
-    final authedClient = _createAuthenticatedClient(instanceUrl, accessToken);
+    final authedMetadataClient = _createAuthenticatedMetadataClient(instanceUrl, accessToken);
     String userFirstName = '';
     String userLastName = '';
+    String userMemberId = '';
     try {
       const meQuery = r'''
         query Me {
-          workspaceMembers(first: 1) {
-            edges {
-              node {
-                name { firstName lastName }
-              }
+          currentUser {
+            workspaceMember {
+              id
+              name { firstName lastName }
             }
           }
         }
       ''';
-      final meResult = await authedClient.query(
+      final meResult = await authedMetadataClient.query(
         QueryOptions(document: gql(meQuery)),
       );
-      final edges = meResult.data?['workspaceMembers']?['edges'] as List?;
-      if (edges != null && edges.isNotEmpty) {
-        final name = edges.first['node']?['name'];
+      final member = meResult.data?['currentUser']?['workspaceMember'];
+      if (member != null) {
+        userMemberId = member['id'] as String? ?? '';
+        final name = member['name'];
         if (name != null) {
           userFirstName = name['firstName'] as String? ?? '';
           userLastName = name['lastName'] as String? ?? '';
@@ -234,6 +237,7 @@ class AuthService {
     await _storage.write(key: 'refresh_token', value: refreshToken);
     await _storage.write(key: 'token_expires_at', value: expiresAt);
     await _storage.write(key: 'auth_method', value: 'email');
+    await _storage.write(key: 'user_member_id', value: userMemberId);
     await _storage.write(key: 'user_first_name', value: userFirstName);
     await _storage.write(key: 'user_last_name', value: userLastName);
     await _storage.delete(key: 'pending_2fa_login_token');
@@ -343,6 +347,7 @@ class AuthService {
     await _storage.delete(key: 'auth_method');
     await _storage.delete(key: 'auth_email');
     await _storage.delete(key: 'auth_password');
+    await _storage.delete(key: 'user_member_id');
     await _storage.delete(key: 'user_first_name');
     await _storage.delete(key: 'user_last_name');
     // The member an API-key user picked under Settings → "I am" belongs to this login only.
@@ -371,12 +376,12 @@ class AuthService {
     );
   }
 
-  GraphQLClient _createAuthenticatedClient(String baseUrl, String token) {
+  GraphQLClient _createAuthenticatedMetadataClient(String baseUrl, String token) {
     final customHttpClient = TimeoutHttpClient(
       timeoutDuration: const Duration(seconds: 30),
     );
     final link = HttpLink(
-      '$baseUrl/graphql',
+      '$baseUrl/metadata',
       defaultHeaders: {'Authorization': 'Bearer $token'},
       httpClient: customHttpClient,
     );

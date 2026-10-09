@@ -138,7 +138,7 @@ class TwentyTaskRepository {
 
     final QueryOptions options = QueryOptions(
       document: parseString(query),
-      variables: {if (filter != null) 'filter': filter},
+      variables: {'filter': ?filter},
       fetchPolicy: FetchPolicy.networkOnly,
     );
 

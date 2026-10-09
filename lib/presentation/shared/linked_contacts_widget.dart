@@ -15,11 +15,11 @@ class LinkedContactsWidget extends ConsumerWidget {
   final bool isCompact;
 
   const LinkedContactsWidget({
-    Key? key,
+    super.key,
     required this.entityId,
     required this.type,
     this.isCompact = false,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

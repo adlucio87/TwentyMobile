@@ -135,7 +135,7 @@ class _DynamicListScreenState extends ConsumerState<DynamicListScreen> {
                 controller: _scrollController,
                 physics: const AlwaysScrollableScrollPhysics(),
                 itemCount: records.length + 1,
-                separatorBuilder: (_, __) => const SizedBox(height: 8),
+                separatorBuilder: (_, _) => const SizedBox(height: 8),
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 itemBuilder: (context, index) {
                   if (index == records.length) {

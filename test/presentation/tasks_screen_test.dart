@@ -9,7 +9,6 @@ import 'package:pocketcrm/presentation/shared/empty_state_widget.dart';
 import 'package:pocketcrm/shared/widgets/task_card.dart';
 
 import '../core/di/providers_test.mocks.dart';
-import 'package:mockito/mockito.dart';
 
 // Mock task data class
 class MockTasksProvider extends Tasks {

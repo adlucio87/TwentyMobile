@@ -28,3 +28,7 @@ Maestro richiede un device/emulatore connesso. Se non è connesso alcun device, 
 Comandi utili:
 - tutte le verifiche: `./scripts/verify.sh --all`
 - una singola area:   `./scripts/verify.sh --area flutter|functions|firebase|maestro`
+
+## Esecuzione e Debug
+
+- Quando viene richiesto di eseguire o testare l'app in debug e non viene specificato un dispositivo, utilizza **SEMPRE** "Pixel Fold" come dispositivo di default (es. `flutter run -d "Pixel Fold"`).

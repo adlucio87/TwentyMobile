@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 class BusinessCardParser {
   /// Main entry point — analyzes raw OCR text
   static BusinessCardData parse(String rawText) {
@@ -150,8 +149,9 @@ class BusinessCardParser {
     for (final line in lines) {
       final lower = line.toLowerCase();
 
-      if (excludePatterns.any((p) => p.hasMatch(line)))
+      if (excludePatterns.any((p) => p.hasMatch(line))) {
         continue; // Skip excluded lines
+      }
 
       double score = 0;
 

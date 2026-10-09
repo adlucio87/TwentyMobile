@@ -48,7 +48,7 @@ class MainShell extends ConsumerWidget {
           bottom: false,
           child: Column(
             children: [
-              if (demoBanner != null) demoBanner,
+              ?demoBanner,
               Expanded(
                 child: Row(
                   children: [
@@ -103,7 +103,7 @@ class MainShell extends ConsumerWidget {
         bottom: false,
         child: Column(
           children: [
-            if (demoBanner != null) demoBanner,
+            ?demoBanner,
             Expanded(child: Scaffold(body: child)),
           ],
         ),

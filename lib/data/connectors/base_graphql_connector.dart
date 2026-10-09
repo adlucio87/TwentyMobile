@@ -45,27 +45,62 @@ class BaseGraphQLConnector {
 
     if (_currentMemberId != null) return _currentMemberId;
 
-    const String query = r'''
-      query Me {
-        workspaceMembers(first: 1) {
-          edges {
-            node {
-              id
+    final storedId = await storageService.read(key: 'user_member_id');
+    if (storedId != null && storedId.isNotEmpty) {
+      _currentMemberId = storedId;
+      return _currentMemberId;
+    }
+
+    // Fallback for existing sessions: fetch from metadata endpoint
+    final instanceUrl = await storageService.read(key: 'instance_url');
+    final apiToken = await storageService.read(key: 'api_token');
+    
+    if (instanceUrl != null && apiToken != null) {
+      try {
+        final customHttpClient = TimeoutHttpClient(
+          timeoutDuration: const Duration(seconds: 30),
+        );
+        final link = HttpLink(
+          '$instanceUrl/metadata',
+          defaultHeaders: {'Authorization': 'Bearer $apiToken'},
+          httpClient: customHttpClient,
+        );
+        final metadataClient = GraphQLClient(
+          link: link,
+          cache: GraphQLCache(),
+          queryRequestTimeout: const Duration(seconds: 30),
+        );
+
+        const String query = r'''
+          query Me {
+            currentUser {
+              workspaceMember {
+                id
+              }
             }
           }
+        ''';
+        final result = await metadataClient.query(
+          QueryOptions(
+            document: parseString(query),
+            fetchPolicy: FetchPolicy.networkOnly,
+          ),
+        );
+
+        final memberId = result.data?['currentUser']?['workspaceMember']?['id'] as String?;
+        if (memberId != null && memberId.isNotEmpty) {
+          _currentMemberId = memberId;
+          await storageService.write(key: 'user_member_id', value: memberId);
+          return _currentMemberId;
         }
+      } catch (_) {
+        // Ignore errors and fallback
       }
-    ''';
-    final options = QueryOptions(
-      document: parseString(query),
-      fetchPolicy: FetchPolicy.networkOnly,
-    );
-    final result = await queryWithRefresh(options);
-    final edges = result.data?['workspaceMembers']?['edges'] as List?;
-    if (edges != null && edges.isNotEmpty) {
-      _currentMemberId = edges.first['node']?['id'] as String?;
     }
-    return _currentMemberId;
+
+    // If we can't resolve the identity, return a non-existent ID so it doesn't broaden
+    // the query to all readable tasks.
+    return 'unresolved_identity';
   }
 
   /// Checks whether the exception is a network timeout.
