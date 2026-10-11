@@ -1,5 +1,5 @@
+import 'package:pocketcrm/core/localization/l10n_extension.dart';
 import 'package:flutter/material.dart';
-import 'package:pocketcrm/l10n/app_localizations.dart';
 
 class DueDatePicker extends StatelessWidget {
   final DateTime? selectedDate;
@@ -12,7 +12,7 @@ class DueDatePicker extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(AppLocalizations.of(context)?.dueDate ?? 'Due Date', style: Theme.of(context).textTheme.labelLarge),
+        Text(context.l10n.dueDate, style: Theme.of(context).textTheme.labelLarge),
         const SizedBox(height: 8),
 
         // Shortcut rapidi
@@ -82,7 +82,7 @@ class DueDatePicker extends StatelessWidget {
           TextButton(
             onPressed: () => onDateSelected(null),
             child: Text(
-              AppLocalizations.of(context)?.removeDueDate ?? 'Remove due date',
+              context.l10n.removeDueDate,
               style: const TextStyle(color: Colors.red),
             ),
           ),

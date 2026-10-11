@@ -10,6 +10,7 @@ import 'package:pocketcrm/domain/models/contact.dart';
 import 'package:pocketcrm/presentation/contacts/contacts_screen.dart';
 
 import '../core/di/providers_test.mocks.dart';
+import '../helpers/localized_app.dart';
 
 // Create a dummy storage service for testing
 class MockStorageService extends Mock implements StorageService {
@@ -39,9 +40,7 @@ void main() {
           crmRepositoryProvider.overrideWith((ref) => Future.value(mockCRMRepository)),
           storageServiceProvider.overrideWithValue(mockStorageService),
         ],
-        child: const MaterialApp(
-          home: ContactsScreen(),
-        ),
+        child: localizedTestApp(home: const ContactsScreen()),
       );
     }
 

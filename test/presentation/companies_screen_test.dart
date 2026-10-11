@@ -10,6 +10,7 @@ import 'package:pocketcrm/presentation/shared/skeleton_loading.dart';
 import 'package:pocketcrm/presentation/shared/empty_state_widget.dart';
 
 import '../core/di/providers_test.mocks.dart';
+import '../helpers/localized_app.dart';
 
 void main() {
   group('CompaniesScreen Tests', () {
@@ -24,9 +25,7 @@ void main() {
         overrides: [
           crmRepositoryProvider.overrideWith((ref) => Future.value(mockCRMRepository)),
         ],
-        child: const MaterialApp(
-          home: CompaniesScreen(),
-        ),
+        child: localizedTestApp(home: const CompaniesScreen()),
       );
     }
 
@@ -68,7 +67,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.byType(EmptyStateWidget), findsOneWidget);
-      expect(find.text('No companies'), findsOneWidget);
+      expect(find.text('No companies found'), findsOneWidget);
     });
 
     testWidgets('Search field is visible', (WidgetTester tester) async {

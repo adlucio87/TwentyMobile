@@ -4,8 +4,8 @@ import 'package:go_router/go_router.dart';
 import 'package:pocketcrm/core/di/providers.dart';
 import 'package:pocketcrm/core/di/auth_state.dart';
 import 'package:pocketcrm/core/config/demo_config.dart';
+import 'package:pocketcrm/core/localization/l10n_extension.dart';
 import 'package:pocketcrm/presentation/shared/snackbar_helper.dart';
-import 'package:pocketcrm/l10n/app_localizations.dart';
 import 'package:pocketcrm/presentation/shared/language_button.dart';
 
 class InstanceSetupScreen extends ConsumerStatefulWidget {
@@ -60,11 +60,11 @@ class _InstanceSetupScreenState extends ConsumerState<InstanceSetupScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = context.l10n;
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(l10n?.configureCrm ?? 'Configure CRM'),
+        title: Text(l10n.configureCrm),
         actions: const [
           LanguageSelectorButton(),
         ],
@@ -95,7 +95,7 @@ class _InstanceSetupScreenState extends ConsumerState<InstanceSetupScreen> {
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
                     : const Icon(Icons.play_circle_outline),
-                label: Text(l10n?.tryDemo ?? 'Try the demo'),
+                label: Text(l10n.tryDemo),
                 style: OutlinedButton.styleFrom(
                   minimumSize: const Size.fromHeight(50),
                   side: BorderSide(
@@ -106,8 +106,7 @@ class _InstanceSetupScreenState extends ConsumerState<InstanceSetupScreen> {
               ),
               const SizedBox(height: 8),
               Text(
-                l10n?.demoSubtitle ??
-                    'Example data · No configuration required\nData is reset every night',
+                l10n.demoSubtitle,
                 textAlign: TextAlign.center,
                 style: const TextStyle(fontSize: 12, color: Colors.grey),
               ),
@@ -118,7 +117,7 @@ class _InstanceSetupScreenState extends ConsumerState<InstanceSetupScreen> {
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: Text(
-                      l10n?.orDivider ?? 'or',
+                      l10n.orDivider,
                       style: TextStyle(color: Colors.grey.shade600),
                     ),
                   ),
@@ -126,22 +125,22 @@ class _InstanceSetupScreenState extends ConsumerState<InstanceSetupScreen> {
                 ],
               ),
               const SizedBox(height: 24),
-              Text(l10n?.instanceUrlQuestion ?? 'What is your Twenty CRM instance URL?'),
+              Text(l10n.instanceUrlQuestion),
               const SizedBox(height: 16),
               TextFormField(
                 controller: _controller,
                 autofillHints: const [AutofillHints.url],
                 decoration: InputDecoration(
-                  labelText: l10n?.instanceUrl ?? 'Instance URL',
-                  hintText: l10n?.instanceUrlHint ?? 'e.g. http://localhost:3000',
+                  labelText: l10n.instanceUrl,
+                  hintText: l10n.instanceUrlHint,
                   prefixIcon: const Icon(Icons.link),
                 ),
                 validator: (val) {
                   if (val == null || val.isEmpty) {
-                    return l10n?.enterValidUrl ?? 'Please enter a valid URL';
+                    return l10n.enterValidUrl;
                   }
                   if (!Uri.parse(val).isAbsolute) {
-                    return l10n?.urlMustStartWithHttp ?? 'URL must start with http:// or https://';
+                    return l10n.urlMustStartWithHttp;
                   }
                   return null;
                 },
@@ -169,7 +168,7 @@ class _InstanceSetupScreenState extends ConsumerState<InstanceSetupScreen> {
                               value: url,
                             );
                             await storage.delete(key: 'is_demo_mode');
-                            if (mounted) {
+                            if (context.mounted) {
                               context.push('/onboarding/method');
                               await _trackServerConnection(url, isDemo: false);
                             }
@@ -189,7 +188,7 @@ class _InstanceSetupScreenState extends ConsumerState<InstanceSetupScreen> {
                           color: Colors.white,
                         ),
                       )
-                    : Text(l10n?.next ?? 'Next'),
+                    : Text(l10n.next),
               ),
               const SizedBox(height: 24),
             ],
@@ -236,8 +235,7 @@ class _InstanceSetupScreenState extends ConsumerState<InstanceSetupScreen> {
         if (mounted) {
           SnackbarHelper.showError(
             context,
-            AppLocalizations.of(context)?.demoUnavailable ??
-                'Demo temporarily unavailable. Please try again later.',
+            context.l10n.demoUnavailable,
           );
         }
       }

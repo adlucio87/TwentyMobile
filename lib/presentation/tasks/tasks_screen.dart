@@ -14,10 +14,10 @@ import 'package:pocketcrm/presentation/shared/swipe_action_wrapper.dart';
 import 'package:pocketcrm/presentation/shared/dialog_helper.dart';
 import 'package:pocketcrm/presentation/home/today_provider.dart';
 import 'package:pocketcrm/core/utils/demo_utils.dart';
+import 'package:pocketcrm/core/localization/l10n_extension.dart';
 import 'package:pocketcrm/shared/widgets/constrained_content.dart';
 import 'package:pocketcrm/shared/widgets/task_card.dart';
 import 'package:pocketcrm/presentation/shared/error_state_widget.dart';
-import 'package:pocketcrm/l10n/app_localizations.dart';
 
 class TasksScreen extends ConsumerStatefulWidget {
   const TasksScreen({super.key});
@@ -30,7 +30,7 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = context.l10n;
     ref.listen(tasksProvider, (previous, next) {
       next.whenData((tasks) {
         NotificationService().syncTaskNotifications(tasks);
@@ -76,7 +76,7 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
             onPressed: () {
               ref.read(taskFilterProvider.notifier).toggle();
             },
-            tooltip: l10n?.filterCompleted ?? 'Filter completed',
+            tooltip: l10n.filterCompleted,
           ),
         ],
       ),
@@ -91,10 +91,10 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
                   height: MediaQuery.of(context).size.height * 0.7,
                   child: EmptyStateWidget(
                     icon: isShowingCompleted ? Icons.task_alt : Icons.checklist,
-                    title: isShowingCompleted ? (l10n?.noCompletedTasks ?? 'No completed tasks') : (l10n?.allClear ?? 'All clear!'),
+                    title: isShowingCompleted ? (l10n.noCompletedTasks) : (l10n.allClear),
                     message: isShowingCompleted
-                        ? (l10n?.noCheckedTasksYet ?? "You haven't checked any tasks yet.")
-                        : (l10n?.noPendingTasksAtTheMoment ?? 'You have no pending tasks at the moment.'),
+                        ? (l10n.noCheckedTasksYet)
+                        : (l10n.noPendingTasksAtTheMoment),
                   ),
                 ),
               ),
@@ -110,8 +110,8 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
                 final task = tasks[index];
                 return SwipeActionWrapper(
                   itemKey: ValueKey('task_${task.id}'),
-                  confirmTitle: l10n?.deleteTask ?? 'Delete Task',
-                  confirmMessage: l10n?.deleteTaskConfirmMessage(task.title) ?? 'Are you sure you want to delete ${task.title}?\nThis action cannot be undone.',
+                  confirmTitle: l10n.deleteTask,
+                  confirmMessage: l10n.deleteTaskConfirmMessage(task.title),
                   onDelete: () async {
                     if (!await DemoUtils.checkDemoAction(context, ref)) return;
                     try {
@@ -179,10 +179,10 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
         ),
       )),
       floatingActionButton: FloatingActionButton(
-        tooltip: l10n?.addTask ?? 'Add Task',
+        tooltip: l10n.addTask,
         onPressed: () async {
           if (!await DemoUtils.checkDemoAction(context, ref)) return;
-          if (mounted) _showAddTaskDialog(context);
+          if (context.mounted) _showAddTaskDialog(context);
         },
         child: const Icon(Icons.add),
       ),
@@ -221,7 +221,7 @@ class AddTaskSheetState extends ConsumerState<AddTaskSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = context.l10n;
     final contactsAsync = ref.watch(contactsProvider);
     final authMethodAsync = ref.watch(authMethodProvider);
     final workspaceMembersAsync = ref.watch(workspaceMembersProvider);
@@ -240,20 +240,20 @@ class AddTaskSheetState extends ConsumerState<AddTaskSheet> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(
-                l10n?.addTask ?? 'New Task',
+                l10n.addTask,
                 style: Theme.of(context).textTheme.headlineSmall,
               ),
               const SizedBox(height: 24),
               TextFormField(
                 controller: _titleController,
                 decoration: InputDecoration(
-                  labelText: l10n?.taskTitle ?? 'Title',
+                  labelText: l10n.taskTitle,
                   hintText: 'What needs to be done?',
                 ),
                 autofocus: true,
                 enabled: !_isLoading,
                 validator: (v) =>
-                    v?.trim().isEmpty == true ? (l10n?.requiredField ?? 'Please enter a title') : null,
+                    v?.trim().isEmpty == true ? (l10n.requiredField) : null,
               ),
               const SizedBox(height: 16),
               contactsAsync.when(
@@ -301,14 +301,14 @@ class AddTaskSheetState extends ConsumerState<AddTaskSheet> {
                             if (members.isEmpty) return const SizedBox.shrink();
                             return DropdownButtonFormField<String>(
                               decoration: InputDecoration(
-                                labelText: l10n?.assignee ?? 'Assign to',
+                                labelText: l10n.assignee,
                                 hintText: 'Select team member',
                               ),
                               initialValue: _selectedAssigneeId,
                               items: [
                                 DropdownMenuItem(
                                   value: null,
-                                  child: Text(l10n?.unassigned ?? 'Unassigned'),
+                                  child: Text(l10n.unassigned),
                                 ),
                                 ...members.map((m) => DropdownMenuItem(
                                   value: m.id,
@@ -343,7 +343,7 @@ class AddTaskSheetState extends ConsumerState<AddTaskSheet> {
                 child: (_selectedDueDate != null && (_selectedDueDate!.hour != 0 || _selectedDueDate!.minute != 0))
                     ? SwitchListTile(
                         contentPadding: EdgeInsets.zero,
-                        title: Text(l10n?.reminderNotification ?? 'Reminder notification'),
+                        title: Text(l10n.reminderNotification),
                         subtitle: Text(
                           _notifyReminder
                               ? '30 min before — ${_selectedDueDate!.hour.toString().padLeft(2, '0')}:${_selectedDueDate!.minute.toString().padLeft(2, '0')}'
@@ -414,7 +414,7 @@ class AddTaskSheetState extends ConsumerState<AddTaskSheet> {
                               NotificationService().cancelTaskReminder(newTask.id);
                             }
   
-                            if (mounted) {
+                            if (context.mounted) {
                               navigator.pop(); // Chiudi solo in caso di successo
                               SnackbarHelper.showSuccess(context, 'Task created successfully');
                             }
@@ -438,7 +438,7 @@ class AddTaskSheetState extends ConsumerState<AddTaskSheet> {
                         width: 20, 
                         child: CircularProgressIndicator(strokeWidth: 2)
                       )
-                    : Text(l10n?.createTask ?? 'Create Task'),
+                    : Text(l10n.createTask),
               ),
               const SizedBox(height: 32),
             ],
@@ -463,7 +463,6 @@ class EditTaskSheetState extends ConsumerState<EditTaskSheet> {
   final _formKey = GlobalKey<FormState>();
   DateTime? _selectedDueDate;
   String? _selectedAssigneeId;
-  String? _selectedContactId;
   
   bool _notifyReminder = true;
   bool _isLoading = false;
@@ -476,7 +475,6 @@ class EditTaskSheetState extends ConsumerState<EditTaskSheet> {
     _bodyController = TextEditingController(text: _extractPlainText(widget.task.body));
     _selectedDueDate = widget.task.dueAt?.toLocal();
     _selectedAssigneeId = widget.task.assigneeId;
-    _selectedContactId = widget.task.contactId;
     _loadNotificationPreference();
   }
 
@@ -527,7 +525,7 @@ class EditTaskSheetState extends ConsumerState<EditTaskSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = context.l10n;
     final authMethodAsync = ref.watch(authMethodProvider);
     final workspaceMembersAsync = ref.watch(workspaceMembersProvider);
     return Padding(
@@ -548,16 +546,17 @@ class EditTaskSheetState extends ConsumerState<EditTaskSheet> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    l10n?.editTask ?? 'Edit Task',
+                    l10n.editTask,
                     style: Theme.of(context).textTheme.headlineSmall,
                   ),
                   IconButton(
                     icon: const Icon(Icons.delete),
                     onPressed: () async {
                       if (!await DemoUtils.checkDemoAction(context, ref)) return;
+                      if (!context.mounted) return;
                       final confirm = await DialogHelper.showDeleteConfirmDialog(
                         context: context,
-                        title: l10n?.deleteTask ?? 'Delete task',
+                        title: l10n.deleteTask,
                         message: 'Do you want to delete \'${widget.task.title}\'?',
                       );
 
@@ -567,11 +566,11 @@ class EditTaskSheetState extends ConsumerState<EditTaskSheet> {
                           ref.invalidate(todayNotifierProvider);
                           if (context.mounted) {
                             Navigator.of(context).pop();
-                            SnackbarHelper.showSuccess(context, l10n?.taskDeleted ?? 'Task deleted');
+                            SnackbarHelper.showSuccess(context, l10n.taskDeleted);
                           }
                         } catch (e) {
                           if (context.mounted) {
-                            SnackbarHelper.showError(context, l10n?.errorDuringDeletion ?? 'Error during deletion');
+                            SnackbarHelper.showError(context, l10n.errorDuringDeletion);
                           }
                         }
                       }
@@ -583,12 +582,12 @@ class EditTaskSheetState extends ConsumerState<EditTaskSheet> {
               TextFormField(
                 controller: _titleController,
                 decoration: InputDecoration(
-                  labelText: l10n?.taskTitle ?? 'Title',
+                  labelText: l10n.taskTitle,
                 ),
                 autofocus: true,
                 enabled: !_isLoading,
                 validator: (v) =>
-                    v?.trim().isEmpty == true ? (l10n?.requiredField ?? 'Please enter a title') : null,
+                    v?.trim().isEmpty == true ? (l10n.requiredField) : null,
               ),
               const SizedBox(height: 16),
               TextFormField(
@@ -602,7 +601,7 @@ class EditTaskSheetState extends ConsumerState<EditTaskSheet> {
               ),
               if (widget.task.contactName != null) ...[
                 const SizedBox(height: 16),
-                Text(l10n?.linkedTo ?? 'Linked to', style: Theme.of(context).textTheme.bodySmall),
+                Text(l10n.linkedTo, style: Theme.of(context).textTheme.bodySmall),
                 const SizedBox(height: 8),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
@@ -642,14 +641,14 @@ class EditTaskSheetState extends ConsumerState<EditTaskSheet> {
                             if (members.isEmpty) return const SizedBox.shrink();
                             return DropdownButtonFormField<String>(
                               decoration: InputDecoration(
-                                labelText: l10n?.assignee ?? 'Assign to',
+                                labelText: l10n.assignee,
                                 hintText: 'Select team member',
                               ),
                               initialValue: _selectedAssigneeId,
                               items: [
                                 DropdownMenuItem(
                                   value: null,
-                                  child: Text(l10n?.unassigned ?? 'Unassigned'),
+                                  child: Text(l10n.unassigned),
                                 ),
                                 ...members.map((m) => DropdownMenuItem(
                                   value: m.id,
@@ -684,7 +683,7 @@ class EditTaskSheetState extends ConsumerState<EditTaskSheet> {
                 child: (_selectedDueDate != null && (_selectedDueDate!.hour != 0 || _selectedDueDate!.minute != 0))
                     ? SwitchListTile(
                         contentPadding: EdgeInsets.zero,
-                        title: Text(l10n?.reminderNotification ?? 'Reminder notification'),
+                        title: Text(l10n.reminderNotification),
                         subtitle: Text(
                           _notifyReminder
                               ? '30 min before — ${_selectedDueDate!.hour.toString().padLeft(2, '0')}:${_selectedDueDate!.minute.toString().padLeft(2, '0')}'
@@ -732,6 +731,7 @@ class EditTaskSheetState extends ConsumerState<EditTaskSheet> {
                     ? null
                     : () async {
                         if (!await DemoUtils.checkDemoAction(context, ref)) return;
+                        if (!context.mounted) return;
                         setState(() { _errorMessage = null; });
                         if (_formKey.currentState!.validate()) {
                           setState(() { _isLoading = true; });
@@ -758,11 +758,11 @@ class EditTaskSheetState extends ConsumerState<EditTaskSheet> {
                               NotificationService().cancelTaskReminder(updatedTask.id);
                             }
 
-                            if (mounted) {
+                            if (context.mounted) {
                               navigator.pop();
                               SnackbarHelper.showSuccess(
                                 context,
-                                l10n?.taskUpdated ?? 'Task updated successfully',
+                                l10n.taskUpdated,
                               );
                             }
                           } catch (e) {
@@ -785,7 +785,7 @@ class EditTaskSheetState extends ConsumerState<EditTaskSheet> {
                         width: 20, 
                         child: CircularProgressIndicator(strokeWidth: 2)
                       )
-                    : Text(l10n?.saveChanges ?? 'Save Changes'),
+                    : Text(l10n.saveChanges),
               ),
               const SizedBox(height: 32),
             ],

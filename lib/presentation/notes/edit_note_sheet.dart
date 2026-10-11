@@ -5,7 +5,7 @@ import 'package:pocketcrm/core/di/providers.dart';
 import 'package:pocketcrm/domain/models/note.dart';
 import 'package:pocketcrm/presentation/shared/snackbar_helper.dart';
 import 'package:pocketcrm/core/utils/demo_utils.dart';
-import 'package:pocketcrm/l10n/app_localizations.dart';
+import 'package:pocketcrm/core/localization/l10n_extension.dart';
 
 class EditNoteSheet extends ConsumerStatefulWidget {
   final Note note;
@@ -70,7 +70,7 @@ class _EditNoteSheetState extends ConsumerState<EditNoteSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = context.l10n;
     return Padding(
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,
@@ -84,7 +84,7 @@ class _EditNoteSheetState extends ConsumerState<EditNoteSheet> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
-              l10n?.editNote ?? 'Edit Note',
+              l10n.editNote,
               style: Theme.of(context).textTheme.headlineSmall,
             ),
             const SizedBox(height: 24),
@@ -95,7 +95,7 @@ class _EditNoteSheetState extends ConsumerState<EditNoteSheet> {
               minLines: 4,
               autofocus: true,
               decoration: InputDecoration(
-                labelText: l10n?.noteText ?? 'Note text',
+                labelText: l10n.noteText,
                 alignLabelWithHint: true,
                 border: const OutlineInputBorder(),
               ),
@@ -109,7 +109,7 @@ class _EditNoteSheetState extends ConsumerState<EditNoteSheet> {
                       width: 20,
                       child: CircularProgressIndicator(strokeWidth: 2),
                     )
-                  : Text(l10n?.saveChanges ?? 'Save Changes'),
+                  : Text(l10n.saveChanges),
             ),
             const SizedBox(height: 32),
           ],
@@ -119,7 +119,7 @@ class _EditNoteSheetState extends ConsumerState<EditNoteSheet> {
   }
 
   Future<void> _saveNote() async {
-    final l10n = AppLocalizations.of(context);
+    final l10n = context.l10n;
     if (!await DemoUtils.checkDemoAction(context, ref)) return;
 
     final text = _bodyController.text.trim();
@@ -142,11 +142,11 @@ class _EditNoteSheetState extends ConsumerState<EditNoteSheet> {
 
       if (mounted) {
         Navigator.of(context).pop();
-        SnackbarHelper.showSuccess(context, l10n?.noteSaved ?? 'Note saved successfully');
+        SnackbarHelper.showSuccess(context, l10n.noteSaved);
       }
     } catch (e) {
       if (mounted) {
-        SnackbarHelper.showError(context, '${l10n?.error ?? 'Error'}: $e');
+        SnackbarHelper.showError(context, '${l10n.error}: $e');
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);

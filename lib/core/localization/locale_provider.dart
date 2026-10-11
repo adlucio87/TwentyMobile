@@ -33,7 +33,7 @@ const List<AppLocaleOption> appLocaleOptions = [
     code: 'en_US',
     name: 'English (US)',
     flag: '🇺🇸',
-    locale: Locale('en'),
+    locale: Locale('en', 'US'),
   ),
   AppLocaleOption(
     code: 'en_GB',
@@ -61,8 +61,34 @@ const List<AppLocaleOption> appLocaleOptions = [
   ),
 ];
 
+/// Resolves the [AppLocaleOption] that matches [locale].
+///
+/// A `null` locale (or an unsupported one) maps to the "system default" option,
+/// which is always the first entry of [appLocaleOptions]. Language-only
+/// fallback (same language, different region) keeps the picker consistent with
+/// locales coming from the OS (e.g. `it_CH` → `it`).
+AppLocaleOption optionForLocale(Locale? locale) {
+  if (locale == null) return appLocaleOptions.first;
+
+  for (final option in appLocaleOptions) {
+    if (option.locale == locale) return option;
+  }
+  for (final option in appLocaleOptions) {
+    if (option.locale?.languageCode == locale.languageCode) return option;
+  }
+  return appLocaleOptions.first;
+}
+
 final localeProvider = StateNotifierProvider<LocaleNotifier, Locale?>((ref) {
   return LocaleNotifier();
+});
+
+/// Currently selected [AppLocaleOption], derived from [localeProvider].
+///
+/// UI code uses this to render the selected language label/flag while keeping
+/// the resolution logic in a single place.
+final selectedLocaleOptionProvider = Provider<AppLocaleOption>((ref) {
+  return optionForLocale(ref.watch(localeProvider));
 });
 
 class LocaleNotifier extends StateNotifier<Locale?> {

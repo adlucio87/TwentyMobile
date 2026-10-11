@@ -30,12 +30,12 @@ void main() {
       expect(prefs.getString('app_locale'), 'it');
     });
 
-    test('can set locale to US English (en)', () async {
+    test('can set locale to US English (en_US)', () async {
       final container = ProviderContainer();
       addTearDown(container.dispose);
 
       await container.read(localeProvider.notifier).setLocale('en_US');
-      expect(container.read(localeProvider), const Locale('en'));
+      expect(container.read(localeProvider), const Locale('en', 'US'));
 
       final prefs = await SharedPreferences.getInstance();
       expect(prefs.getString('app_locale'), 'en_US');
@@ -102,6 +102,46 @@ void main() {
     test('appLocaleOptions contains all 6 required languages plus system', () {
       final codes = appLocaleOptions.map((o) => o.code).toList();
       expect(codes, containsAll(['system', 'it', 'en_US', 'en_GB', 'fr', 'de', 'hi']));
+    });
+
+    group('optionForLocale', () {
+      test('maps a null locale to the system default option', () {
+        expect(optionForLocale(null).code, 'system');
+      });
+
+      test('resolves language + region when both are known', () {
+        expect(optionForLocale(const Locale('en', 'GB')).code, 'en_GB');
+        expect(optionForLocale(const Locale('en', 'US')).code, 'en_US');
+      });
+
+      test('resolves language only locales', () {
+        expect(optionForLocale(const Locale('it')).code, 'it');
+        expect(optionForLocale(const Locale('de')).code, 'de');
+        expect(optionForLocale(const Locale('fr')).code, 'fr');
+        expect(optionForLocale(const Locale('hi')).code, 'hi');
+      });
+
+      test('falls back to the matching language for unknown regions', () {
+        expect(optionForLocale(const Locale('it', 'CH')).code, 'it');
+        expect(optionForLocale(const Locale('en', 'AU')).code, 'en_US');
+      });
+
+      test('falls back to system default for unsupported languages', () {
+        expect(optionForLocale(const Locale('ja')).code, 'system');
+      });
+
+      test('selectedLocaleOptionProvider follows localeProvider', () async {
+        final container = ProviderContainer();
+        addTearDown(container.dispose);
+
+        expect(container.read(selectedLocaleOptionProvider).code, 'system');
+
+        await container.read(localeProvider.notifier).setLocale('fr');
+        expect(container.read(selectedLocaleOptionProvider).code, 'fr');
+
+        await container.read(localeProvider.notifier).setLocale('en_GB');
+        expect(container.read(selectedLocaleOptionProvider).code, 'en_GB');
+      });
     });
   });
 

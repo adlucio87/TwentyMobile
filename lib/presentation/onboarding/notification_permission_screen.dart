@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:pocketcrm/l10n/app_localizations.dart';
+import 'package:pocketcrm/core/localization/l10n_extension.dart';
 import 'package:pocketcrm/presentation/shared/language_button.dart';
 import '../../core/notifications/notification_service.dart';
 
@@ -9,7 +9,7 @@ class NotificationPermissionScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = context.l10n;
 
     return Scaffold(
       appBar: AppBar(
@@ -26,14 +26,13 @@ class NotificationPermissionScreen extends StatelessWidget {
               const Icon(Icons.notifications_active, size: 80, color: Colors.blue),
               const SizedBox(height: 24),
               Text(
-                l10n?.stayUpdated ?? 'Stay updated',
+                l10n.stayUpdated,
                 style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 16),
               Text(
-                l10n?.receiveRemindersTasks ??
-                    'Receive reminders for your upcoming tasks',
+                l10n.receiveRemindersTasks,
                 style: const TextStyle(fontSize: 16, color: Colors.grey),
                 textAlign: TextAlign.center,
               ),
@@ -45,11 +44,11 @@ class NotificationPermissionScreen extends StatelessWidget {
                     context.go('/home');
                   }
                 },
-                child: Text(l10n?.enableNotifications ?? 'Enable notifications'),
+                child: Text(l10n.enableNotifications),
               ),
               TextButton(
                 onPressed: () => context.go('/home'),
-                child: Text(l10n?.notNow ?? 'Not now'),
+                child: Text(l10n.notNow),
               ),
             ],
           ),

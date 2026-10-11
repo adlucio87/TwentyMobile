@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pocketcrm/core/utils/demo_utils.dart';
 import 'package:pocketcrm/core/utils/responsive.dart';
-import 'package:pocketcrm/l10n/app_localizations.dart';
+import 'package:pocketcrm/core/localization/l10n_extension.dart';
 
 class MainShell extends ConsumerWidget {
   final Widget child;
@@ -12,7 +12,7 @@ class MainShell extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = context.l10n;
     final isDemo = ref.watch(isDemoModeProvider).valueOrNull ?? false;
     final isTablet = Responsive.isTablet(context);
     final selectedIndex = _calculateSelectedIndex(context);
@@ -29,7 +29,7 @@ class MainShell extends ConsumerWidget {
             ),
             child: Center(
               child: Text(
-                l10n?.demoBanner ?? '🎭 Demo mode · Data is reset every night',
+                l10n.demoBanner,
                 style: const TextStyle(
                   fontSize: 11,
                   color: Colors.amber,
@@ -61,27 +61,27 @@ class MainShell extends ConsumerWidget {
                         NavigationRailDestination(
                           icon: const Icon(Icons.home_outlined),
                           selectedIcon: const Icon(Icons.home),
-                          label: Text(l10n?.navHome ?? 'Home'),
+                          label: Text(l10n.navHome),
                         ),
                         NavigationRailDestination(
                           icon: const Icon(Icons.people_outlined),
                           selectedIcon: const Icon(Icons.people),
-                          label: Text(l10n?.navContacts ?? 'Contacts'),
+                          label: Text(l10n.navContacts),
                         ),
                         NavigationRailDestination(
                           icon: const Icon(Icons.business_outlined),
                           selectedIcon: const Icon(Icons.business),
-                          label: Text(l10n?.navCompanies ?? 'Companies'),
+                          label: Text(l10n.navCompanies),
                         ),
                         NavigationRailDestination(
                           icon: const Icon(Icons.task_outlined),
                           selectedIcon: const Icon(Icons.task),
-                          label: Text(l10n?.navTasks ?? 'Tasks'),
+                          label: Text(l10n.navTasks),
                         ),
                         NavigationRailDestination(
                           icon: const Icon(Icons.apps_outlined),
                           selectedIcon: const Icon(Icons.apps),
-                          label: Text(l10n?.navMore ?? 'More'),
+                          label: Text(l10n.navMore),
                         ),
                       ],
                     ),
@@ -112,11 +112,11 @@ class MainShell extends ConsumerWidget {
         selectedIndex: selectedIndex,
         onDestinationSelected: (int index) => _onItemTapped(index, context),
         destinations: [
-          NavigationDestination(icon: const Icon(Icons.home), label: l10n?.navHome ?? 'Home'),
-          NavigationDestination(icon: const Icon(Icons.people), label: l10n?.navContacts ?? 'Contacts'),
-          NavigationDestination(icon: const Icon(Icons.business), label: l10n?.navCompanies ?? 'Companies'),
-          NavigationDestination(icon: const Icon(Icons.task), label: l10n?.navTasks ?? 'Tasks'),
-          NavigationDestination(icon: const Icon(Icons.apps), label: l10n?.navMore ?? 'More'),
+          NavigationDestination(icon: const Icon(Icons.home), label: l10n.navHome),
+          NavigationDestination(icon: const Icon(Icons.people), label: l10n.navContacts),
+          NavigationDestination(icon: const Icon(Icons.business), label: l10n.navCompanies),
+          NavigationDestination(icon: const Icon(Icons.task), label: l10n.navTasks),
+          NavigationDestination(icon: const Icon(Icons.apps), label: l10n.navMore),
         ],
       ),
     );

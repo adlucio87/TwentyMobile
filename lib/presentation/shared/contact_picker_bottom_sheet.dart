@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pocketcrm/core/di/providers.dart';
-import 'package:pocketcrm/l10n/app_localizations.dart';
+import 'package:pocketcrm/core/localization/l10n_extension.dart';
 
 class ContactPickerBottomSheet extends ConsumerStatefulWidget {
   const ContactPickerBottomSheet({super.key});
@@ -31,7 +31,7 @@ class _ContactPickerBottomSheetState
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = context.l10n;
     final contactsAsync = ref.watch(contactsProvider);
 
     return DraggableScrollableSheet(
@@ -54,7 +54,7 @@ class _ContactPickerBottomSheetState
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      l10n?.selectContact ?? 'Select Contact',
+                      l10n.selectContact,
                       style: Theme.of(context).textTheme.titleLarge,
                     ),
                     IconButton(
@@ -72,7 +72,7 @@ class _ContactPickerBottomSheetState
                   controller: _searchController,
                   onChanged: _onSearchChanged,
                   decoration: InputDecoration(
-                    hintText: l10n?.searchContacts ?? 'Search contacts...',
+                    hintText: l10n.searchContacts,
                     prefixIcon: const Icon(Icons.search),
                     suffixIcon: _searchQuery.isNotEmpty
                         ? IconButton(
@@ -101,7 +101,7 @@ class _ContactPickerBottomSheetState
                         child: Text(
                           _searchQuery.isNotEmpty
                               ? 'No contacts found for "$_searchQuery"'
-                              : (l10n?.noContactsFound ?? 'No contacts available'),
+                              : (l10n.noContactsFound),
                         ),
                       );
                     }
@@ -137,7 +137,7 @@ class _ContactPickerBottomSheetState
                     child: CircularProgressIndicator(),
                   ),
                   error: (error, _) => Center(
-                    child: Text('${l10n?.error ?? 'Error'}: $error'),
+                    child: Text('${l10n.error}: $error'),
                   ),
                 ),
               ),

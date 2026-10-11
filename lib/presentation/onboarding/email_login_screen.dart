@@ -6,7 +6,7 @@ import 'package:pocketcrm/core/di/auth_state.dart';
 import 'package:pocketcrm/presentation/onboarding/otp_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:pocketcrm/core/di/providers.dart';
-import 'package:pocketcrm/l10n/app_localizations.dart';
+import 'package:pocketcrm/core/localization/l10n_extension.dart';
 import 'package:pocketcrm/presentation/shared/language_button.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
@@ -54,16 +54,16 @@ class _EmailLoginScreenState extends ConsumerState<EmailLoginScreen> {
 
       if (captchaConfig != null) {
         if (mounted) {
-          final l10n = AppLocalizations.of(context);
-          setState(() => _loadingMessage = l10n?.securityCheck ?? 'Security check...');
+          final l10n = context.l10n;
+          setState(() => _loadingMessage = l10n.securityCheck);
         }
         captchaToken = await captchaService.generateCaptchaToken(captchaConfig);
         debugPrint('Captcha token obtained successfully');
       }
 
       if (mounted) {
-        final l10n = AppLocalizations.of(context);
-        setState(() => _loadingMessage = l10n?.loggingIn ?? 'Logging in...');
+        final l10n = context.l10n;
+        setState(() => _loadingMessage = l10n.loggingIn);
       }
 
       // Step 2: Login with credentials (and captcha token if required)
@@ -107,16 +107,16 @@ class _EmailLoginScreenState extends ConsumerState<EmailLoginScreen> {
       debugPrint('LOGIN ERROR: $e');
       Sentry.captureException(e, stackTrace: stackTrace);
       if (mounted) {
-        final l10n = AppLocalizations.of(context);
+        final l10n = context.l10n;
         String message = e.toString();
         if (message.contains('UNAUTHENTICATED')) {
-          message = l10n?.incorrectCredentials ?? 'Incorrect email or password. Please try again.';
+          message = l10n.incorrectCredentials;
         } else if (message.contains('Not Found') || message.contains('user not found')) {
-          message = l10n?.noAccountFound ?? 'No account found with this email.';
+          message = l10n.noAccountFound;
         } else if (message.contains('SocketException') || message.contains('Failed host lookup')) {
-          message = l10n?.unableToReachServer ?? 'Unable to reach the server. Check the URL.';
+          message = l10n.unableToReachServer;
         } else if (message.contains('password login is disabled')) {
-          message = l10n?.passwordLoginDisabled ?? 'Password login is not enabled on this Twenty instance.';
+          message = l10n.passwordLoginDisabled;
         } else if (message.startsWith('Exception: ')) {
           message = message.substring(11);
         }
@@ -142,11 +142,11 @@ class _EmailLoginScreenState extends ConsumerState<EmailLoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = context.l10n;
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(l10n?.loginWithEmailTitle ?? 'Login with Email'),
+        title: Text(l10n.loginWithEmailTitle),
         actions: const [
           LanguageSelectorButton(),
         ],
@@ -173,16 +173,16 @@ class _EmailLoginScreenState extends ConsumerState<EmailLoginScreen> {
                         keyboardType: TextInputType.emailAddress,
                         autofillHints: const [AutofillHints.email],
                         decoration: InputDecoration(
-                          labelText: l10n?.email ?? 'Email',
-                          hintText: l10n?.emailHint ?? 'Enter your email',
+                          labelText: l10n.email,
+                          hintText: l10n.emailHint,
                           prefixIcon: const Icon(Icons.email),
                         ),
                         validator: (val) {
                           if (val == null || val.isEmpty) {
-                            return l10n?.emailRequired ?? 'Email is required';
+                            return l10n.emailRequired;
                           }
                           if (!val.contains('@') || !val.contains('.')) {
-                            return l10n?.enterValidEmail ?? 'Enter a valid email';
+                            return l10n.enterValidEmail;
                           }
                           return null;
                         },
@@ -193,8 +193,8 @@ class _EmailLoginScreenState extends ConsumerState<EmailLoginScreen> {
                         obscureText: _obscureText,
                         autofillHints: const [AutofillHints.password],
                         decoration: InputDecoration(
-                          labelText: l10n?.password ?? 'Password',
-                          hintText: l10n?.passwordHint ?? 'Enter your password',
+                          labelText: l10n.password,
+                          hintText: l10n.passwordHint,
                           prefixIcon: const Icon(Icons.lock),
                           suffixIcon: IconButton(
                             icon: Icon(
@@ -209,10 +209,10 @@ class _EmailLoginScreenState extends ConsumerState<EmailLoginScreen> {
                         ),
                         validator: (val) {
                           if (val == null || val.isEmpty) {
-                            return l10n?.passwordRequired ?? 'Password is required';
+                            return l10n.passwordRequired;
                           }
                           if (val.length < 6) {
-                            return l10n?.passwordMinLength ?? 'Password must be at least 6 characters';
+                            return l10n.passwordMinLength;
                           }
                           return null;
                         },
@@ -229,7 +229,7 @@ class _EmailLoginScreenState extends ConsumerState<EmailLoginScreen> {
                         alignment: Alignment.centerRight,
                         child: TextButton(
                           onPressed: _openForgotPassword,
-                          child: Text(l10n?.forgotPassword ?? 'Forgot password?'),
+                          child: Text(l10n.forgotPassword),
                         ),
                       ),
                       const Spacer(),
@@ -259,7 +259,7 @@ class _EmailLoginScreenState extends ConsumerState<EmailLoginScreen> {
                                     ],
                                   ],
                                  )
-                              : Text(l10n?.loginButton ?? 'Login'),
+                              : Text(l10n.loginButton),
                         ),
                       ),
                       const SizedBox(height: 16),
@@ -271,7 +271,7 @@ class _EmailLoginScreenState extends ConsumerState<EmailLoginScreen> {
                             context.go('/onboarding/method');
                           }
                         },
-                        child: Text(l10n?.goBack ?? 'Go back'),
+                        child: Text(l10n.goBack),
                       ),
                       const SizedBox(height: 24),
                     ],

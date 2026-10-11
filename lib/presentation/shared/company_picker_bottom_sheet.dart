@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pocketcrm/core/di/providers.dart';
+import 'package:pocketcrm/core/localization/l10n_extension.dart';
 import 'package:pocketcrm/presentation/shared/snackbar_helper.dart';
-import 'package:pocketcrm/l10n/app_localizations.dart';
 
 class CompanyPickerBottomSheet extends ConsumerStatefulWidget {
   const CompanyPickerBottomSheet({super.key});
@@ -34,7 +34,7 @@ class _CompanyPickerBottomSheetState
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = context.l10n;
     final companiesAsync = ref.watch(companiesProvider);
 
     return DraggableScrollableSheet(
@@ -57,7 +57,7 @@ class _CompanyPickerBottomSheetState
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      l10n?.selectCompany ?? 'Select Company',
+                      l10n.selectCompany,
                       style: Theme.of(context).textTheme.titleLarge,
                     ),
                     IconButton(
@@ -76,7 +76,7 @@ class _CompanyPickerBottomSheetState
                   focusNode: _searchFocus,
                   onChanged: _onSearchChanged,
                   decoration: InputDecoration(
-                    hintText: l10n?.searchCompanies ?? 'Search companies...',
+                    hintText: l10n.searchCompanies,
                     prefixIcon: const Icon(Icons.search),
                     suffixIcon: _searchQuery.isNotEmpty
                         ? IconButton(
@@ -120,7 +120,7 @@ class _CompanyPickerBottomSheetState
                         child: Text(
                           _searchQuery.isNotEmpty
                               ? 'No companies found for "$_searchQuery"'
-                              : (l10n?.noCompaniesFound ?? 'No companies available'),
+                              : (l10n.noCompaniesFound),
                         ),
                       );
                     }
@@ -155,7 +155,7 @@ class _CompanyPickerBottomSheetState
                     child: CircularProgressIndicator(),
                   ),
                   error: (error, _) => Center(
-                    child: Text('${l10n?.error ?? 'Error'}: $error'),
+                    child: Text('${l10n.error}: $error'),
                   ),
                 ),
               ),
@@ -171,26 +171,27 @@ class _CompanyPickerBottomSheetState
     final navigator = Navigator.of(context);
 
     // Show a dialog to confirm creation
-    final l10n = AppLocalizations.of(context);
+    final l10n = context.l10n;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text(l10n?.createNewCompany ?? 'Create New Company'),
+        title: Text(l10n.createNewCompany),
         content: Text('Are you sure you want to create a new company named "$name"?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: Text(l10n?.cancel ?? 'Cancel'),
+            child: Text(l10n.cancel),
           ),
           ElevatedButton(
             onPressed: () => Navigator.of(ctx).pop(true),
-            child: Text(l10n?.create ?? 'Create'),
+            child: Text(l10n.create),
           ),
         ],
       ),
     );
 
     if (confirmed != true) return;
+    if (!context.mounted) return;
 
     try {
       // Show loading indicator
@@ -204,16 +205,16 @@ class _CompanyPickerBottomSheetState
           .read(companiesProvider.notifier)
           .addCompany(name: name);
 
-      // Hide loading indicator
-      if (mounted) Navigator.of(context).pop();
+      if (!context.mounted) return;
 
-      if (mounted) {
-        SnackbarHelper.showSuccess(context, 'Company "$name" created.');
-        navigator.pop(newCompany);
-      }
+      // Hide loading indicator
+      Navigator.of(context).pop();
+
+      SnackbarHelper.showSuccess(context, 'Company "$name" created.');
+      navigator.pop(newCompany);
     } catch (e) {
-      if (mounted) Navigator.of(context).pop(); // hide loading
-      if (mounted) {
+      if (context.mounted) {
+        Navigator.of(context).pop(); // hide loading
         SnackbarHelper.showError(context, 'Error creating company: $e');
       }
     }

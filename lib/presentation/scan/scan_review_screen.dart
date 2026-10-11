@@ -7,7 +7,7 @@ import 'package:go_router/go_router.dart';
 import '../../core/di/providers.dart';
 import 'scan_provider.dart';
 import 'package:pocketcrm/core/utils/demo_utils.dart';
-import 'package:pocketcrm/l10n/app_localizations.dart';
+import 'package:pocketcrm/core/localization/l10n_extension.dart';
 
 class ScanReviewScreen extends ConsumerStatefulWidget {
   const ScanReviewScreen({super.key});
@@ -49,7 +49,7 @@ class _ScanReviewScreenState extends ConsumerState<ScanReviewScreen> {
           'REVIEW: build - status: ${scanState.status}, data: ${scanState.parsedData}');
     }
 
-    final l10n = AppLocalizations.of(context);
+    final l10n = context.l10n;
 
     // Mostra loading se ancora in elaborazione
     if (scanState.status == ScanStatus.processing) {
@@ -60,7 +60,7 @@ class _ScanReviewScreenState extends ConsumerState<ScanReviewScreen> {
             children: [
               const CircularProgressIndicator(),
               const SizedBox(height: 16),
-              Text(l10n?.analyzingBusinessCard ?? 'Analyzing business card...'),
+              Text(l10n.analyzingBusinessCard),
             ],
           ),
         ),
@@ -76,11 +76,11 @@ class _ScanReviewScreenState extends ConsumerState<ScanReviewScreen> {
             children: [
               const Icon(Icons.error_outline, size: 64, color: Colors.red),
               const SizedBox(height: 16),
-              Text(scanState.errorMessage ?? (l10n?.error ?? 'Unknown error')),
+              Text(scanState.errorMessage ?? (l10n.error)),
               const SizedBox(height: 24),
               FilledButton(
                 onPressed: () => Navigator.pop(context),
-                child: Text(l10n?.tryAgain ?? 'Try Again'),
+                child: Text(l10n.tryAgain),
               ),
             ],
           ),
@@ -93,7 +93,7 @@ class _ScanReviewScreenState extends ConsumerState<ScanReviewScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(l10n?.verifyData ?? 'Verify data'),
+        title: Text(l10n.verifyData),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
@@ -114,27 +114,27 @@ class _ScanReviewScreenState extends ConsumerState<ScanReviewScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(l10n?.contacts.toUpperCase() ?? 'CONTACT',
+                  Text(l10n.contacts.toUpperCase(),
                     style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600,
                         letterSpacing: 1.2, color: Colors.grey)),
                   const SizedBox(height: 8),
                   Row(children: [
-                    Expanded(child: _Field(l10n?.firstName ?? 'Name', _firstName, Icons.person)),
+                    Expanded(child: _buildField(l10n.firstName, _firstName, Icons.person)),
                     const SizedBox(width: 12),
-                    Expanded(child: _Field(l10n?.lastName ?? 'Last Name', _lastName, null)),
+                    Expanded(child: _buildField(l10n.lastName, _lastName, null)),
                   ]),
                   const SizedBox(height: 12),
-                  _Field(l10n?.email ?? 'Email', _email, Icons.email),
+                  _buildField(l10n.email, _email, Icons.email),
                   const SizedBox(height: 12),
-                  _Field(l10n?.phone ?? 'Phone', _phone, Icons.phone),
+                  _buildField(l10n.phone, _phone, Icons.phone),
                   const SizedBox(height: 24),
-                  Text(l10n?.company.toUpperCase() ?? 'COMPANY',
+                  Text(l10n.company.toUpperCase(),
                     style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600,
                         letterSpacing: 1.2, color: Colors.grey)),
                   const SizedBox(height: 8),
-                  _Field(l10n?.company ?? 'Company', _company, Icons.business),
+                  _buildField(l10n.company, _company, Icons.business),
                   const SizedBox(height: 12),
-                  _Field(l10n?.jobTitle ?? 'Role', _jobTitle, Icons.work_outline),
+                  _buildField(l10n.jobTitle, _jobTitle, Icons.work_outline),
                 ],
               ),
             ),
@@ -147,7 +147,7 @@ class _ScanReviewScreenState extends ConsumerState<ScanReviewScreen> {
               onPressed: _isSaving ? null : _save,
               child: _isSaving
                   ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                  : Text(l10n?.addContact ?? 'Create Contact'),
+                  : Text(l10n.addContact),
             ),
           ),
         ],
@@ -155,7 +155,7 @@ class _ScanReviewScreenState extends ConsumerState<ScanReviewScreen> {
     );
   }
 
-  Widget _Field(String label, TextEditingController ctrl, IconData? icon) {
+  Widget _buildField(String label, TextEditingController ctrl, IconData? icon) {
     return TextField(
       controller: ctrl,
       decoration: InputDecoration(
@@ -166,12 +166,13 @@ class _ScanReviewScreenState extends ConsumerState<ScanReviewScreen> {
   }
 
   Future<void> _save() async {
-    final l10n = AppLocalizations.of(context);
+    final l10n = context.l10n;
+    final messenger = ScaffoldMessenger.of(context);
     if (!await DemoUtils.checkDemoAction(context, ref)) return;
 
     if (_firstName.text.trim().isEmpty && _email.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n?.enterNameOrEmail ?? 'Enter at least name or email')),
+      messenger.showSnackBar(
+        SnackBar(content: Text(l10n.enterNameOrEmail)),
       );
       return;
     }
@@ -191,9 +192,9 @@ class _ScanReviewScreenState extends ConsumerState<ScanReviewScreen> {
       ref.invalidate(contactsProvider);
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
+        messenger.showSnackBar(
           SnackBar(
-            content: Text('✅ ${l10n?.contactAdded ?? 'Contact added'}'),
+            content: Text('✅ ${l10n.contactAdded}'),
             backgroundColor: Colors.green,
           ),
         );
@@ -203,7 +204,7 @@ class _ScanReviewScreenState extends ConsumerState<ScanReviewScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('${l10n?.error ?? 'Error'}: $e'), backgroundColor: Colors.red),
+          SnackBar(content: Text('${l10n.error}: $e'), backgroundColor: Colors.red),
         );
       }
     } finally {
@@ -227,7 +228,7 @@ class _ConfidenceBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = context.l10n;
     final color = confidence >= 0.7
         ? Colors.green
         : confidence >= 0.4
@@ -235,10 +236,10 @@ class _ConfidenceBanner extends StatelessWidget {
             : Colors.red;
 
     final message = confidence >= 0.7
-        ? (l10n?.confidenceHigh ?? '✅ Excellent capture — verify data')
+        ? (l10n.confidenceHigh)
         : confidence >= 0.4
-            ? (l10n?.confidenceMedium ?? '⚠️ Partial capture — check fields')
-            : (l10n?.confidenceLow ?? '❌ Difficult to read — fill manually');
+            ? (l10n.confidenceMedium)
+            : (l10n.confidenceLow);
 
     return Container(
       width: double.infinity,

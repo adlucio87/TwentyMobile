@@ -1,3 +1,5 @@
+// Benchmark manuale: stampa i tempi su stdout di proposito.
+// ignore_for_file: avoid_print
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';

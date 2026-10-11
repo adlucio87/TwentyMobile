@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pocketcrm/presentation/contact_detail/voice_note_provider.dart';
 import 'package:pocketcrm/presentation/shared/snackbar_helper.dart';
 import 'package:pocketcrm/core/utils/demo_utils.dart';
-import 'package:pocketcrm/l10n/app_localizations.dart';
+import 'package:pocketcrm/core/localization/l10n_extension.dart';
 
 class VoiceNoteSheet extends ConsumerStatefulWidget {
   final String contactId;
@@ -135,7 +135,7 @@ class _VoiceNoteSheetState extends ConsumerState<VoiceNoteSheet>
             padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
           ),
           child: Text(
-            AppLocalizations.of(context)?.startRecording ?? 'Start recording',
+            context.l10n.startRecording,
             style: const TextStyle(fontSize: 18),
           ),
         ),
@@ -149,7 +149,7 @@ class _VoiceNoteSheetState extends ConsumerState<VoiceNoteSheet>
   }
 
   Widget _buildRecordingState(BuildContext context, VoiceNoteState state) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = context.l10n;
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -168,7 +168,7 @@ class _VoiceNoteSheetState extends ConsumerState<VoiceNoteSheet>
         ),
         const SizedBox(height: 16),
         Text(
-          l10n?.recording ?? 'Listening...',
+          l10n.recording,
           style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 32),
@@ -209,7 +209,7 @@ class _VoiceNoteSheetState extends ConsumerState<VoiceNoteSheet>
              ref.read(voiceNoteNotifierProvider.notifier).reset();
           },
           child: Text(
-            l10n?.cancel ?? 'Cancel',
+            l10n.cancel,
             style: const TextStyle(color: Colors.grey),
           ),
         )
@@ -304,13 +304,13 @@ class _VoiceNoteSheetState extends ConsumerState<VoiceNoteSheet>
             onPressed: () {
               ref.read(voiceNoteNotifierProvider.notifier).reset();
             },
-            child: Text(AppLocalizations.of(context)?.rerecord ?? 'Rerecord'),
+            child: Text(context.l10n.rerecord),
           )
         ],
       );
     }
 
-    final l10n = AppLocalizations.of(context);
+    final l10n = context.l10n;
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -351,14 +351,14 @@ class _VoiceNoteSheetState extends ConsumerState<VoiceNoteSheet>
           style: ElevatedButton.styleFrom(
              padding: const EdgeInsets.symmetric(vertical: 16),
           ),
-          child: Text(l10n?.saveAsNote ?? 'Save as note'),
+          child: Text(l10n.saveAsNote),
         ),
         const SizedBox(height: 8),
         TextButton(
           onPressed: () {
             ref.read(voiceNoteNotifierProvider.notifier).reset();
           },
-          child: Text(l10n?.rerecord ?? 'Rerecord'),
+          child: Text(l10n.rerecord),
         ),
       ],
     );

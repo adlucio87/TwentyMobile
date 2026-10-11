@@ -18,12 +18,6 @@ class TodayNotifier extends _$TodayNotifier {
   Future<TodayData> _loadTodayData() async {
     final repo = await ref.read(crmRepositoryProvider.future);
 
-    final now = DateTime.now();
-    final startOfToday = DateTime(now.year, now.month, now.day);
-    final endOfToday = startOfToday.add(const Duration(days: 1));
-    final startOfTomorrow = endOfToday;
-    final endOfTomorrow = startOfTomorrow.add(const Duration(days: 1));
-
     final List<Task> overdueTasks = [];
     final List<Task> todayTasks = [];
     final List<Task> tomorrowTasks = [];

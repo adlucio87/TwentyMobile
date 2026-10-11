@@ -1,3 +1,5 @@
+// Benchmark manuale: stampa i tempi su stdout di proposito.
+// ignore_for_file: avoid_print
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pocketcrm/core/utils/storage_service.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';

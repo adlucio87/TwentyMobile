@@ -16,11 +16,11 @@ import 'package:pocketcrm/presentation/shared/skeleton_loading.dart';
 import 'package:pocketcrm/presentation/shared/snackbar_helper.dart';
 import 'package:pocketcrm/presentation/shared/error_state_widget.dart';
 import 'package:pocketcrm/core/utils/demo_utils.dart';
+import 'package:pocketcrm/core/localization/l10n_extension.dart';
 import 'package:pocketcrm/presentation/shared/dialog_helper.dart';
 import 'package:pocketcrm/presentation/companies/companies_screen.dart';
 import 'package:pocketcrm/shared/widgets/constrained_content.dart';
 import 'package:pocketcrm/presentation/workflows/workflow_action_button.dart';
-import 'package:pocketcrm/l10n/app_localizations.dart';
 
 class CompanyDetailScreen extends ConsumerStatefulWidget {
   final String id;
@@ -51,12 +51,12 @@ class _CompanyDetailScreenState extends ConsumerState<CompanyDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = context.l10n;
     final detailAsync = ref.watch(companyDetailProvider(widget.id));
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(l10n?.companyDetails ?? 'Company Details'),
+        title: Text(l10n.companyDetails),
         actions: [
           if (detailAsync.hasValue)
             WorkflowActionButton(
@@ -66,7 +66,7 @@ class _CompanyDetailScreenState extends ConsumerState<CompanyDetailScreen> {
           if (detailAsync.hasValue)
             IconButton(
               icon: const Icon(Icons.edit),
-              tooltip: l10n?.editCompany ?? 'Edit company',
+              tooltip: l10n.editCompany,
               onPressed: () {
                 showModalBottomSheet(
                   context: context,
@@ -81,16 +81,16 @@ class _CompanyDetailScreenState extends ConsumerState<CompanyDetailScreen> {
           if (detailAsync.hasValue)
             IconButton(
               icon: const Icon(Icons.delete),
-              tooltip: l10n?.deleteCompany ?? 'Delete company',
+              tooltip: l10n.deleteCompany,
               onPressed: () async {
                 if (!await DemoUtils.checkDemoAction(context, ref)) return;
+                if (!context.mounted) return;
 
                 final confirm = await DialogHelper.showDeleteConfirmDialog(
                   context: context,
-                  title: l10n?.deleteCompany ?? 'Delete company',
+                  title: l10n.deleteCompany,
                   message:
-                      l10n?.deleteCompanyConfirmMessage(detailAsync.value!.name) ??
-                      'Are you sure you want to delete ${detailAsync.value!.name}?\nThis action cannot be undone.',
+                      l10n.deleteCompanyConfirmMessage(detailAsync.value!.name),
                 );
 
                 if (confirm && context.mounted) {
@@ -101,13 +101,13 @@ class _CompanyDetailScreenState extends ConsumerState<CompanyDetailScreen> {
 
                     if (context.mounted) {
                       Navigator.of(context).pop();
-                      SnackbarHelper.showSuccess(context, l10n?.companyDeleted ?? 'Company deleted');
+                      SnackbarHelper.showSuccess(context, l10n.companyDeleted);
                     }
                   } catch (e) {
                     if (context.mounted) {
                       SnackbarHelper.showError(
                         context,
-                        l10n?.errorDuringDeletion ?? 'Error during deletion',
+                        l10n.errorDuringDeletion,
                       );
                     }
                   }
@@ -126,14 +126,14 @@ class _CompanyDetailScreenState extends ConsumerState<CompanyDetailScreen> {
             );
           },
           icon: const Icon(Icons.add),
-          label: Text(l10n?.newNote ?? 'New Note'),
+          label: Text(l10n.newNote),
         ),
       ),
       body: detailAsync.when(
         data: (company) => _buildDetail(context, company),
         loading: () => const DetailSkeleton(),
         error: (err, stack) => ErrorStateWidget(
-          title: l10n?.loadingError ?? 'Error loading details',
+          title: l10n.loadingError,
           message: err.toString().replaceAll('Exception: ', ''),
           onRetry: () => ref.invalidate(companyDetailProvider(widget.id)),
         ),
@@ -142,7 +142,7 @@ class _CompanyDetailScreenState extends ConsumerState<CompanyDetailScreen> {
   }
 
   Widget _buildDetail(BuildContext context, Company company) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = context.l10n;
     final metadataAsync = ref.watch(workspaceMetadataProvider);
     List<FieldMetadata> companyFields = [];
     ObjectMetadata? companyMetadata;
@@ -216,13 +216,13 @@ class _CompanyDetailScreenState extends ConsumerState<CompanyDetailScreen> {
                   ListTile(
                     leading: const Icon(Icons.category),
                     title: Text(company.industry!),
-                    subtitle: Text(l10n?.industry ?? 'Industry'),
+                    subtitle: Text(l10n.industry),
                   ),
                 if (company.employeesCount != null)
                   ListTile(
                     leading: const Icon(Icons.people),
                     title: Text('${company.employeesCount}'),
-                    subtitle: Text(l10n?.employees ?? 'Employees'),
+                    subtitle: Text(l10n.employees),
                   ),
                 if (company.industry == null && company.employeesCount == null)
                   const ListTile(
@@ -242,10 +242,10 @@ class _CompanyDetailScreenState extends ConsumerState<CompanyDetailScreen> {
                   ListTile(
                     key: const Key('company_edit_fields'),
                     dense: true,
-                    title: Text(l10n?.customFields ?? 'Custom fields'),
+                    title: Text(l10n.customFields),
                     trailing: IconButton(
                       icon: const Icon(Icons.tune),
-                      tooltip: l10n?.editFields ?? 'Edit fields',
+                      tooltip: l10n.editFields,
                       onPressed: () => showEditFieldsSheet(
                         context,
                         objectType: 'company',
@@ -302,7 +302,7 @@ class _CompanyDetailScreenState extends ConsumerState<CompanyDetailScreen> {
           ),
           const SizedBox(height: 24),
           Text(
-            l10n?.notes ?? 'Related Notes',
+            l10n.notes,
             style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
           ),
           const SizedBox(height: 8),
@@ -320,7 +320,7 @@ class _CompanyNotesList extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = context.l10n;
     final notesAsync = ref.watch(companyNotesProvider(companyId));
 
     return notesAsync.when(
@@ -329,7 +329,7 @@ class _CompanyNotesList extends ConsumerWidget {
           return Center(
             child: Padding(
               padding: const EdgeInsets.all(16.0),
-              child: Text(l10n?.noNotesPresent ?? 'No notes present'),
+              child: Text(l10n.noNotesPresent),
             ),
           );
         }
@@ -342,7 +342,7 @@ class _CompanyNotesList extends ConsumerWidget {
         );
       },
       loading: () => const ListSkeleton(shrinkWrap: true),
-      error: (err, stack) => Center(child: Text('${l10n?.error ?? 'Error'}: $err')),
+      error: (err, stack) => Center(child: Text('${l10n.error}: $err')),
     );
   }
 }
@@ -370,7 +370,7 @@ class _AddCompanyNoteSheetState extends ConsumerState<_AddCompanyNoteSheet> {
   }
 
   Future<void> _save() async {
-    final l10n = AppLocalizations.of(context);
+    final l10n = context.l10n;
     final text = _bodyController.text.trim();
     if (text.isEmpty) return;
     setState(() => _isLoading = true);
@@ -380,11 +380,11 @@ class _AddCompanyNoteSheetState extends ConsumerState<_AddCompanyNoteSheet> {
           .addNote(widget.companyId, text);
       if (mounted) {
         Navigator.of(context).pop();
-        SnackbarHelper.showSuccess(context, l10n?.noteSaved ?? 'Note added successfully');
+        SnackbarHelper.showSuccess(context, l10n.noteSaved);
       }
     } catch (e) {
       if (mounted) {
-        SnackbarHelper.showError(context, '${l10n?.error ?? 'Error'}: $e');
+        SnackbarHelper.showError(context, '${l10n.error}: $e');
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -393,7 +393,7 @@ class _AddCompanyNoteSheetState extends ConsumerState<_AddCompanyNoteSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = context.l10n;
     return Padding(
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,
@@ -406,7 +406,7 @@ class _AddCompanyNoteSheetState extends ConsumerState<_AddCompanyNoteSheet> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text(l10n?.newNote ?? 'New Note', style: Theme.of(context).textTheme.headlineSmall),
+            Text(l10n.newNote, style: Theme.of(context).textTheme.headlineSmall),
             const SizedBox(height: 24),
             TextField(
               controller: _bodyController,
@@ -415,7 +415,7 @@ class _AddCompanyNoteSheetState extends ConsumerState<_AddCompanyNoteSheet> {
               minLines: 3,
               autofocus: true,
               decoration: InputDecoration(
-                labelText: l10n?.noteText ?? 'Note text',
+                labelText: l10n.noteText,
                 alignLabelWithHint: true,
                 border: const OutlineInputBorder(),
               ),
@@ -429,7 +429,7 @@ class _AddCompanyNoteSheetState extends ConsumerState<_AddCompanyNoteSheet> {
                       width: 20,
                       child: CircularProgressIndicator(strokeWidth: 2),
                     )
-                  : Text(l10n?.saveNote ?? 'Save Note'),
+                  : Text(l10n.saveNote),
             ),
             const SizedBox(height: 32),
           ],

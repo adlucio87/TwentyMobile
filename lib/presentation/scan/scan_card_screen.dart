@@ -7,7 +7,7 @@ import 'package:image_picker/image_picker.dart';
 
 import 'scan_provider.dart';
 import 'scan_review_screen.dart';
-import 'package:pocketcrm/l10n/app_localizations.dart';
+import 'package:pocketcrm/core/localization/l10n_extension.dart';
 
 class ScanCardScreen extends ConsumerStatefulWidget {
   const ScanCardScreen({super.key});
@@ -41,7 +41,7 @@ class _ScanCardScreenState extends ConsumerState<ScanCardScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = context.l10n;
     return Scaffold(
       backgroundColor: Colors.black,
       body: Stack(
@@ -68,7 +68,7 @@ class _ScanCardScreenState extends ConsumerState<ScanCardScreen> {
                       ),
                       Expanded(
                         child: Text(
-                          l10n?.frameBusinessCard ?? 'Frame the business card',
+                          l10n.frameBusinessCard,
                           textAlign: TextAlign.center,
                           style: const TextStyle(color: Colors.white, fontSize: 16,
                               fontWeight: FontWeight.w600),
@@ -89,7 +89,7 @@ class _ScanCardScreenState extends ConsumerState<ScanCardScreen> {
                 Padding(
                   padding: const EdgeInsets.only(bottom: 32),
                   child: Text(
-                    l10n?.keepCardHorizontal ?? 'Keep the card horizontal and well-lit',
+                    l10n.keepCardHorizontal,
                     style: const TextStyle(color: Colors.white70, fontSize: 13),
                   ),
                 ),
@@ -146,14 +146,15 @@ class _ScanCardScreenState extends ConsumerState<ScanCardScreen> {
   }
 
   Future<void> _processAndNavigate(XFile image) async {
+    if (!mounted) return;
     // Optional Crop
-    final l10n = mounted ? AppLocalizations.of(context) : null;
+    final l10n = context.l10n;
     final cropped = await ImageCropper().cropImage(
       sourcePath: image.path,
       aspectRatio: const CropAspectRatio(ratioX: 85, ratioY: 55), // business card proportions
       uiSettings: [
         AndroidUiSettings(
-          toolbarTitle: l10n?.cropBusinessCard ?? 'Crop business card',
+          toolbarTitle: l10n.cropBusinessCard,
           toolbarColor: Colors.black,
           statusBarLight: false,
           toolbarWidgetColor: Colors.white,

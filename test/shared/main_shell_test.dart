@@ -5,6 +5,8 @@ import 'package:go_router/go_router.dart';
 import 'package:pocketcrm/shared/main_shell.dart';
 import 'package:pocketcrm/core/utils/demo_utils.dart';
 
+import '../helpers/localized_app.dart';
+
 void main() {
   group('MainShell Tests', () {
     testWidgets('MainShell should contain a SafeArea that accounts for the top', (WidgetTester tester) async {
@@ -41,6 +43,9 @@ void main() {
             isDemoModeProvider.overrideWith((ref) => Future.value(true)),
           ],
           child: MaterialApp.router(
+            locale: testLocale,
+            localizationsDelegates: testLocalizationsDelegates,
+            supportedLocales: testSupportedLocales,
             routerConfig: router,
           ),
         ),
@@ -64,10 +69,8 @@ void main() {
       expect(find.textContaining('Demo mode'), findsOneWidget);
 
       // Verify content is below the status bar (in terms of local coordinates)
-      // By default widget tests have no padding, but we can check the layout
-      final bannerLabel = find.textContaining('Demo mode');
-      final bannerPosition = tester.getTopLeft(bannerLabel);
-      
+      // By default widget tests have no padding, so the banner sits at the top
+      // of the SafeArea.
       // If we provided a MediaQuery with top padding, we could verify it's shifted
       // For now, checking the widget structure is sufficient
     });
@@ -94,6 +97,9 @@ void main() {
             isDemoModeProvider.overrideWith((ref) => Future.value(false)),
           ],
           child: MaterialApp.router(
+            locale: testLocale,
+            localizationsDelegates: testLocalizationsDelegates,
+            supportedLocales: testSupportedLocales,
             routerConfig: router,
           ),
         ),

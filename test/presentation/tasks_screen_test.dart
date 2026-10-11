@@ -9,6 +9,7 @@ import 'package:pocketcrm/presentation/shared/empty_state_widget.dart';
 import 'package:pocketcrm/shared/widgets/task_card.dart';
 
 import '../core/di/providers_test.mocks.dart';
+import '../helpers/localized_app.dart';
 
 // Mock task data class
 class MockTasksProvider extends Tasks {
@@ -38,9 +39,7 @@ void main() {
           crmRepositoryProvider.overrideWith((ref) => Future.value(mockCRMRepository)),
           tasksProvider.overrideWith(() => MockTasksProvider(mockTasks)),
         ],
-        child: const MaterialApp(
-          home: TasksScreen(),
-        ),
+        child: localizedTestApp(home: const TasksScreen()),
       );
     }
 

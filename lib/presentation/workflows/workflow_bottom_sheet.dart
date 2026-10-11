@@ -1,11 +1,11 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:pocketcrm/l10n/app_localizations.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:pocketcrm/core/di/providers.dart';
 import 'package:pocketcrm/core/theme/app_colors.dart';
+import 'package:pocketcrm/core/localization/l10n_extension.dart';
 import 'package:pocketcrm/domain/models/workflow.dart';
 import 'package:pocketcrm/domain/models/workflow_run.dart';
 import 'package:pocketcrm/presentation/shared/snackbar_helper.dart';
@@ -619,7 +619,7 @@ class _WorkflowBottomSheetState extends ConsumerState<WorkflowBottomSheet> {
 
         // Slide to execute
         SlideToExecuteButton(
-          label: AppLocalizations.of(context)?.slideToExecute ?? 'Slide to execute',
+          label: context.l10n.slideToExecute,
           enabled: _isFormValid,
           onExecute: _executeWorkflow,
         ),

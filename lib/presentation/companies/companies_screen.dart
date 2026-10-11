@@ -12,9 +12,9 @@ import 'package:pocketcrm/core/utils/color_utils.dart';
 import 'package:pocketcrm/domain/models/company.dart';
 import 'package:pocketcrm/presentation/shared/snackbar_helper.dart';
 import 'package:pocketcrm/core/utils/demo_utils.dart';
+import 'package:pocketcrm/core/localization/l10n_extension.dart';
 import 'package:pocketcrm/presentation/shared/swipe_action_wrapper.dart';
 import 'package:pocketcrm/shared/widgets/constrained_content.dart';
-import 'package:pocketcrm/l10n/app_localizations.dart';
 import 'dart:async';
 
 class CompaniesScreen extends ConsumerStatefulWidget {
@@ -25,7 +25,6 @@ class CompaniesScreen extends ConsumerStatefulWidget {
 }
 
 class _CompaniesScreenState extends ConsumerState<CompaniesScreen> {
-  final bool _isSearching = false;
   final TextEditingController _searchController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   Timer? _debounce;
@@ -61,7 +60,7 @@ class _CompaniesScreenState extends ConsumerState<CompaniesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = context.l10n;
     final companiesAsync = ref.watch(companiesProvider);
 
     return Scaffold(
@@ -69,7 +68,7 @@ class _CompaniesScreenState extends ConsumerState<CompaniesScreen> {
         title: TextField(
           controller: _searchController,
           decoration: InputDecoration(
-            hintText: l10n?.searchCompanies ?? 'Search companies...',
+            hintText: l10n.searchCompanies,
             prefixIcon: const Icon(Icons.search),
             contentPadding: const EdgeInsets.symmetric(vertical: 0),
             border: OutlineInputBorder(
@@ -86,10 +85,10 @@ class _CompaniesScreenState extends ConsumerState<CompaniesScreen> {
         actions: const [],
       ),
       floatingActionButton: FloatingActionButton(
-        tooltip: l10n?.addCompany ?? 'Add Company',
+        tooltip: l10n.addCompany,
         onPressed: () async {
           if (!await DemoUtils.checkDemoAction(context, ref)) return;
-          if (mounted) {
+          if (context.mounted) {
             showModalBottomSheet(
               context: context,
               isScrollControlled: true,
@@ -113,8 +112,8 @@ class _CompaniesScreenState extends ConsumerState<CompaniesScreen> {
                   height: MediaQuery.of(context).size.height * 0.7,
                   child: EmptyStateWidget(
                     icon: Icons.business,
-                    title: l10n?.noCompaniesFound ?? 'No companies',
-                    message: l10n?.noCompaniesInDatabase ?? 'There are no companies in the database.',
+                    title: l10n.noCompaniesFound,
+                    message: l10n.noCompaniesInDatabase,
                   ),
                 ),
               ),
@@ -144,10 +143,9 @@ class _CompaniesScreenState extends ConsumerState<CompaniesScreen> {
                 final bgColor = ColorUtils.avatarColor(company.name);
                 return SwipeActionWrapper(
                   itemKey: ValueKey('company_${company.id}'),
-                  confirmTitle: l10n?.deleteCompany ?? 'Delete company',
+                  confirmTitle: l10n.deleteCompany,
                   confirmMessage:
-                      l10n?.deleteCompanyConfirmMessage(company.name) ??
-                      'Are you sure you want to delete ${company.name}?\nThis action cannot be undone.',
+                      l10n.deleteCompanyConfirmMessage(company.name),
                   onDelete: () async {
                     if (!await DemoUtils.checkDemoAction(context, ref)) return;
                     try {
@@ -158,7 +156,7 @@ class _CompaniesScreenState extends ConsumerState<CompaniesScreen> {
                       if (context.mounted) {
                         SnackbarHelper.showError(
                           context,
-                          '${l10n?.errorDuringDeletion ?? 'Failed to delete company'}: ${e.toString().replaceAll('Exception: ', '')}',
+                          '${l10n.errorDuringDeletion}: ${e.toString().replaceAll('Exception: ', '')}',
                         );
                       }
                     }
@@ -283,7 +281,7 @@ class _CompaniesScreenState extends ConsumerState<CompaniesScreen> {
         },
         loading: () => const ListSkeleton(),
         error: (err, stack) => ErrorStateWidget(
-          title: l10n?.loadingError ?? 'Loading error',
+          title: l10n.loadingError,
           message: err.toString().replaceAll('Exception: ', ''),
           onRetry: () => ref.invalidate(companiesProvider),
         ),
@@ -316,7 +314,7 @@ class AddCompanySheetState extends ConsumerState<AddCompanySheet> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = context.l10n;
     return Padding(
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,
@@ -335,7 +333,7 @@ class AddCompanySheetState extends ConsumerState<AddCompanySheet> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    l10n?.newCompany ?? 'New Company',
+                    l10n.newCompany,
                     style: Theme.of(context).textTheme.headlineSmall,
                   ),
                 ],
@@ -343,15 +341,15 @@ class AddCompanySheetState extends ConsumerState<AddCompanySheet> {
               const SizedBox(height: 24),
               TextFormField(
                 controller: _nameController,
-                decoration: InputDecoration(labelText: l10n?.companyName ?? 'Company Name'),
-                validator: (v) => v?.trim().isEmpty == true ? (l10n?.requiredField ?? 'Required') : null,
+                decoration: InputDecoration(labelText: l10n.companyName),
+                validator: (v) => v?.trim().isEmpty == true ? (l10n.requiredField) : null,
                 enabled: !_isLoading,
               ),
               const SizedBox(height: 16),
               TextFormField(
                 controller: _domainController,
                 decoration: InputDecoration(
-                  labelText: l10n?.domainOrWebsite ?? 'Domain or Website',
+                  labelText: l10n.domainOrWebsite,
                   hintText: 'e.g. example.com',
                 ),
                 keyboardType: TextInputType.url,
@@ -412,11 +410,11 @@ class AddCompanySheetState extends ConsumerState<AddCompanySheet> {
                                       : null,
                                 );
 
-                            if (mounted) {
+                            if (context.mounted) {
                               navigator.pop();
                               SnackbarHelper.showSuccess(
                                 context,
-                                l10n?.companyCreated ?? 'Company created successfully',
+                                l10n.companyCreated,
                               );
                             }
                           } catch (e) {
@@ -442,7 +440,7 @@ class AddCompanySheetState extends ConsumerState<AddCompanySheet> {
                         width: 20,
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
-                    : Text(l10n?.saveCompany ?? 'Save Company'),
+                    : Text(l10n.saveCompany),
               ),
               const SizedBox(height: 32),
             ],
@@ -486,7 +484,7 @@ class EditCompanySheetState extends ConsumerState<EditCompanySheet> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = context.l10n;
     return Padding(
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,
@@ -505,7 +503,7 @@ class EditCompanySheetState extends ConsumerState<EditCompanySheet> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    l10n?.editCompany ?? 'Edit Company',
+                    l10n.editCompany,
                     style: Theme.of(context).textTheme.headlineSmall,
                   ),
                 ],
@@ -513,15 +511,15 @@ class EditCompanySheetState extends ConsumerState<EditCompanySheet> {
               const SizedBox(height: 24),
               TextFormField(
                 controller: _nameController,
-                decoration: InputDecoration(labelText: l10n?.companyName ?? 'Company Name'),
-                validator: (v) => v?.trim().isEmpty == true ? (l10n?.requiredField ?? 'Required') : null,
+                decoration: InputDecoration(labelText: l10n.companyName),
+                validator: (v) => v?.trim().isEmpty == true ? (l10n.requiredField) : null,
                 enabled: !_isLoading,
               ),
               const SizedBox(height: 16),
               TextFormField(
                 controller: _domainController,
                 decoration: InputDecoration(
-                  labelText: l10n?.domainOrWebsite ?? 'Domain or Website',
+                  labelText: l10n.domainOrWebsite,
                   hintText: 'e.g. example.com',
                 ),
                 keyboardType: TextInputType.url,
@@ -581,11 +579,11 @@ class EditCompanySheetState extends ConsumerState<EditCompanySheet> {
                                   domainName: _domainController.text.trim(),
                                 );
 
-                            if (mounted) {
+                            if (context.mounted) {
                               navigator.pop();
                               SnackbarHelper.showSuccess(
                                 context,
-                                l10n?.companyUpdated ?? 'Company updated successfully',
+                                l10n.companyUpdated,
                               );
                             }
                           } catch (e) {
@@ -611,7 +609,7 @@ class EditCompanySheetState extends ConsumerState<EditCompanySheet> {
                         width: 20,
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
-                    : Text(l10n?.saveChanges ?? 'Save Changes'),
+                    : Text(l10n.saveChanges),
               ),
               const SizedBox(height: 32),
             ],

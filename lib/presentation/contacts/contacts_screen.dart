@@ -13,10 +13,10 @@ import 'package:pocketcrm/presentation/shared/empty_state_widget.dart';
 import 'package:pocketcrm/presentation/shared/swipe_action_wrapper.dart';
 import 'package:pocketcrm/core/utils/demo_utils.dart';
 import 'package:pocketcrm/core/utils/color_utils.dart';
+import 'package:pocketcrm/core/localization/l10n_extension.dart';
 import 'package:pocketcrm/presentation/contacts/edit_contact_sheet.dart';
 import 'package:pocketcrm/presentation/shared/error_state_widget.dart';
 import 'package:pocketcrm/shared/widgets/constrained_content.dart';
-import 'package:pocketcrm/l10n/app_localizations.dart';
 
 class ContactsScreen extends ConsumerStatefulWidget {
   const ContactsScreen({super.key});
@@ -59,14 +59,14 @@ class _ContactsScreenState extends ConsumerState<ContactsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = context.l10n;
     final contactsAsync = ref.watch(contactsProvider);
 
     return Scaffold(
       appBar: AppBar(
         title: TextField(
           decoration: InputDecoration(
-            hintText: l10n?.searchContacts ?? 'Search contacts...',
+            hintText: l10n.searchContacts,
             prefixIcon: const Icon(Icons.search),
             contentPadding: const EdgeInsets.symmetric(vertical: 0),
             border: OutlineInputBorder(
@@ -93,8 +93,8 @@ class _ContactsScreenState extends ConsumerState<ContactsScreen> {
                   height: MediaQuery.of(context).size.height * 0.7,
                   child: EmptyStateWidget(
                     icon: Icons.people_outline,
-                    title: l10n?.noContactsFound ?? 'No contacts',
-                    message: l10n?.noResultsMatchSearch ?? 'No results match your search.',
+                    title: l10n.noContactsFound,
+                    message: l10n.noResultsMatchSearch,
                   ),
                 ),
               ),
@@ -223,10 +223,10 @@ class _ContactsScreenState extends ConsumerState<ContactsScreen> {
         ),
       )),
       floatingActionButton: FloatingActionButton(
-        tooltip: l10n?.addContact ?? 'Add Contact',
+        tooltip: l10n.addContact,
         onPressed: () async {
           if (!await DemoUtils.checkDemoAction(context, ref)) return;
-          if (mounted) _showAddContactDialog(context);
+          if (context.mounted) _showAddContactDialog(context);
         },
         child: const Icon(Icons.add),
       ),
@@ -267,15 +267,9 @@ class AddContactSheetState extends ConsumerState<AddContactSheet> {
     return email.contains('@') && email.contains('.');
   }
 
-  bool _isValidPhone(String phone) {
-    if (phone.isEmpty) return true; // Optional
-    // Basic validation: allows + and digits, min 5 chars, max 15
-    return RegExp(r'^\+?[0-9\s\-\(\)]{5,15}$').hasMatch(phone);
-  }
-
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = context.l10n;
     return Padding(
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,
@@ -294,12 +288,12 @@ class AddContactSheetState extends ConsumerState<AddContactSheet> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    l10n?.newContact ?? 'New Contact',
+                    l10n.newContact,
                     style: Theme.of(context).textTheme.headlineSmall,
                   ),
                   IconButton(
                     icon: const Icon(Icons.import_contacts),
-                    tooltip: l10n?.importFromContacts ?? 'Import from contacts',
+                    tooltip: l10n.importFromContacts,
                     onPressed: _isLoading
                         ? null
                         : () async {
@@ -370,24 +364,24 @@ class AddContactSheetState extends ConsumerState<AddContactSheet> {
               const SizedBox(height: 24),
               TextFormField(
                 controller: _firstNameController,
-                decoration: InputDecoration(labelText: l10n?.firstName ?? 'First Name'),
-                validator: (v) => v?.isEmpty == true ? (l10n?.requiredField ?? 'Required') : null,
+                decoration: InputDecoration(labelText: l10n.firstName),
+                validator: (v) => v?.isEmpty == true ? (l10n.requiredField) : null,
                 enabled: !_isLoading,
               ),
               const SizedBox(height: 16),
               TextFormField(
                 controller: _lastNameController,
-                decoration: InputDecoration(labelText: l10n?.lastName ?? 'Last Name'),
-                validator: (v) => v?.trim().isEmpty == true ? (l10n?.requiredField ?? 'Required') : null,
+                decoration: InputDecoration(labelText: l10n.lastName),
+                validator: (v) => v?.trim().isEmpty == true ? (l10n.requiredField) : null,
                 enabled: !_isLoading,
               ),
               const SizedBox(height: 16),
               TextFormField(
                 controller: _emailController,
-                decoration: InputDecoration(labelText: l10n?.email ?? 'Email'),
+                decoration: InputDecoration(labelText: l10n.email),
                 keyboardType: TextInputType.emailAddress,
                 validator: (v) =>
-                    !_isValidEmail(v ?? '') ? (l10n?.invalidEmailFormat ?? 'Invalid email format') : null,
+                    !_isValidEmail(v ?? '') ? (l10n.invalidEmailFormat) : null,
                 enabled: !_isLoading,
               ),
               const SizedBox(height: 16),
@@ -395,7 +389,7 @@ class AddContactSheetState extends ConsumerState<AddContactSheet> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    l10n?.phoneMobile ?? 'Phone (Mobile)',
+                    l10n.phoneMobile,
                     style: TextStyle(
                       color: Theme.of(context).colorScheme.onSurfaceVariant,
                       fontSize: 12,
@@ -473,11 +467,11 @@ class AddContactSheetState extends ConsumerState<AddContactSheet> {
                                       : null,
                                 );
 
-                            if (mounted) {
+                            if (context.mounted) {
                               navigator.pop(); // Pop solo se successo
                               SnackbarHelper.showSuccess(
                                 context,
-                                l10n?.contactAdded ?? 'Contact created successfully',
+                                l10n.contactAdded,
                               );
                             }
                           } catch (e) {
@@ -511,7 +505,7 @@ class AddContactSheetState extends ConsumerState<AddContactSheet> {
                         width: 20,
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
-                    : Text(l10n?.saveContact ?? 'Save Contact'),
+                    : Text(l10n.saveContact),
               ),
               const SizedBox(height: 32),
             ],
