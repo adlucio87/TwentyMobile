@@ -693,13 +693,13 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get whereFindToken =>
-      'टोकन कहाँ मिलेगा? Twenty → सेटिंग्स → API और वेबहुक';
+      'कुंजी कहाँ मिलेगी? Twenty → सेटिंग्स → API और वेबहुक';
 
   @override
-  String get tokenHint => 'टोकन दर्ज करें...';
+  String get tokenHint => 'कुंजी दर्ज करें...';
 
   @override
-  String get tokenRequired => 'कृपया एक टोकन दर्ज करें';
+  String get tokenRequired => 'कृपया एक कुंजी दर्ज करें';
 
   @override
   String get connect => 'कनेक्ट करें';
@@ -795,4 +795,13 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get selectLanguage => 'भाषा चुनें';
+
+  @override
+  String get paste => 'चिपकाएँ';
+
+  @override
+  String get pastedFromClipboard => 'क्लिपबोर्ड से पेस्ट किया गया';
+
+  @override
+  String get clipboardEmpty => 'क्लिपबोर्ड खाली है';
 }

@@ -699,7 +699,7 @@ class AppLocalizationsIt extends AppLocalizations {
       'Dove trovo la chiave? Twenty → Impostazioni → API e Webhook';
 
   @override
-  String get tokenHint => 'Inserisci token...';
+  String get tokenHint => 'Inserisci chiave...';
 
   @override
   String get tokenRequired => 'Inserisci una chiave API';
@@ -799,4 +799,13 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get selectLanguage => 'Seleziona Lingua';
+
+  @override
+  String get paste => 'Incolla';
+
+  @override
+  String get pastedFromClipboard => 'Contenuto incollato dagli appunti';
+
+  @override
+  String get clipboardEmpty => 'Gli appunti sono vuoti';
 }

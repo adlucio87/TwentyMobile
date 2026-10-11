@@ -220,9 +220,9 @@
   "adminBadge": "व्यवस्थापक",
   "apiTokenTitle": "API कुंजी",
   "enterApiToken": "अपनी Twenty CRM API कुंजी दर्ज करें।",
-  "whereFindToken": "टोकन कहाँ मिलेगा? Twenty → सेटिंग्स → API और वेबहुक",
-  "tokenHint": "टोकन दर्ज करें...",
-  "tokenRequired": "कृपया एक टोकन दर्ज करें",
+  "whereFindToken": "कुंजी कहाँ मिलेगी? Twenty → सेटिंग्स → API और वेबहुक",
+  "tokenHint": "कुंजी दर्ज करें...",
+  "tokenRequired": "कृपया एक कुंजी दर्ज करें",
   "connect": "कनेक्ट करें",
   "pasteFromClipboard": "क्लिपबोर्ड से चिपकाएं",
   "loginWithEmailTitle": "ईमेल से लॉगिन करें",
@@ -252,5 +252,8 @@
   "receiveRemindersTasks": "अपने आगामी कार्यों के लिए अनुस्मारक प्राप्त करें",
   "enableNotifications": "सूचनाएं सक्षम करें",
   "notNow": "अभी नहीं",
-  "selectLanguage": "भाषा चुनें"
+  "selectLanguage": "भाषा चुनें",
+  "paste": "चिपकाएँ",
+  "pastedFromClipboard": "क्लिपबोर्ड से पेस्ट किया गया",
+  "clipboardEmpty": "क्लिपबोर्ड खाली है"
 }

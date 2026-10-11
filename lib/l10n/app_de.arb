@@ -252,5 +252,8 @@
   "receiveRemindersTasks": "Erhalten Sie Erinnerungen für Ihre anstehenden Aufgaben",
   "enableNotifications": "Benachrichtigungen aktivieren",
   "notNow": "Nicht jetzt",
-  "selectLanguage": "Sprache auswählen"
+  "selectLanguage": "Sprache auswählen",
+  "paste": "Einfügen",
+  "pastedFromClipboard": "Aus der Zwischenablage eingefügt",
+  "clipboardEmpty": "Zwischenablage ist leer"
 }

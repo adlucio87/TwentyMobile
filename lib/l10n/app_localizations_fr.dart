@@ -802,4 +802,13 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get selectLanguage => 'Sélectionner la langue';
+
+  @override
+  String get paste => 'Coller';
+
+  @override
+  String get pastedFromClipboard => 'Contenu collé depuis le presse-papiers';
+
+  @override
+  String get clipboardEmpty => 'Le presse-papiers est vide';
 }

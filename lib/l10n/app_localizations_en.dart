@@ -684,20 +684,20 @@ class AppLocalizationsEn extends AppLocalizations {
   String get adminBadge => 'Admin';
 
   @override
-  String get apiTokenTitle => 'API Token';
+  String get apiTokenTitle => 'API Key';
 
   @override
-  String get enterApiToken => 'Enter your Twenty CRM API Token.';
+  String get enterApiToken => 'Enter your Twenty CRM API Key.';
 
   @override
   String get whereFindToken =>
-      'Where can I find the token? Twenty → Settings → API & Webhooks';
+      'Where can I find the key? Twenty → Settings → API & Webhooks';
 
   @override
-  String get tokenHint => 'Enter token...';
+  String get tokenHint => 'Enter key...';
 
   @override
-  String get tokenRequired => 'Please enter a token';
+  String get tokenRequired => 'Please enter a key';
 
   @override
   String get connect => 'Connect';
@@ -794,6 +794,15 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get selectLanguage => 'Select Language';
+
+  @override
+  String get paste => 'Paste';
+
+  @override
+  String get pastedFromClipboard => 'Pasted from clipboard';
+
+  @override
+  String get clipboardEmpty => 'Clipboard is empty';
 }
 
 /// The translations for English, as used in the United Kingdom (`en_GB`).
@@ -1476,20 +1485,20 @@ class AppLocalizationsEnGb extends AppLocalizationsEn {
   String get adminBadge => 'Admin';
 
   @override
-  String get apiTokenTitle => 'API Token';
+  String get apiTokenTitle => 'API Key';
 
   @override
-  String get enterApiToken => 'Enter your Twenty CRM API Token.';
+  String get enterApiToken => 'Enter your Twenty CRM API Key.';
 
   @override
   String get whereFindToken =>
-      'Where can I find the token? Twenty → Settings → API & Webhooks';
+      'Where can I find the key? Twenty → Settings → API & Webhooks';
 
   @override
-  String get tokenHint => 'Enter token...';
+  String get tokenHint => 'Enter key...';
 
   @override
-  String get tokenRequired => 'Please enter a token';
+  String get tokenRequired => 'Please enter a key';
 
   @override
   String get connect => 'Connect';
@@ -1586,4 +1595,13 @@ class AppLocalizationsEnGb extends AppLocalizationsEn {
 
   @override
   String get selectLanguage => 'Select Language';
+
+  @override
+  String get paste => 'Paste';
+
+  @override
+  String get pastedFromClipboard => 'Pasted from clipboard';
+
+  @override
+  String get clipboardEmpty => 'Clipboard is empty';
 }

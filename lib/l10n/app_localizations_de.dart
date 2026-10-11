@@ -802,4 +802,13 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get selectLanguage => 'Sprache auswählen';
+
+  @override
+  String get paste => 'Einfügen';
+
+  @override
+  String get pastedFromClipboard => 'Aus der Zwischenablage eingefügt';
+
+  @override
+  String get clipboardEmpty => 'Zwischenablage ist leer';
 }

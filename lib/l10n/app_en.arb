@@ -254,11 +254,11 @@
   "loginWithApiKeyDesc": "Full workspace access. For administrators and owners.",
   "recommended": "Recommended",
   "adminBadge": "Admin",
-  "apiTokenTitle": "API Token",
-  "enterApiToken": "Enter your Twenty CRM API Token.",
-  "whereFindToken": "Where can I find the token? Twenty → Settings → API & Webhooks",
-  "tokenHint": "Enter token...",
-  "tokenRequired": "Please enter a token",
+  "apiTokenTitle": "API Key",
+  "enterApiToken": "Enter your Twenty CRM API Key.",
+  "whereFindToken": "Where can I find the key? Twenty → Settings → API & Webhooks",
+  "tokenHint": "Enter key...",
+  "tokenRequired": "Please enter a key",
   "connect": "Connect",
   "pasteFromClipboard": "Paste from clipboard",
   "loginWithEmailTitle": "Login with Email",
@@ -288,5 +288,8 @@
   "receiveRemindersTasks": "Receive reminders for your upcoming tasks",
   "enableNotifications": "Enable notifications",
   "notNow": "Not now",
-  "selectLanguage": "Select Language"
+  "selectLanguage": "Select Language",
+  "paste": "Paste",
+  "pastedFromClipboard": "Pasted from clipboard",
+  "clipboardEmpty": "Clipboard is empty"
 }

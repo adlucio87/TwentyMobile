@@ -4,7 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pocketcrm/core/di/auth_state.dart';
 import 'package:pocketcrm/core/di/providers.dart';
-import 'package:pocketcrm/l10n/app_localizations.dart';
+import 'package:pocketcrm/core/localization/l10n_extension.dart';
+import 'package:pocketcrm/presentation/shared/clipboard_paste.dart';
 import 'package:pocketcrm/presentation/shared/language_button.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
@@ -44,32 +45,20 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
     super.dispose();
   }
 
+  /// Pastes the verification code from the system clipboard.
+  ///
+  /// Only called from explicit user interactions (context menu entry and the
+  /// "Paste from clipboard" button), so that no clipboard read happens as a
+  /// side effect of building the text selection toolbar.
   Future<void> _pasteFromClipboard() async {
-    final data = await Clipboard.getData(Clipboard.kTextPlain);
-    final text = data?.text?.trim() ?? '';
-    if (text.isEmpty) return;
-
-    final digits = text.replaceAll(RegExp(r'\D'), '');
-    final code = digits.length >= 6 ? digits.substring(0, 6) : digits;
-    if (code.isNotEmpty) {
-      HapticFeedback.mediumImpact();
-      setState(() {
-        _otpController.text = code;
-        _error = null;
-      });
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              AppLocalizations.of(context)?.codePasted ??
-                  'Code pasted from clipboard',
-            ),
-            duration: const Duration(seconds: 2),
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
-      }
-    }
+    final l10n = context.l10n;
+    await pasteFromClipboard(
+      context,
+      _otpController,
+      successMessage: l10n.codePasted,
+      emptyMessage: l10n.clipboardEmpty,
+      otpMode: true,
+    );
   }
 
   void _onOtpChanged() {
@@ -137,15 +126,13 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final l10n = AppLocalizations.of(context);
+    final l10n = context.l10n;
     final isReady = _otpController.text.length == 6;
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(l10n?.twoFactorTitle ?? 'Two-Factor Authentication'),
-        actions: const [
-          LanguageSelectorButton(),
-        ],
+        title: Text(l10n.twoFactorTitle),
+        actions: const [LanguageSelectorButton()],
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
@@ -163,9 +150,7 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
           builder: (context, constraints) {
             return SingleChildScrollView(
               child: ConstrainedBox(
-                constraints: BoxConstraints(
-                  minHeight: constraints.maxHeight,
-                ),
+                constraints: BoxConstraints(minHeight: constraints.maxHeight),
                 child: IntrinsicHeight(
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 32),
@@ -179,7 +164,9 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
                           width: 80,
                           height: 80,
                           decoration: BoxDecoration(
-                            color: theme.colorScheme.primaryContainer.withAlpha(80),
+                            color: theme.colorScheme.primaryContainer.withAlpha(
+                              80,
+                            ),
                             shape: BoxShape.circle,
                           ),
                           child: Icon(
@@ -192,7 +179,7 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
 
                         // Title
                         Text(
-                          l10n?.enterVerificationCode ?? 'Enter your verification code',
+                          l10n.enterVerificationCode,
                           style: theme.textTheme.headlineSmall?.copyWith(
                             fontWeight: FontWeight.bold,
                           ),
@@ -202,8 +189,7 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
 
                         // Subtitle
                         Text(
-                          l10n?.openAuthenticatorApp ??
-                              'Open your authenticator app and enter the 6-digit code',
+                          l10n.openAuthenticatorApp,
                           style: theme.textTheme.bodyMedium?.copyWith(
                             color: theme.colorScheme.onSurfaceVariant,
                           ),
@@ -211,63 +197,66 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
                         ),
                         const SizedBox(height: 40),
 
-                        // OTP Input with long-press paste and context menu auto-paste
+                        // OTP input. A long press opens the platform context
+                        // menu whose paste entry sanitizes the code from the
+                        // clipboard (digits only, at most 6).
                         SizedBox(
                           width: 240,
-                          child: GestureDetector(
-                            onLongPress: _pasteFromClipboard,
-                            child: TextField(
-                              controller: _otpController,
-                              keyboardType: TextInputType.number,
-                              maxLength: 6,
-                              autofocus: true,
-                              textAlign: TextAlign.center,
-                              enabled: !_isLoading,
-                              contextMenuBuilder: (context, editableTextState) {
-                                _pasteFromClipboard();
-                                return AdaptiveTextSelectionToolbar.editableText(
-                                  editableTextState: editableTextState,
-                                );
-                              },
-                              style: const TextStyle(
+                          child: TextField(
+                            controller: _otpController,
+                            keyboardType: TextInputType.number,
+                            maxLength: 6,
+                            autofocus: true,
+                            textAlign: TextAlign.center,
+                            enabled: !_isLoading,
+                            contextMenuBuilder: (context, editableTextState) {
+                              return AdaptiveTextSelectionToolbar.buttonItems(
+                                anchors: editableTextState.contextMenuAnchors,
+                                buttonItems: pasteContextMenuButtonItems(
+                                  editableTextState,
+                                  pasteLabel: context.l10n.paste,
+                                  onPaste: _pasteFromClipboard,
+                                ),
+                              );
+                            },
+                            style: const TextStyle(
+                              fontSize: 32,
+                              fontWeight: FontWeight.w600,
+                              letterSpacing: 16,
+                            ),
+                            inputFormatters: [
+                              FilteringTextInputFormatter.digitsOnly,
+                            ],
+                            decoration: InputDecoration(
+                              counterText: '', // hide "0/6"
+                              hintText: '------',
+                              hintStyle: TextStyle(
                                 fontSize: 32,
-                                fontWeight: FontWeight.w600,
                                 letterSpacing: 16,
+                                color: theme.colorScheme.outline.withAlpha(100),
                               ),
-                              inputFormatters: [
-                                FilteringTextInputFormatter.digitsOnly,
-                              ],
-                              decoration: InputDecoration(
-                                counterText: '', // hide "0/6"
-                                hintText: '------',
-                                hintStyle: TextStyle(
-                                  fontSize: 32,
-                                  letterSpacing: 16,
-                                  color: theme.colorScheme.outline.withAlpha(100),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: BorderSide(
+                                  color: _error != null
+                                      ? theme.colorScheme.error
+                                      : theme.colorScheme.primary,
+                                  width: 2,
                                 ),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(12),
+                              ),
+                              errorBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: BorderSide(
+                                  color: theme.colorScheme.error,
+                                  width: 2,
                                 ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                  borderSide: BorderSide(
-                                    color: _error != null
-                                        ? theme.colorScheme.error
-                                        : theme.colorScheme.primary,
-                                    width: 2,
-                                  ),
-                                ),
-                                errorBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                  borderSide: BorderSide(
-                                    color: theme.colorScheme.error,
-                                    width: 2,
-                                  ),
-                                ),
-                                contentPadding: const EdgeInsets.symmetric(
-                                  vertical: 16,
-                                  horizontal: 16,
-                                ),
+                              ),
+                              contentPadding: const EdgeInsets.symmetric(
+                                vertical: 16,
+                                horizontal: 16,
                               ),
                             ),
                           ),
@@ -279,9 +268,7 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
                         TextButton.icon(
                           onPressed: _isLoading ? null : _pasteFromClipboard,
                           icon: const Icon(Icons.paste_rounded, size: 18),
-                          label: Text(
-                            l10n?.pasteFromClipboard ?? 'Paste from clipboard',
-                          ),
+                          label: Text(l10n.pasteFromClipboard),
                         ),
 
                         // Error message
@@ -316,7 +303,9 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
                         SizedBox(
                           width: double.infinity,
                           child: ElevatedButton(
-                            onPressed: (isReady && !_isLoading) ? _verifyOtp : null,
+                            onPressed: (isReady && !_isLoading)
+                                ? _verifyOtp
+                                : null,
                             child: _isLoading
                                 ? const SizedBox(
                                     height: 20,
@@ -326,7 +315,7 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
                                       color: Colors.white,
                                     ),
                                   )
-                                : Text(l10n?.verify ?? 'Verify'),
+                                : Text(l10n.verify),
                           ),
                         ),
 
@@ -336,8 +325,7 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
                         Padding(
                           padding: const EdgeInsets.only(bottom: 32),
                           child: Text(
-                            l10n?.cantFindCode ??
-                                "Can't find the code? Check your authenticator app (e.g. Google Authenticator, Authy).",
+                            l10n.cantFindCode,
                             style: theme.textTheme.bodySmall?.copyWith(
                               color: theme.colorScheme.onSurfaceVariant,
                             ),

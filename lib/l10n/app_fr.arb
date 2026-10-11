@@ -252,5 +252,8 @@
   "receiveRemindersTasks": "Recevez des rappels pour vos tâches à venir",
   "enableNotifications": "Activer les notifications",
   "notNow": "Pas maintenant",
-  "selectLanguage": "Sélectionner la langue"
+  "selectLanguage": "Sélectionner la langue",
+  "paste": "Coller",
+  "pastedFromClipboard": "Contenu collé depuis le presse-papiers",
+  "clipboardEmpty": "Le presse-papiers est vide"
 }

@@ -221,7 +221,7 @@
   "apiTokenTitle": "Chiave API",
   "enterApiToken": "Inserisci la tua chiave API di Twenty CRM.",
   "whereFindToken": "Dove trovo la chiave? Twenty → Impostazioni → API e Webhook",
-  "tokenHint": "Inserisci token...",
+  "tokenHint": "Inserisci chiave...",
   "tokenRequired": "Inserisci una chiave API",
   "connect": "Connetti",
   "pasteFromClipboard": "Incolla dagli appunti",
@@ -252,5 +252,8 @@
   "receiveRemindersTasks": "Ricevi promemoria per le tue prossime attività",
   "enableNotifications": "Attiva notifiche",
   "notNow": "Non ora",
-  "selectLanguage": "Seleziona Lingua"
+  "selectLanguage": "Seleziona Lingua",
+  "paste": "Incolla",
+  "pastedFromClipboard": "Contenuto incollato dagli appunti",
+  "clipboardEmpty": "Gli appunti sono vuoti"
 }

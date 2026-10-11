@@ -1416,31 +1416,31 @@ abstract class AppLocalizations {
   /// No description provided for @apiTokenTitle.
   ///
   /// In en, this message translates to:
-  /// **'API Token'**
+  /// **'API Key'**
   String get apiTokenTitle;
 
   /// No description provided for @enterApiToken.
   ///
   /// In en, this message translates to:
-  /// **'Enter your Twenty CRM API Token.'**
+  /// **'Enter your Twenty CRM API Key.'**
   String get enterApiToken;
 
   /// No description provided for @whereFindToken.
   ///
   /// In en, this message translates to:
-  /// **'Where can I find the token? Twenty → Settings → API & Webhooks'**
+  /// **'Where can I find the key? Twenty → Settings → API & Webhooks'**
   String get whereFindToken;
 
   /// No description provided for @tokenHint.
   ///
   /// In en, this message translates to:
-  /// **'Enter token...'**
+  /// **'Enter key...'**
   String get tokenHint;
 
   /// No description provided for @tokenRequired.
   ///
   /// In en, this message translates to:
-  /// **'Please enter a token'**
+  /// **'Please enter a key'**
   String get tokenRequired;
 
   /// No description provided for @connect.
@@ -1622,6 +1622,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Select Language'**
   String get selectLanguage;
+
+  /// No description provided for @paste.
+  ///
+  /// In en, this message translates to:
+  /// **'Paste'**
+  String get paste;
+
+  /// No description provided for @pastedFromClipboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Pasted from clipboard'**
+  String get pastedFromClipboard;
+
+  /// No description provided for @clipboardEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Clipboard is empty'**
+  String get clipboardEmpty;
 }
 
 class _AppLocalizationsDelegate
