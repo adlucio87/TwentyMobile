@@ -14,6 +14,7 @@ import 'package:go_router/go_router.dart';
 import 'package:pocketcrm/shared/widgets/constrained_content.dart';
 import 'package:pocketcrm/l10n/app_localizations.dart';
 import 'package:pocketcrm/core/localization/locale_provider.dart';
+import 'package:pocketcrm/presentation/shared/language_button.dart';
 import 'package:pocketcrm/core/config/app_config.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
@@ -323,54 +324,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             title: Text(currentOption.name),
             subtitle: Text(l10n?.language ?? 'Language'),
             trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-            onTap: () {
-              showModalBottomSheet(
-                context: context,
-                shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-                ),
-                builder: (modalContext) {
-                  return SafeArea(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: Text(
-                            l10n?.language ?? 'Select Language',
-                            style: Theme.of(modalContext).textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                        const Divider(height: 1),
-                        Flexible(
-                          child: ListView.builder(
-                            shrinkWrap: true,
-                            itemCount: appLocaleOptions.length,
-                            itemBuilder: (context, index) {
-                              final option = appLocaleOptions[index];
-                              final isSelected = option.code == currentOption.code;
-                              return ListTile(
-                                leading: Text(option.flag, style: const TextStyle(fontSize: 24)),
-                                title: Text(option.name),
-                                trailing: isSelected
-                                    ? const Icon(Icons.check, color: Colors.green)
-                                    : null,
-                                onTap: () {
-                                  ref.read(localeProvider.notifier).setLocale(option.code);
-                                  Navigator.pop(modalContext);
-                                },
-                              );
-                            },
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              );
-            },
+            onTap: () => showLanguageSelectionSheet(context, ref),
           ),
           const SizedBox(height: 32),
           Text(

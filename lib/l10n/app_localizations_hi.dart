@@ -611,4 +611,188 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get noResultsMatchSearch => 'आपकी खोज से कोई परिणाम मेल नहीं खाता।';
+
+  @override
+  String get welcomeSubtitle =>
+      'आपका पोर्टेबल सीआरएम हमेशा आपके साथ। चलते-फिरते संपर्कों और कंपनियों को प्रीमियम अनुभव के साथ प्रबंधित करें।';
+
+  @override
+  String get connectCrm => 'अपना सीआरएम कनेक्ट करें';
+
+  @override
+  String get configureCrm => 'सीआरएम कॉन्फ़िगर करें';
+
+  @override
+  String get tryDemo => 'डेमो आज़माएं';
+
+  @override
+  String get demoSubtitle =>
+      'उदाहरण डेटा · किसी कॉन्फ़िगरेशन की आवश्यकता नहीं है\nडेटा हर रात रीसेट किया जाता है';
+
+  @override
+  String get orDivider => 'या';
+
+  @override
+  String get instanceUrlQuestion => 'आपके Twenty CRM इंस्टेंस का URL क्या है?';
+
+  @override
+  String get instanceUrl => 'इंस्टेंस URL';
+
+  @override
+  String get instanceUrlHint => 'उदा. http://localhost:3000';
+
+  @override
+  String get enterValidUrl => 'कृपया एक मान्य URL दर्ज करें';
+
+  @override
+  String get urlMustStartWithHttp =>
+      'URL http:// या https:// से शुरू होना चाहिए';
+
+  @override
+  String get next => 'आगे बढ़ें';
+
+  @override
+  String get demoUnavailable =>
+      'डेमो अस्थायी रूप से अनुपलब्ध है। कृपया बाद में पुनः प्रयास करें।';
+
+  @override
+  String get authentication => 'प्रमाणीकरण';
+
+  @override
+  String get howDoYouWantToConnect => 'आप कैसे कनेक्ट करना चाहते हैं?';
+
+  @override
+  String get chooseAccessMethod =>
+      'चुनें कि आप अपने Twenty CRM इंस्टेंस को कैसे एक्सेस करना चाहते हैं';
+
+  @override
+  String get loginWithAccount => 'अपने खाते से लॉगिन करें';
+
+  @override
+  String get loginWithAccountDesc =>
+      'अपना ईमेल और पासवर्ड उपयोग करें। आप केवल आपको सौंपे गए डेटा को देखेंगे।';
+
+  @override
+  String get loginWithApiKey => 'API कुंजी से लॉगिन करें';
+
+  @override
+  String get loginWithApiKeyDesc =>
+      'पूर्ण कार्यक्षेत्र पहुंच। व्यवस्थापकों और स्वामियों के लिए।';
+
+  @override
+  String get recommended => 'अनुशंसित';
+
+  @override
+  String get adminBadge => 'व्यवस्थापक';
+
+  @override
+  String get apiTokenTitle => 'API कुंजी';
+
+  @override
+  String get enterApiToken => 'अपनी Twenty CRM API कुंजी दर्ज करें।';
+
+  @override
+  String get whereFindToken =>
+      'टोकन कहाँ मिलेगा? Twenty → सेटिंग्स → API और वेबहुक';
+
+  @override
+  String get tokenHint => 'टोकन दर्ज करें...';
+
+  @override
+  String get tokenRequired => 'कृपया एक टोकन दर्ज करें';
+
+  @override
+  String get connect => 'कनेक्ट करें';
+
+  @override
+  String get pasteFromClipboard => 'क्लिपबोर्ड से चिपकाएं';
+
+  @override
+  String get loginWithEmailTitle => 'ईमेल से लॉगिन करें';
+
+  @override
+  String get emailHint => 'अपना ईमेल दर्ज करें';
+
+  @override
+  String get password => 'पासवर्ड';
+
+  @override
+  String get passwordHint => 'अपना पासवर्ड दर्ज करें';
+
+  @override
+  String get emailRequired => 'ईमेल आवश्यक है';
+
+  @override
+  String get enterValidEmail => 'एक मान्य ईमेल दर्ज करें';
+
+  @override
+  String get passwordRequired => 'पासवर्ड आवश्यक है';
+
+  @override
+  String get passwordMinLength => 'पासवर्ड कम से कम 6 अक्षरों का होना चाहिए';
+
+  @override
+  String get forgotPassword => 'पासवर्ड भूल गए?';
+
+  @override
+  String get loginButton => 'लॉगिन करें';
+
+  @override
+  String get goBack => 'वापस जाएं';
+
+  @override
+  String get securityCheck => 'सुरक्षा जांच...';
+
+  @override
+  String get loggingIn => 'लॉगिन हो रहा है...';
+
+  @override
+  String get incorrectCredentials =>
+      'गलत ईमेल या पासवर्ड। कृपया पुनः प्रयास करें।';
+
+  @override
+  String get noAccountFound => 'इस ईमेल के साथ कोई खाता नहीं मिला।';
+
+  @override
+  String get unableToReachServer => 'सर्वर तक पहुंचने में असमर्थ। URL जांचें।';
+
+  @override
+  String get passwordLoginDisabled =>
+      'इस Twenty इंस्टेंस पर पासवर्ड लॉगिन सक्षम नहीं है।';
+
+  @override
+  String get twoFactorTitle => 'दो-कारक प्रमाणीकरण';
+
+  @override
+  String get enterVerificationCode => 'अपना सत्यापन कोड दर्ज करें';
+
+  @override
+  String get openAuthenticatorApp =>
+      'अपना प्रमाणक ऐप खोलें और 6 अंकों का कोड दर्ज करें';
+
+  @override
+  String get verify => 'सत्यापित करें';
+
+  @override
+  String get cantFindCode =>
+      'कोड नहीं मिल रहा? अपना प्रमाणक ऐप जांचें (उदा. Google Authenticator, Authy)।';
+
+  @override
+  String get codePasted => 'क्लिपबोर्ड से कोड चिपकाया गया';
+
+  @override
+  String get stayUpdated => 'अपडेट रहें';
+
+  @override
+  String get receiveRemindersTasks =>
+      'अपने आगामी कार्यों के लिए अनुस्मारक प्राप्त करें';
+
+  @override
+  String get enableNotifications => 'सूचनाएं सक्षम करें';
+
+  @override
+  String get notNow => 'अभी नहीं';
+
+  @override
+  String get selectLanguage => 'भाषा चुनें';
 }

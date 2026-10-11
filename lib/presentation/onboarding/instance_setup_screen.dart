@@ -5,6 +5,8 @@ import 'package:pocketcrm/core/di/providers.dart';
 import 'package:pocketcrm/core/di/auth_state.dart';
 import 'package:pocketcrm/core/config/demo_config.dart';
 import 'package:pocketcrm/presentation/shared/snackbar_helper.dart';
+import 'package:pocketcrm/l10n/app_localizations.dart';
+import 'package:pocketcrm/presentation/shared/language_button.dart';
 
 class InstanceSetupScreen extends ConsumerStatefulWidget {
   const InstanceSetupScreen({super.key});
@@ -58,8 +60,15 @@ class _InstanceSetupScreenState extends ConsumerState<InstanceSetupScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Configure CRM')),
+      appBar: AppBar(
+        title: Text(l10n?.configureCrm ?? 'Configure CRM'),
+        actions: const [
+          LanguageSelectorButton(),
+        ],
+      ),
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {
@@ -86,7 +95,7 @@ class _InstanceSetupScreenState extends ConsumerState<InstanceSetupScreen> {
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
                     : const Icon(Icons.play_circle_outline),
-                label: const Text('Try the demo'),
+                label: Text(l10n?.tryDemo ?? 'Try the demo'),
                 style: OutlinedButton.styleFrom(
                   minimumSize: const Size.fromHeight(50),
                   side: BorderSide(
@@ -96,10 +105,11 @@ class _InstanceSetupScreenState extends ConsumerState<InstanceSetupScreen> {
                 ),
               ),
               const SizedBox(height: 8),
-              const Text(
-                'Example data · No configuration required\nData is reset every night',
+              Text(
+                l10n?.demoSubtitle ??
+                    'Example data · No configuration required\nData is reset every night',
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 12, color: Colors.grey),
+                style: const TextStyle(fontSize: 12, color: Colors.grey),
               ),
               const SizedBox(height: 24),
               Row(
@@ -108,7 +118,7 @@ class _InstanceSetupScreenState extends ConsumerState<InstanceSetupScreen> {
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: Text(
-                      'or',
+                      l10n?.orDivider ?? 'or',
                       style: TextStyle(color: Colors.grey.shade600),
                     ),
                   ),
@@ -116,22 +126,22 @@ class _InstanceSetupScreenState extends ConsumerState<InstanceSetupScreen> {
                 ],
               ),
               const SizedBox(height: 24),
-              const Text('What is your Twenty CRM instance URL?'),
+              Text(l10n?.instanceUrlQuestion ?? 'What is your Twenty CRM instance URL?'),
               const SizedBox(height: 16),
               TextFormField(
                 controller: _controller,
                 autofillHints: const [AutofillHints.url],
-                decoration: const InputDecoration(
-                  labelText: 'Instance URL',
-                  hintText: 'e.g. http://localhost:3000',
-                  prefixIcon: Icon(Icons.link),
+                decoration: InputDecoration(
+                  labelText: l10n?.instanceUrl ?? 'Instance URL',
+                  hintText: l10n?.instanceUrlHint ?? 'e.g. http://localhost:3000',
+                  prefixIcon: const Icon(Icons.link),
                 ),
                 validator: (val) {
                   if (val == null || val.isEmpty) {
-                    return 'Please enter a valid URL';
+                    return l10n?.enterValidUrl ?? 'Please enter a valid URL';
                   }
                   if (!Uri.parse(val).isAbsolute) {
-                    return 'URL must start with http:// or https://';
+                    return l10n?.urlMustStartWithHttp ?? 'URL must start with http:// or https://';
                   }
                   return null;
                 },
@@ -179,7 +189,7 @@ class _InstanceSetupScreenState extends ConsumerState<InstanceSetupScreen> {
                           color: Colors.white,
                         ),
                       )
-                    : const Text('Next'),
+                    : Text(l10n?.next ?? 'Next'),
               ),
               const SizedBox(height: 24),
             ],
@@ -226,7 +236,8 @@ class _InstanceSetupScreenState extends ConsumerState<InstanceSetupScreen> {
         if (mounted) {
           SnackbarHelper.showError(
             context,
-            'Demo temporarily unavailable. Please try again later.',
+            AppLocalizations.of(context)?.demoUnavailable ??
+                'Demo temporarily unavailable. Please try again later.',
           );
         }
       }

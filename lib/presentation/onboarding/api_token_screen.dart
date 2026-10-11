@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pocketcrm/core/di/providers.dart';
 import 'package:pocketcrm/core/di/auth_state.dart';
 import 'package:pocketcrm/data/connectors/twenty_connector.dart';
+import 'package:pocketcrm/l10n/app_localizations.dart';
+import 'package:pocketcrm/presentation/shared/language_button.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
 class ApiTokenScreen extends ConsumerStatefulWidget {
@@ -36,10 +39,41 @@ class _ApiTokenScreenState extends ConsumerState<ApiTokenScreen> {
     }
   }
 
+  Future<void> _pasteFromClipboard() async {
+    final data = await Clipboard.getData(Clipboard.kTextPlain);
+    final text = data?.text?.trim() ?? '';
+    if (text.isNotEmpty) {
+      HapticFeedback.mediumImpact();
+      setState(() {
+        _controller.text = text;
+        _error = null;
+      });
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              AppLocalizations.of(context)?.codePasted ??
+                  'Code pasted from clipboard',
+            ),
+            duration: const Duration(seconds: 2),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     return Scaffold(
-      appBar: AppBar(title: const Text('API Token')),
+      appBar: AppBar(
+        title: Text(l10n?.apiTokenTitle ?? 'API Token'),
+        actions: const [
+          LanguageSelectorButton(),
+        ],
+      ),
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {
@@ -56,27 +90,44 @@ class _ApiTokenScreenState extends ConsumerState<ApiTokenScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const Text('Enter your Twenty CRM API Token.'),
+              Text(l10n?.enterApiToken ?? 'Enter your Twenty CRM API Token.'),
               const SizedBox(height: 8),
-              const Text(
-                'Where can I find the token? Twenty → Settings → API & Webhooks',
-                style: TextStyle(color: Colors.grey, fontSize: 12),
+              Text(
+                l10n?.whereFindToken ??
+                    'Where can I find the token? Twenty → Settings → API & Webhooks',
+                style: const TextStyle(color: Colors.grey, fontSize: 12),
               ),
               const SizedBox(height: 16),
-              TextFormField(
-                controller: _controller,
-                obscureText: true,
-                decoration: InputDecoration(
-                  labelText: 'API Token',
-                  hintText: 'Enter token...',
-                  prefixIcon: const Icon(Icons.key),
-                  errorText: _error,
-                  errorMaxLines: 10,
+              GestureDetector(
+                onLongPress: _pasteFromClipboard,
+                child: TextFormField(
+                  controller: _controller,
+                  obscureText: true,
+                  contextMenuBuilder: (context, editableTextState) {
+                    _pasteFromClipboard();
+                    return AdaptiveTextSelectionToolbar.editableText(
+                      editableTextState: editableTextState,
+                    );
+                  },
+                  decoration: InputDecoration(
+                    labelText: l10n?.apiTokenTitle ?? 'API Token',
+                    hintText: l10n?.tokenHint ?? 'Enter token...',
+                    prefixIcon: const Icon(Icons.key),
+                    suffixIcon: IconButton(
+                      icon: const Icon(Icons.paste_rounded),
+                      tooltip: l10n?.pasteFromClipboard ?? 'Paste from clipboard',
+                      onPressed: _pasteFromClipboard,
+                    ),
+                    errorText: _error,
+                    errorMaxLines: 10,
+                  ),
+                  validator: (val) {
+                    if (val == null || val.isEmpty) {
+                      return l10n?.tokenRequired ?? 'Please enter a token';
+                    }
+                    return null;
+                  },
                 ),
-                validator: (val) {
-                  if (val == null || val.isEmpty) return 'Please enter a token';
-                  return null;
-                },
               ),
               const Spacer(),
               ElevatedButton(
@@ -90,7 +141,7 @@ class _ApiTokenScreenState extends ConsumerState<ApiTokenScreen> {
                           color: Colors.white,
                         ),
                       )
-                    : const Text('Connect'),
+                    : Text(l10n?.connect ?? 'Connect'),
               ),
               const SizedBox(height: 24),
             ],

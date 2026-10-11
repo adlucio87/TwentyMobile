@@ -613,4 +613,190 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String get noResultsMatchSearch =>
       'Nessun risultato corrisponde alla tua ricerca.';
+
+  @override
+  String get welcomeSubtitle =>
+      'Il tuo CRM portatile sempre con te. Gestisci contatti e aziende ovunque con un\'esperienza premium.';
+
+  @override
+  String get connectCrm => 'Collega il tuo CRM';
+
+  @override
+  String get configureCrm => 'Configura CRM';
+
+  @override
+  String get tryDemo => 'Prova la demo';
+
+  @override
+  String get demoSubtitle =>
+      'Dati di esempio · Nessuna configurazione richiesta\nI dati vengono ripristinati ogni notte';
+
+  @override
+  String get orDivider => 'oppure';
+
+  @override
+  String get instanceUrlQuestion =>
+      'Qual è l\'URL della tua istanza Twenty CRM?';
+
+  @override
+  String get instanceUrl => 'URL Istanza';
+
+  @override
+  String get instanceUrlHint => 'es. http://localhost:3000';
+
+  @override
+  String get enterValidUrl => 'Inserisci un URL valido';
+
+  @override
+  String get urlMustStartWithHttp =>
+      'L\'URL deve iniziare con http:// o https://';
+
+  @override
+  String get next => 'Avanti';
+
+  @override
+  String get demoUnavailable =>
+      'Demo temporaneamente non disponibile. Riprova più tardi.';
+
+  @override
+  String get authentication => 'Autenticazione';
+
+  @override
+  String get howDoYouWantToConnect => 'Come vuoi connetterti?';
+
+  @override
+  String get chooseAccessMethod =>
+      'Scegli come accedere alla tua istanza Twenty CRM';
+
+  @override
+  String get loginWithAccount => 'Accedi con il tuo account';
+
+  @override
+  String get loginWithAccountDesc =>
+      'Usa email e password. Vedrai solo i dati assegnati a te.';
+
+  @override
+  String get loginWithApiKey => 'Accedi con Chiave API';
+
+  @override
+  String get loginWithApiKeyDesc =>
+      'Accesso completo all\'area di lavoro. Per amministratori e proprietari.';
+
+  @override
+  String get recommended => 'Consigliato';
+
+  @override
+  String get adminBadge => 'Admin';
+
+  @override
+  String get apiTokenTitle => 'Chiave API';
+
+  @override
+  String get enterApiToken => 'Inserisci la tua chiave API di Twenty CRM.';
+
+  @override
+  String get whereFindToken =>
+      'Dove trovo la chiave? Twenty → Impostazioni → API e Webhook';
+
+  @override
+  String get tokenHint => 'Inserisci token...';
+
+  @override
+  String get tokenRequired => 'Inserisci una chiave API';
+
+  @override
+  String get connect => 'Connetti';
+
+  @override
+  String get pasteFromClipboard => 'Incolla dagli appunti';
+
+  @override
+  String get loginWithEmailTitle => 'Accedi con Email';
+
+  @override
+  String get emailHint => 'Inserisci la tua email';
+
+  @override
+  String get password => 'Password';
+
+  @override
+  String get passwordHint => 'Inserisci la tua password';
+
+  @override
+  String get emailRequired => 'L\'email è obbligatoria';
+
+  @override
+  String get enterValidEmail => 'Inserisci un\'email valida';
+
+  @override
+  String get passwordRequired => 'La password è obbligatoria';
+
+  @override
+  String get passwordMinLength =>
+      'La password deve contenere almeno 6 caratteri';
+
+  @override
+  String get forgotPassword => 'Password dimenticata?';
+
+  @override
+  String get loginButton => 'Accedi';
+
+  @override
+  String get goBack => 'Torna indietro';
+
+  @override
+  String get securityCheck => 'Verifica di sicurezza...';
+
+  @override
+  String get loggingIn => 'Accesso in corso...';
+
+  @override
+  String get incorrectCredentials => 'Email o password non corretti. Riprova.';
+
+  @override
+  String get noAccountFound => 'Nessun account trovato con questa email.';
+
+  @override
+  String get unableToReachServer =>
+      'Impossibile raggiungere il server. Verifica l\'URL.';
+
+  @override
+  String get passwordLoginDisabled =>
+      'L\'accesso con password non è abilitato su questa istanza di Twenty.';
+
+  @override
+  String get twoFactorTitle => 'Autenticazione a Due Fattori';
+
+  @override
+  String get enterVerificationCode => 'Inserisci il codice di verifica';
+
+  @override
+  String get openAuthenticatorApp =>
+      'Apri l\'app di autenticazione e inserisci il codice a 6 cifre';
+
+  @override
+  String get verify => 'Verifica';
+
+  @override
+  String get cantFindCode =>
+      'Non trovi il codice? Controlla l\'app di autenticazione (es. Google Authenticator, Authy).';
+
+  @override
+  String get codePasted => 'Codice incollato dagli appunti';
+
+  @override
+  String get stayUpdated => 'Rimani aggiornato';
+
+  @override
+  String get receiveRemindersTasks =>
+      'Ricevi promemoria per le tue prossime attività';
+
+  @override
+  String get enableNotifications => 'Attiva notifiche';
+
+  @override
+  String get notNow => 'Non ora';
+
+  @override
+  String get selectLanguage => 'Seleziona Lingua';
 }

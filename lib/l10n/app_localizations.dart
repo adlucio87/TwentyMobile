@@ -1280,6 +1280,348 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No results match your search.'**
   String get noResultsMatchSearch;
+
+  /// No description provided for @welcomeSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your portable CRM always with you. Manage contacts and companies on the go with a premium experience.'**
+  String get welcomeSubtitle;
+
+  /// No description provided for @connectCrm.
+  ///
+  /// In en, this message translates to:
+  /// **'Connect your CRM'**
+  String get connectCrm;
+
+  /// No description provided for @configureCrm.
+  ///
+  /// In en, this message translates to:
+  /// **'Configure CRM'**
+  String get configureCrm;
+
+  /// No description provided for @tryDemo.
+  ///
+  /// In en, this message translates to:
+  /// **'Try the demo'**
+  String get tryDemo;
+
+  /// No description provided for @demoSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Example data · No configuration required\nData is reset every night'**
+  String get demoSubtitle;
+
+  /// No description provided for @orDivider.
+  ///
+  /// In en, this message translates to:
+  /// **'or'**
+  String get orDivider;
+
+  /// No description provided for @instanceUrlQuestion.
+  ///
+  /// In en, this message translates to:
+  /// **'What is your Twenty CRM instance URL?'**
+  String get instanceUrlQuestion;
+
+  /// No description provided for @instanceUrl.
+  ///
+  /// In en, this message translates to:
+  /// **'Instance URL'**
+  String get instanceUrl;
+
+  /// No description provided for @instanceUrlHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. http://localhost:3000'**
+  String get instanceUrlHint;
+
+  /// No description provided for @enterValidUrl.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a valid URL'**
+  String get enterValidUrl;
+
+  /// No description provided for @urlMustStartWithHttp.
+  ///
+  /// In en, this message translates to:
+  /// **'URL must start with http:// or https://'**
+  String get urlMustStartWithHttp;
+
+  /// No description provided for @next.
+  ///
+  /// In en, this message translates to:
+  /// **'Next'**
+  String get next;
+
+  /// No description provided for @demoUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Demo temporarily unavailable. Please try again later.'**
+  String get demoUnavailable;
+
+  /// No description provided for @authentication.
+  ///
+  /// In en, this message translates to:
+  /// **'Authentication'**
+  String get authentication;
+
+  /// No description provided for @howDoYouWantToConnect.
+  ///
+  /// In en, this message translates to:
+  /// **'How do you want to connect?'**
+  String get howDoYouWantToConnect;
+
+  /// No description provided for @chooseAccessMethod.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose how you want to access your Twenty CRM instance'**
+  String get chooseAccessMethod;
+
+  /// No description provided for @loginWithAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Login with your account'**
+  String get loginWithAccount;
+
+  /// No description provided for @loginWithAccountDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Use your email and password. You will only see data assigned to you.'**
+  String get loginWithAccountDesc;
+
+  /// No description provided for @loginWithApiKey.
+  ///
+  /// In en, this message translates to:
+  /// **'Login with API Key'**
+  String get loginWithApiKey;
+
+  /// No description provided for @loginWithApiKeyDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Full workspace access. For administrators and owners.'**
+  String get loginWithApiKeyDesc;
+
+  /// No description provided for @recommended.
+  ///
+  /// In en, this message translates to:
+  /// **'Recommended'**
+  String get recommended;
+
+  /// No description provided for @adminBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Admin'**
+  String get adminBadge;
+
+  /// No description provided for @apiTokenTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'API Token'**
+  String get apiTokenTitle;
+
+  /// No description provided for @enterApiToken.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your Twenty CRM API Token.'**
+  String get enterApiToken;
+
+  /// No description provided for @whereFindToken.
+  ///
+  /// In en, this message translates to:
+  /// **'Where can I find the token? Twenty → Settings → API & Webhooks'**
+  String get whereFindToken;
+
+  /// No description provided for @tokenHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter token...'**
+  String get tokenHint;
+
+  /// No description provided for @tokenRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a token'**
+  String get tokenRequired;
+
+  /// No description provided for @connect.
+  ///
+  /// In en, this message translates to:
+  /// **'Connect'**
+  String get connect;
+
+  /// No description provided for @pasteFromClipboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Paste from clipboard'**
+  String get pasteFromClipboard;
+
+  /// No description provided for @loginWithEmailTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Login with Email'**
+  String get loginWithEmailTitle;
+
+  /// No description provided for @emailHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your email'**
+  String get emailHint;
+
+  /// No description provided for @password.
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get password;
+
+  /// No description provided for @passwordHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your password'**
+  String get passwordHint;
+
+  /// No description provided for @emailRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Email is required'**
+  String get emailRequired;
+
+  /// No description provided for @enterValidEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid email'**
+  String get enterValidEmail;
+
+  /// No description provided for @passwordRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Password is required'**
+  String get passwordRequired;
+
+  /// No description provided for @passwordMinLength.
+  ///
+  /// In en, this message translates to:
+  /// **'Password must be at least 6 characters'**
+  String get passwordMinLength;
+
+  /// No description provided for @forgotPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Forgot password?'**
+  String get forgotPassword;
+
+  /// No description provided for @loginButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Login'**
+  String get loginButton;
+
+  /// No description provided for @goBack.
+  ///
+  /// In en, this message translates to:
+  /// **'Go back'**
+  String get goBack;
+
+  /// No description provided for @securityCheck.
+  ///
+  /// In en, this message translates to:
+  /// **'Security check...'**
+  String get securityCheck;
+
+  /// No description provided for @loggingIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Logging in...'**
+  String get loggingIn;
+
+  /// No description provided for @incorrectCredentials.
+  ///
+  /// In en, this message translates to:
+  /// **'Incorrect email or password. Please try again.'**
+  String get incorrectCredentials;
+
+  /// No description provided for @noAccountFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No account found with this email.'**
+  String get noAccountFound;
+
+  /// No description provided for @unableToReachServer.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to reach the server. Check the URL.'**
+  String get unableToReachServer;
+
+  /// No description provided for @passwordLoginDisabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Password login is not enabled on this Twenty instance.'**
+  String get passwordLoginDisabled;
+
+  /// No description provided for @twoFactorTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Two-Factor Authentication'**
+  String get twoFactorTitle;
+
+  /// No description provided for @enterVerificationCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your verification code'**
+  String get enterVerificationCode;
+
+  /// No description provided for @openAuthenticatorApp.
+  ///
+  /// In en, this message translates to:
+  /// **'Open your authenticator app and enter the 6-digit code'**
+  String get openAuthenticatorApp;
+
+  /// No description provided for @verify.
+  ///
+  /// In en, this message translates to:
+  /// **'Verify'**
+  String get verify;
+
+  /// No description provided for @cantFindCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Can\'t find the code? Check your authenticator app (e.g. Google Authenticator, Authy).'**
+  String get cantFindCode;
+
+  /// No description provided for @codePasted.
+  ///
+  /// In en, this message translates to:
+  /// **'Code pasted from clipboard'**
+  String get codePasted;
+
+  /// No description provided for @stayUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Stay updated'**
+  String get stayUpdated;
+
+  /// No description provided for @receiveRemindersTasks.
+  ///
+  /// In en, this message translates to:
+  /// **'Receive reminders for your upcoming tasks'**
+  String get receiveRemindersTasks;
+
+  /// No description provided for @enableNotifications.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable notifications'**
+  String get enableNotifications;
+
+  /// No description provided for @notNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Not now'**
+  String get notNow;
+
+  /// No description provided for @selectLanguage.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Language'**
+  String get selectLanguage;
 }
 
 class _AppLocalizationsDelegate

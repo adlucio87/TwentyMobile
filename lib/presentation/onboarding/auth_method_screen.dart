@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:pocketcrm/l10n/app_localizations.dart';
+import 'package:pocketcrm/presentation/shared/language_button.dart';
 
 class AuthMethodScreen extends StatelessWidget {
   const AuthMethodScreen({super.key});
@@ -7,9 +9,15 @@ class AuthMethodScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Authentication')),
+      appBar: AppBar(
+        title: Text(l10n?.authentication ?? 'Authentication'),
+        actions: const [
+          LanguageSelectorButton(),
+        ],
+      ),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(24.0),
@@ -17,12 +25,13 @@ class AuthMethodScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(
-                'How do you want to connect?',
+                l10n?.howDoYouWantToConnect ?? 'How do you want to connect?',
                 style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
               Text(
-                'Choose how you want to access your Twenty CRM instance',
+                l10n?.chooseAccessMethod ??
+                    'Choose how you want to access your Twenty CRM instance',
                 style: theme.textTheme.bodyLarge?.copyWith(
                   color: theme.colorScheme.onSurface.withValues(alpha: (0.6)),
                 ),
@@ -30,20 +39,22 @@ class AuthMethodScreen extends StatelessWidget {
               const SizedBox(height: 32),
               _buildMethodCard(
                 context,
-                title: 'Login with your account',
-                description: 'Use your email and password. You will only see data assigned to you.',
+                title: l10n?.loginWithAccount ?? 'Login with your account',
+                description: l10n?.loginWithAccountDesc ??
+                    'Use your email and password. You will only see data assigned to you.',
                 icon: Icons.person,
-                badgeText: 'Recommended',
+                badgeText: l10n?.recommended ?? 'Recommended',
                 badgeColor: Colors.green,
                 onTap: () => context.push('/onboarding/email'),
               ),
               const SizedBox(height: 16),
               _buildMethodCard(
                 context,
-                title: 'Login with API Key',
-                description: 'Full workspace access. For administrators and owners.',
+                title: l10n?.loginWithApiKey ?? 'Login with API Key',
+                description: l10n?.loginWithApiKeyDesc ??
+                    'Full workspace access. For administrators and owners.',
                 icon: Icons.key,
-                badgeText: 'Admin',
+                badgeText: l10n?.adminBadge ?? 'Admin',
                 badgeColor: theme.colorScheme.primary,
                 onTap: () => context.push('/onboarding/token'),
               ),

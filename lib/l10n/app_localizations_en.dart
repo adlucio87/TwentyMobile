@@ -610,6 +610,190 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get noResultsMatchSearch => 'No results match your search.';
+
+  @override
+  String get welcomeSubtitle =>
+      'Your portable CRM always with you. Manage contacts and companies on the go with a premium experience.';
+
+  @override
+  String get connectCrm => 'Connect your CRM';
+
+  @override
+  String get configureCrm => 'Configure CRM';
+
+  @override
+  String get tryDemo => 'Try the demo';
+
+  @override
+  String get demoSubtitle =>
+      'Example data · No configuration required\nData is reset every night';
+
+  @override
+  String get orDivider => 'or';
+
+  @override
+  String get instanceUrlQuestion => 'What is your Twenty CRM instance URL?';
+
+  @override
+  String get instanceUrl => 'Instance URL';
+
+  @override
+  String get instanceUrlHint => 'e.g. http://localhost:3000';
+
+  @override
+  String get enterValidUrl => 'Please enter a valid URL';
+
+  @override
+  String get urlMustStartWithHttp => 'URL must start with http:// or https://';
+
+  @override
+  String get next => 'Next';
+
+  @override
+  String get demoUnavailable =>
+      'Demo temporarily unavailable. Please try again later.';
+
+  @override
+  String get authentication => 'Authentication';
+
+  @override
+  String get howDoYouWantToConnect => 'How do you want to connect?';
+
+  @override
+  String get chooseAccessMethod =>
+      'Choose how you want to access your Twenty CRM instance';
+
+  @override
+  String get loginWithAccount => 'Login with your account';
+
+  @override
+  String get loginWithAccountDesc =>
+      'Use your email and password. You will only see data assigned to you.';
+
+  @override
+  String get loginWithApiKey => 'Login with API Key';
+
+  @override
+  String get loginWithApiKeyDesc =>
+      'Full workspace access. For administrators and owners.';
+
+  @override
+  String get recommended => 'Recommended';
+
+  @override
+  String get adminBadge => 'Admin';
+
+  @override
+  String get apiTokenTitle => 'API Token';
+
+  @override
+  String get enterApiToken => 'Enter your Twenty CRM API Token.';
+
+  @override
+  String get whereFindToken =>
+      'Where can I find the token? Twenty → Settings → API & Webhooks';
+
+  @override
+  String get tokenHint => 'Enter token...';
+
+  @override
+  String get tokenRequired => 'Please enter a token';
+
+  @override
+  String get connect => 'Connect';
+
+  @override
+  String get pasteFromClipboard => 'Paste from clipboard';
+
+  @override
+  String get loginWithEmailTitle => 'Login with Email';
+
+  @override
+  String get emailHint => 'Enter your email';
+
+  @override
+  String get password => 'Password';
+
+  @override
+  String get passwordHint => 'Enter your password';
+
+  @override
+  String get emailRequired => 'Email is required';
+
+  @override
+  String get enterValidEmail => 'Enter a valid email';
+
+  @override
+  String get passwordRequired => 'Password is required';
+
+  @override
+  String get passwordMinLength => 'Password must be at least 6 characters';
+
+  @override
+  String get forgotPassword => 'Forgot password?';
+
+  @override
+  String get loginButton => 'Login';
+
+  @override
+  String get goBack => 'Go back';
+
+  @override
+  String get securityCheck => 'Security check...';
+
+  @override
+  String get loggingIn => 'Logging in...';
+
+  @override
+  String get incorrectCredentials =>
+      'Incorrect email or password. Please try again.';
+
+  @override
+  String get noAccountFound => 'No account found with this email.';
+
+  @override
+  String get unableToReachServer =>
+      'Unable to reach the server. Check the URL.';
+
+  @override
+  String get passwordLoginDisabled =>
+      'Password login is not enabled on this Twenty instance.';
+
+  @override
+  String get twoFactorTitle => 'Two-Factor Authentication';
+
+  @override
+  String get enterVerificationCode => 'Enter your verification code';
+
+  @override
+  String get openAuthenticatorApp =>
+      'Open your authenticator app and enter the 6-digit code';
+
+  @override
+  String get verify => 'Verify';
+
+  @override
+  String get cantFindCode =>
+      'Can\'t find the code? Check your authenticator app (e.g. Google Authenticator, Authy).';
+
+  @override
+  String get codePasted => 'Code pasted from clipboard';
+
+  @override
+  String get stayUpdated => 'Stay updated';
+
+  @override
+  String get receiveRemindersTasks =>
+      'Receive reminders for your upcoming tasks';
+
+  @override
+  String get enableNotifications => 'Enable notifications';
+
+  @override
+  String get notNow => 'Not now';
+
+  @override
+  String get selectLanguage => 'Select Language';
 }
 
 /// The translations for English, as used in the United Kingdom (`en_GB`).
@@ -1218,4 +1402,188 @@ class AppLocalizationsEnGb extends AppLocalizationsEn {
 
   @override
   String get noResultsMatchSearch => 'No results match your search.';
+
+  @override
+  String get welcomeSubtitle =>
+      'Your portable CRM always with you. Manage contacts and companies on the go with a premium experience.';
+
+  @override
+  String get connectCrm => 'Connect your CRM';
+
+  @override
+  String get configureCrm => 'Configure CRM';
+
+  @override
+  String get tryDemo => 'Try the demo';
+
+  @override
+  String get demoSubtitle =>
+      'Example data · No configuration required\nData is reset every night';
+
+  @override
+  String get orDivider => 'or';
+
+  @override
+  String get instanceUrlQuestion => 'What is your Twenty CRM instance URL?';
+
+  @override
+  String get instanceUrl => 'Instance URL';
+
+  @override
+  String get instanceUrlHint => 'e.g. http://localhost:3000';
+
+  @override
+  String get enterValidUrl => 'Please enter a valid URL';
+
+  @override
+  String get urlMustStartWithHttp => 'URL must start with http:// or https://';
+
+  @override
+  String get next => 'Next';
+
+  @override
+  String get demoUnavailable =>
+      'Demo temporarily unavailable. Please try again later.';
+
+  @override
+  String get authentication => 'Authentication';
+
+  @override
+  String get howDoYouWantToConnect => 'How do you want to connect?';
+
+  @override
+  String get chooseAccessMethod =>
+      'Choose how you want to access your Twenty CRM instance';
+
+  @override
+  String get loginWithAccount => 'Login with your account';
+
+  @override
+  String get loginWithAccountDesc =>
+      'Use your email and password. You will only see data assigned to you.';
+
+  @override
+  String get loginWithApiKey => 'Login with API Key';
+
+  @override
+  String get loginWithApiKeyDesc =>
+      'Full workspace access. For administrators and owners.';
+
+  @override
+  String get recommended => 'Recommended';
+
+  @override
+  String get adminBadge => 'Admin';
+
+  @override
+  String get apiTokenTitle => 'API Token';
+
+  @override
+  String get enterApiToken => 'Enter your Twenty CRM API Token.';
+
+  @override
+  String get whereFindToken =>
+      'Where can I find the token? Twenty → Settings → API & Webhooks';
+
+  @override
+  String get tokenHint => 'Enter token...';
+
+  @override
+  String get tokenRequired => 'Please enter a token';
+
+  @override
+  String get connect => 'Connect';
+
+  @override
+  String get pasteFromClipboard => 'Paste from clipboard';
+
+  @override
+  String get loginWithEmailTitle => 'Login with Email';
+
+  @override
+  String get emailHint => 'Enter your email';
+
+  @override
+  String get password => 'Password';
+
+  @override
+  String get passwordHint => 'Enter your password';
+
+  @override
+  String get emailRequired => 'Email is required';
+
+  @override
+  String get enterValidEmail => 'Enter a valid email';
+
+  @override
+  String get passwordRequired => 'Password is required';
+
+  @override
+  String get passwordMinLength => 'Password must be at least 6 characters';
+
+  @override
+  String get forgotPassword => 'Forgot password?';
+
+  @override
+  String get loginButton => 'Login';
+
+  @override
+  String get goBack => 'Go back';
+
+  @override
+  String get securityCheck => 'Security check...';
+
+  @override
+  String get loggingIn => 'Logging in...';
+
+  @override
+  String get incorrectCredentials =>
+      'Incorrect email or password. Please try again.';
+
+  @override
+  String get noAccountFound => 'No account found with this email.';
+
+  @override
+  String get unableToReachServer =>
+      'Unable to reach the server. Check the URL.';
+
+  @override
+  String get passwordLoginDisabled =>
+      'Password login is not enabled on this Twenty instance.';
+
+  @override
+  String get twoFactorTitle => 'Two-Factor Authentication';
+
+  @override
+  String get enterVerificationCode => 'Enter your verification code';
+
+  @override
+  String get openAuthenticatorApp =>
+      'Open your authenticator app and enter the 6-digit code';
+
+  @override
+  String get verify => 'Verify';
+
+  @override
+  String get cantFindCode =>
+      'Can\'t find the code? Check your authenticator app (e.g. Google Authenticator, Authy).';
+
+  @override
+  String get codePasted => 'Code pasted from clipboard';
+
+  @override
+  String get stayUpdated => 'Stay updated';
+
+  @override
+  String get receiveRemindersTasks =>
+      'Receive reminders for your upcoming tasks';
+
+  @override
+  String get enableNotifications => 'Enable notifications';
+
+  @override
+  String get notNow => 'Not now';
+
+  @override
+  String get selectLanguage => 'Select Language';
 }
