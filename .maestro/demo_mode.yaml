@@ -1,0 +1,25 @@
+appId: com.luciosoft.pocketcrm
+name: "Demo Mode Connection Flow"
+tags:
+  - e2e
+  - demo
+---
+- launchApp:
+    clearState: true
+- extendedWaitUntil:
+    visible: "TwentyMobile"
+    timeout: 15000
+- tapOn: "Connect your CRM"
+- extendedWaitUntil:
+    visible: ".*Try.*demo.*"
+    timeout: 10000
+- tapOn: ".*Try.*demo.*"
+# Demo mode boots the main shell. The amber banner is the demo-only marker, so
+# it replaces the previous "Today" (the home tab is labelled "Home") and
+# "DEMO MODE" (the banner reads "Demo mode · Data is reset every night").
+- extendedWaitUntil:
+    visible: ".*Demo mode.*Data is reset every night.*"
+    timeout: 30000
+- assertVisible: "Home"
+- assertVisible: "Contacts"
+- assertVisible: "Tasks"

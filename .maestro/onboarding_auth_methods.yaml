@@ -1,0 +1,34 @@
+appId: com.luciosoft.pocketcrm
+name: "Onboarding and Auth Methods Flow"
+tags:
+  - e2e
+  - onboarding
+---
+- launchApp:
+    clearState: true
+- extendedWaitUntil:
+    visible: "TwentyMobile"
+    timeout: 15000
+- assertVisible: "TwentyMobile"
+- tapOn: "Connect your CRM"
+- extendedWaitUntil:
+    visible: "Configure CRM"
+    timeout: 10000
+- assertVisible: "Try the demo"
+- assertVisible: "Instance URL"
+- tapOn:
+    text: "Instance URL"
+- inputText: "https://twentycrm.luciosoft.it"
+- hideKeyboard
+- tapOn: "Next"
+- extendedWaitUntil:
+    visible: "How do you want to connect?"
+    timeout: 10000
+- assertVisible: ".*Login with Google / SSO.*"
+- assertVisible: ".*Login with your account.*"
+- assertVisible: ".*Login with API Key.*"
+- tapOn: ".*Login with Google / SSO.*"
+- extendedWaitUntil:
+    visible: "Google / SSO Login"
+    timeout: 15000
+- assertVisible: "Google / SSO Login"

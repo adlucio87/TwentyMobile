@@ -1,7 +1,7 @@
 #!/bin/bash
 # ==============================================================================
 # scripts/verify/all.sh
-# Esegue la pipeline di verifica disponibile: Flutter + Functions + Firebase
+# Esegue la pipeline di verifica disponibile: Flutter + Backend (Functions/Regole)
 # (+ Maestro con WITH_MAESTRO=1). Salta gli step i cui script non esistono.
 # ==============================================================================
 set -e
@@ -18,8 +18,7 @@ run_step() {
 }
 
 run_step flutter.sh
-run_step functions.sh
-run_step firebase.sh
+run_step backend.sh
 
 if [ "${WITH_MAESTRO:-0}" = "1" ]; then
     run_step maestro.sh

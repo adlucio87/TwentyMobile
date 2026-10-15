@@ -1,0 +1,64 @@
+appId: com.luciosoft.pocketcrm
+name: "OAuth PKCE Login Screen and propagator redirect"
+tags:
+  - e2e
+  - onboarding
+  - oauth
+---
+- launchApp:
+    clearState: true
+- extendedWaitUntil:
+    visible: "TwentyMobile"
+    timeout: 20000
+- tapOn: "Connect your CRM"
+- extendedWaitUntil:
+    visible: "Configure CRM"
+    timeout: 10000
+- tapOn:
+    text: "Instance URL"
+- inputText: "https://twentycrm.luciosoft.it"
+- hideKeyboard
+- tapOn: "Next"
+- extendedWaitUntil:
+    visible: "How do you want to connect?"
+    timeout: 10000
+- tapOn: ".*Login with Google / SSO.*"
+# --- OAuth 2.0 PKCE screen ---
+- extendedWaitUntil:
+    visible: "OAuth Client ID"
+    timeout: 25000
+- assertVisible: "Google / SSO Login"
+- assertVisible: "https://twentycrm.luciosoft.it"
+# The app must show the redirect URI it will actually use. This instance is
+# single-workspace, so it is Twenty's own propagator and not the HTTPS bouncer.
+- assertVisible:
+    text: ".*auth/oauth-propagator/callback.*"
+# Twenty v1.19 exposes no registration_endpoint: *when no team-shared Client ID
+# is registered for this instance* the screen has to explain that the Client ID
+# must be created manually instead of quietly leaving it empty.
+#
+# The shared registry (backend/lib/registry.js) may instead pre-fill the field
+# for this instance, which intentionally hides that notice — hence the
+# conditional block. For a fully deterministic run build the app with
+# `--dart-define=OAUTH_REGISTRY_URL=` (registry disabled, see AGENTS.md).
+- runFlow:
+    when:
+      visible:
+        text: ".*automatic client registration.*"
+    commands:
+      # --- Empty client ID is blocked client-side, never sent to the server ---
+      - scrollUntilVisible:
+          element:
+            text: "Sign in with Browser"
+          direction: DOWN
+      - tapOn: "Sign in with Browser"
+      - assertVisible: "Enter the OAuth Client ID"
+      - assertVisible: "Sign in with Browser"
+
+# The primary action is always reachable, whichever client ID source filled the
+# field (manual entry, saved credentials or the shared team registry).
+- scrollUntilVisible:
+    element:
+      text: "Sign in with Browser"
+    direction: DOWN
+- assertVisible: "Sign in with Browser"
