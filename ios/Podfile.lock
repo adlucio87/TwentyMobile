@@ -99,7 +99,7 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/google_mlkit_text_recognition/ios"
 
 SPEC CHECKSUMS:
-  Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
+  Flutter: 71a624a5bc0c04062bf19101d501e466baf2fb47
   flutter_inappwebview_ios: 6f63631e2c62a7c350263b13fa5427aedefe81d4
   google_mlkit_commons: 75b2579ccf522fe01d42e689babda04c4510ba2f
   google_mlkit_text_recognition: 4d510169638309ef7ed2aff1971b620e8d785d6e
