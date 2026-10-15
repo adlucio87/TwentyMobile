@@ -1,0 +1,23 @@
+{
+  "name": "twentymobile-backend",
+  "version": "1.0.0",
+  "description": "Zero-Knowledge OAuth Client Registry for TwentyMobile",
+  "main": "index.js",
+  "scripts": {
+    "serve": "firebase emulators:start --only functions",
+    "shell": "firebase functions:shell",
+    "start": "npm run shell",
+    "deploy": "firebase deploy --only functions,hosting,firestore:rules",
+    "lint": "node --check index.js && node --check lib/registry.js && node --check test/registry.test.js",
+    "test": "node --test test/*.test.js"
+  },
+  "engines": {
+    "node": "20"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "firebase-admin": "^12.0.0",
+    "firebase-functions": "^5.0.0"
+  },
+  "private": true
+}
