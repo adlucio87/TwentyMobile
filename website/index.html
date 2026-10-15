@@ -1,0 +1,2221 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TwentyMobile — Mobile CRM for Twenty by Luciosoft | iOS & Android</title>
+    <meta name="description"
+        content="The first native open-source mobile client for Twenty CRM by Luciosoft. Manage contacts, tasks, companies, and opportunities on iOS and Android.">
+    <meta name="keywords"
+        content="twenty mobile, twentymobile, twenty crm mobile, twenty crm app, open source crm mobile, luciosoft, twentymobile luciosoft, flutter crm, ios crm, android crm">
+    <meta name="author" content="Luciosoft - Andrea Luciano">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <link rel="canonical" href="https://twentymobilecrm.luciosoft.it/">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://twentymobilecrm.luciosoft.it/">
+    <meta property="og:site_name" content="TwentyMobile by Luciosoft">
+    <meta property="og:title" content="TwentyMobile — Mobile CRM for Twenty by Luciosoft">
+    <meta property="og:description"
+        content="Manage your contacts, tasks and companies on the go with TwentyMobile, developed by Luciosoft for iOS and Android.">
+    <meta property="og:image" content="https://twentymobilecrm.luciosoft.it/assets/img/twentymobilecrm-logo.png">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary">
+    <meta property="twitter:url" content="https://twentymobilecrm.luciosoft.it/">
+    <meta property="twitter:title" content="TwentyMobile — Mobile CRM for Twenty by Luciosoft">
+    <meta property="twitter:description"
+        content="Manage your contacts, tasks and companies on the go with TwentyMobile, developed by Luciosoft.">
+    <meta property="twitter:image" content="https://twentymobilecrm.luciosoft.it/assets/img/twentymobilecrm-logo.png">
+
+    <!-- Structured Data (Schema.org) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "SoftwareApplication",
+          "@id": "https://twentymobilecrm.luciosoft.it/#software",
+          "name": "TwentyMobile",
+          "alternateName": ["TwentyMobile CRM", "TwentyMobile by Luciosoft"],
+          "applicationCategory": "BusinessApplication",
+          "operatingSystem": "iOS, Android",
+          "url": "https://twentymobilecrm.luciosoft.it/",
+          "description": "TwentyMobile by Luciosoft is an open-source mobile CRM client for Twenty. Manage contacts, tasks, and companies on iOS and Android.",
+          "image": "https://twentymobilecrm.luciosoft.it/assets/img/twentymobilecrm-logo.png",
+          "author": {
+            "@type": "Organization",
+            "name": "Luciosoft",
+            "url": "https://luciosoft.it/"
+          },
+          "publisher": {
+            "@type": "Organization",
+            "name": "Luciosoft",
+            "url": "https://luciosoft.it/"
+          },
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+          },
+          "downloadUrl": [
+            "https://apps.apple.com/us/app/twentymoblie/id6760371090",
+            "https://play.google.com/store/apps/details?id=com.luciosoft.pocketcrm&hl=en"
+          ],
+          "sameAs": [
+            "https://apps.apple.com/us/app/twentymoblie/id6760371090",
+            "https://play.google.com/store/apps/details?id=com.luciosoft.pocketcrm&hl=en"
+          ]
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://twentymobilecrm.luciosoft.it/#website",
+          "url": "https://twentymobilecrm.luciosoft.it/",
+          "name": "TwentyMobile - Luciosoft",
+          "publisher": {
+            "@type": "Organization",
+            "name": "Luciosoft",
+            "url": "https://luciosoft.it/"
+          }
+        }
+      ]
+    }
+    </script>
+
+    <link rel="icon" type="image/png" href="assets/img/twentymobilecrm-logo.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --bg: #0a0a0a;
+            --bg-card: #111111;
+            --bg-elevated: #1a1a1a;
+            --border: rgba(255, 255, 255, 0.08);
+            --border-hover: rgba(255, 255, 255, 0.16);
+            --text: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.5);
+            --text-tertiary: rgba(255, 255, 255, 0.3);
+            --accent: #ffffff;
+            --accent-muted: rgba(255, 255, 255, 0.07);
+            --green: #22c55e;
+            --blue: #3b82f6;
+        }
+
+        body.light {
+            --bg: #ffffff;
+            --bg-card: #f8fafc;
+            --bg-elevated: #f1f5f9;
+            --border: rgba(0, 0, 0, 0.08);
+            --border-hover: rgba(0, 0, 0, 0.16);
+            --text: #0a0a0a;
+            --text-secondary: rgba(0, 0, 0, 0.5);
+            --text-tertiary: rgba(0, 0, 0, 0.3);
+            --accent: #0a0a0a;
+            --accent-muted: rgba(0, 0, 0, 0.05);
+        }
+
+        body.light nav {
+            background: rgba(255, 255, 255, 0.85);
+        }
+
+        body.light .btn-white {
+            background: #0a0a0a;
+            color: #ffffff;
+        }
+
+        body.light .code-block {
+            background: #1a1a2e;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Geist', -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+
+        /* ── NAV ── */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 40px;
+            background: rgba(10, 10, 10, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            z-index: 1000;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: var(--text);
+            font-size: 1rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+        }
+
+        .nav-brand img {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+        }
+
+        .nav-center {
+            display: flex;
+            gap: 32px;
+            align-items: center;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav-link:hover {
+            color: var(--text);
+        }
+
+        .nav-right {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .btn-ghost {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 7px 16px;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            font-weight: 500;
+            text-decoration: none;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            transition: all 0.2s;
+        }
+
+        .btn-ghost:hover {
+            color: var(--text);
+            border-color: var(--border-hover);
+            background: var(--accent-muted);
+        }
+
+        #theme-toggle {
+            width: 38px;
+            height: 38px;
+            padding: 0;
+            justify-content: center;
+            cursor: pointer;
+            background: transparent;
+        }
+
+        .btn-white {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 7px 16px;
+            background: var(--text);
+            color: var(--bg);
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+
+        .btn-white:hover {
+            opacity: 0.9;
+        }
+
+        /* ── HERO ── */
+        .hero {
+            padding: 160px 40px 100px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 800px;
+            height: 500px;
+            background: radial-gradient(ellipse at center top, rgba(255, 255, 255, 0.04) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .hero-eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 5px 14px;
+            background: var(--accent-muted);
+            border: 1px solid var(--border);
+            border-radius: 100px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 32px;
+            font-family: 'Geist Mono', monospace;
+            letter-spacing: 0.02em;
+        }
+
+        .hero-eyebrow span {
+            width: 6px;
+            height: 6px;
+            background: var(--green);
+            border-radius: 50%;
+            display: inline-block;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.4;
+            }
+        }
+
+        h1 {
+            font-size: clamp(3rem, 7vw, 6rem);
+            font-weight: 700;
+            line-height: 1.0;
+            letter-spacing: -0.04em;
+            margin-bottom: 24px;
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        h1 em {
+            font-style: normal;
+            color: var(--text-secondary);
+        }
+
+        .hero-sub {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            max-width: 520px;
+            margin: 0 auto 48px;
+            line-height: 1.6;
+            font-weight: 400;
+        }
+
+        .hero-cta {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 80px;
+        }
+
+        .btn-store {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 24px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border-radius: 10px;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .btn-store-primary {
+            background: var(--text);
+            color: var(--bg);
+            border: 1px solid var(--text);
+        }
+
+        .btn-store-primary:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        .btn-store-secondary {
+            background: transparent;
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+
+        .btn-store-secondary:hover {
+            border-color: var(--border-hover);
+            background: var(--accent-muted);
+            transform: translateY(-1px);
+        }
+
+        /* ── PHONE MOCKUP ── */
+        .hero-visual {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            gap: 20px;
+            height: 600px;
+        }
+
+        .phone-wrap {
+            position: relative;
+            transition: transform 0.3s ease;
+        }
+
+        .phone-wrap:hover {
+            transform: translateY(-8px);
+        }
+
+        .phone-wrap.side {
+            opacity: 0.5;
+            transform: scale(0.88) translateY(30px);
+        }
+
+        .phone-wrap.side:hover {
+            opacity: 0.7;
+            transform: scale(0.9) translateY(20px);
+        }
+
+        .phone {
+            width: 240px;
+            height: 520px;
+            background: #1a1a1a;
+            border: 1.5px solid rgba(255, 255, 255, 0.12);
+            border-radius: 40px;
+            overflow: hidden;
+            position: relative;
+            box-shadow:
+                0 0 0 1px rgba(0, 0, 0, 0.5),
+                0 40px 80px rgba(0, 0, 0, 0.6),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+
+        .phone-small {
+            width: 200px;
+            height: 430px;
+        }
+
+        .phone img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: top;
+            display: none;
+        }
+
+        .phone img.active {
+            display: block;
+            animation: slideUp 0.4s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .phone-notch {
+            position: absolute;
+            top: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 22px;
+            background: #000;
+            border-radius: 100px;
+            z-index: 10;
+        }
+
+        /* ── DIVIDER ── */
+        .divider {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 0;
+        }
+
+        /* ── SECTION COMMON ── */
+        section {
+            padding: 100px 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-label {
+            font-family: 'Geist Mono', monospace;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: var(--text-tertiary);
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            margin-bottom: 16px;
+        }
+
+        .section-title {
+            font-size: clamp(2rem, 4vw, 3.5rem);
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            line-height: 1.1;
+            margin-bottom: 16px;
+        }
+
+        .section-sub {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            max-width: 500px;
+            line-height: 1.6;
+        }
+
+        /* ── FEATURES BENTO ── */
+        .bento {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 16px;
+            margin-top: 64px;
+        }
+
+        .bento-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 32px;
+            transition: border-color 0.3s, transform 0.3s;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .bento-card:hover {
+            border-color: var(--border-hover);
+            transform: translateY(-2px);
+        }
+
+        .bento-card.col-5 {
+            grid-column: span 5;
+        }
+
+        .bento-card.col-7 {
+            grid-column: span 7;
+        }
+
+        .bento-card.col-4 {
+            grid-column: span 4;
+        }
+
+        .bento-card.col-8 {
+            grid-column: span 8;
+        }
+
+        .bento-card.col-6 {
+            grid-column: span 6;
+        }
+
+        .bento-card.col-12 {
+            grid-column: span 12;
+        }
+
+        .card-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            margin-bottom: 20px;
+            color: var(--text-secondary);
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            margin-bottom: 8px;
+        }
+
+        .card-desc {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .card-visual {
+            width: 100%;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 24px;
+            border: 1px solid var(--border);
+        }
+
+        .card-visual img {
+            width: 100%;
+            height: 280px;
+            object-fit: cover;
+            object-position: top;
+            display: block;
+        }
+
+        /* Card with phone preview */
+        .card-phone-preview {
+            display: flex;
+            justify-content: center;
+            margin-top: 24px;
+        }
+
+        .mini-phone {
+            width: 160px;
+            height: 340px;
+            background: #1a1a1a;
+            border: 1.5px solid rgba(255, 255, 255, 0.1);
+            border-radius: 28px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .mini-phone img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: top;
+        }
+
+        /* Feature highlight card */
+        .card-highlight {
+            background: linear-gradient(135deg, #1a1a1a 0%, #111 100%);
+        }
+
+        .card-highlight::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+        }
+
+        /* ── OPEN SOURCE SECTION ── */
+        .oss-section {
+            background: var(--bg-card);
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+            padding: 100px 40px;
+        }
+
+        .oss-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 80px;
+            align-items: center;
+        }
+
+        .oss-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-top: 48px;
+        }
+
+        .stat-box {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: -0.04em;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            font-family: 'Geist Mono', monospace;
+        }
+
+        .code-block {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+            font-family: 'Geist Mono', monospace;
+            font-size: 0.8rem;
+            line-height: 1.8;
+            color: var(--text-secondary);
+        }
+
+        .code-line {
+            display: block;
+        }
+
+        .code-comment {
+            color: var(--text-tertiary);
+        }
+
+        .code-key {
+            color: #93c5fd;
+        }
+
+        .code-val {
+            color: #86efac;
+        }
+
+        .code-str {
+            color: #fca5a5;
+        }
+
+        /* ── HOW IT WORKS ── */
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1px;
+            background: var(--border);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            margin-top: 64px;
+        }
+
+        .step {
+            background: var(--bg-card);
+            padding: 40px 32px;
+        }
+
+        .step-num {
+            font-family: 'Geist Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--text-tertiary);
+            margin-bottom: 20px;
+            letter-spacing: 0.05em;
+        }
+
+        .step-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            margin-bottom: 10px;
+        }
+
+        .step-desc {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* ── CTA ── */
+        .cta-section {
+            padding: 160px 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-section::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 600px;
+            height: 400px;
+            background: radial-gradient(ellipse at center bottom, rgba(255, 255, 255, 0.03) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .cta-section h2 {
+            font-size: clamp(2.5rem, 5vw, 5rem);
+            font-weight: 700;
+            letter-spacing: -0.04em;
+            line-height: 1.0;
+            margin-bottom: 24px;
+        }
+
+        .cta-section h2 em {
+            font-style: normal;
+            color: var(--text-secondary);
+        }
+
+        .cta-section p {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            margin-bottom: 48px;
+        }
+
+        /* ── FOOTER ── */
+        footer {
+            border-top: 1px solid var(--border);
+            padding: 48px 40px;
+        }
+
+        .footer-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 24px;
+        }
+
+        .footer-brand {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .footer-brand span {
+            color: var(--text-tertiary);
+            font-weight: 400;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 24px;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            font-size: 0.8rem;
+            color: var(--text-tertiary);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .footer-links a:hover {
+            color: var(--text-secondary);
+        }
+
+        .footer-copy {
+            font-size: 0.75rem;
+            color: var(--text-tertiary);
+            font-family: 'Geist Mono', monospace;
+        }
+
+        /* ── SLIDER DOTS ── */
+        .slider-nav {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 32px;
+        }
+
+        .s-dot {
+            width: 4px;
+            height: 4px;
+            background: var(--text-tertiary);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .s-dot.active {
+            background: var(--text);
+            width: 20px;
+            border-radius: 2px;
+        }
+
+        /* ── DISCLAIMER BADGE ── */
+        .disclaimer {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            background: rgba(251, 191, 36, 0.08);
+            border: 1px solid rgba(251, 191, 36, 0.2);
+            border-radius: 6px;
+            font-size: 0.75rem;
+            color: rgba(251, 191, 36, 0.7);
+            font-family: 'Geist Mono', monospace;
+            margin-bottom: 40px;
+        }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 900px) {
+            nav {
+                padding: 0 20px;
+            }
+
+            .nav-center {
+                display: none;
+            }
+
+            .nav-right a.btn-ghost,
+            .nav-right a.btn-white {
+                display: none;
+            }
+
+            .hero {
+                padding: 120px 20px 60px;
+            }
+
+            section {
+                padding: 60px 20px;
+            }
+
+            .bento-card.col-5,
+            .bento-card.col-7,
+            .bento-card.col-4,
+            .bento-card.col-8 {
+                grid-column: span 12;
+            }
+
+            .bento-card.col-6 {
+                grid-column: span 12;
+            }
+
+            .oss-inner {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+
+            .steps {
+                grid-template-columns: 1fr;
+            }
+
+            .hero-visual {
+                height: auto;
+                flex-direction: column;
+                align-items: center;
+                gap: 0;
+            }
+
+            .phone-wrap.side {
+                display: none;
+            }
+
+            .footer-inner {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .cta-section {
+                padding: 80px 20px;
+            }
+
+            .faq-section {
+                padding: 60px 20px;
+            }
+
+            .faq-controls-row {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+
+        /* ── FAQ & GUIDES SECTION ── */
+        .faq-section {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 100px 40px;
+        }
+
+        .faq-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .faq-search-box {
+            position: relative;
+            max-width: 720px;
+            margin: 32px auto 20px;
+        }
+
+        .faq-search-box i.search-icon {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-tertiary);
+            font-size: 1rem;
+            pointer-events: none;
+        }
+
+        .faq-search-input {
+            width: 100%;
+            padding: 16px 48px 16px 52px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            color: var(--text);
+            font-family: 'Geist', -apple-system, sans-serif;
+            font-size: 0.95rem;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .faq-search-input:focus {
+            border-color: var(--border-hover);
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.06);
+        }
+
+        body.light .faq-search-input:focus {
+            box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .faq-clear-btn {
+            position: absolute;
+            right: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: transparent;
+            border: none;
+            color: var(--text-tertiary);
+            cursor: pointer;
+            font-size: 1rem;
+            padding: 4px;
+            display: none;
+        }
+
+        .faq-clear-btn:hover {
+            color: var(--text);
+        }
+
+        .faq-controls-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+
+        .faq-categories {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .faq-category-btn {
+            padding: 7px 16px;
+            border-radius: 100px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            font-family: 'Geist', sans-serif;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .faq-category-btn:hover {
+            color: var(--text);
+            border-color: var(--border-hover);
+        }
+
+        .faq-category-btn.active {
+            background: var(--text);
+            color: var(--bg);
+            border-color: var(--text);
+            font-weight: 600;
+        }
+
+        .faq-count {
+            font-size: 0.8rem;
+            font-family: 'Geist Mono', monospace;
+            color: var(--text-tertiary);
+        }
+
+        .faq-accordion {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .faq-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            overflow: hidden;
+            transition: border-color 0.2s, background 0.2s;
+        }
+
+        .faq-item:hover {
+            border-color: var(--border-hover);
+        }
+
+        .faq-item[open] {
+            border-color: rgba(255, 255, 255, 0.22);
+            background: var(--bg-elevated);
+        }
+
+        body.light .faq-item[open] {
+            border-color: rgba(0, 0, 0, 0.18);
+        }
+
+        .faq-item summary {
+            list-style: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 22px 26px;
+            cursor: pointer;
+            user-select: none;
+            gap: 16px;
+        }
+
+        .faq-item summary::-webkit-details-marker {
+            display: none;
+        }
+
+        .faq-question-wrap {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            text-align: left;
+        }
+
+        .faq-question {
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: var(--text);
+            letter-spacing: -0.015em;
+        }
+
+        .faq-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 3px 9px;
+            border-radius: 6px;
+            font-size: 0.72rem;
+            font-family: 'Geist Mono', monospace;
+            font-weight: 500;
+            background: var(--accent-muted);
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+        }
+
+        .faq-badge.badge-ios {
+            border-color: rgba(59, 130, 246, 0.35);
+            color: #60a5fa;
+            background: rgba(59, 130, 246, 0.08);
+        }
+
+        .faq-badge.badge-android {
+            border-color: rgba(34, 197, 94, 0.35);
+            color: #4ade80;
+            background: rgba(34, 197, 94, 0.08);
+        }
+
+        .faq-chevron {
+            color: var(--text-tertiary);
+            font-size: 0.85rem;
+            transition: transform 0.25s ease;
+            flex-shrink: 0;
+        }
+
+        .faq-item[open] .faq-chevron {
+            transform: rotate(180deg);
+            color: var(--text);
+        }
+
+        .faq-answer {
+            padding: 0 26px 24px 26px;
+            color: var(--text-secondary);
+            font-size: 0.93rem;
+            line-height: 1.7;
+            border-top: 1px solid var(--border);
+            padding-top: 20px;
+            margin-top: 2px;
+        }
+
+        .faq-answer strong {
+            color: var(--text);
+        }
+
+        .faq-answer ol, .faq-answer ul {
+            margin: 12px 0 14px 22px;
+            padding: 0;
+        }
+
+        .faq-answer li {
+            margin-bottom: 8px;
+        }
+
+        .faq-callout {
+            margin: 16px 0 8px;
+            padding: 14px 18px;
+            border-radius: 10px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            font-size: 0.85rem;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            line-height: 1.55;
+        }
+
+        .faq-callout.tip {
+            border-color: rgba(34, 197, 94, 0.3);
+            background: rgba(34, 197, 94, 0.05);
+        }
+
+        .faq-callout.note {
+            border-color: rgba(59, 130, 246, 0.3);
+            background: rgba(59, 130, 246, 0.05);
+        }
+
+        .faq-code-inline {
+            padding: 2px 7px;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            border-radius: 5px;
+            font-family: 'Geist Mono', monospace;
+            font-size: 0.82rem;
+            color: var(--text);
+            word-break: break-all;
+        }
+
+        .faq-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 14px 0;
+            font-size: 0.85rem;
+        }
+
+        .faq-table th, .faq-table td {
+            padding: 10px 14px;
+            border: 1px solid var(--border);
+            text-align: left;
+        }
+
+        .faq-table th {
+            background: var(--bg-elevated);
+            color: var(--text);
+            font-weight: 600;
+        }
+
+        .faq-empty-state {
+            text-align: center;
+            padding: 50px 20px;
+            background: var(--bg-card);
+            border: 1px dashed var(--border);
+            border-radius: 14px;
+            display: none;
+        }
+
+        .faq-empty-state p {
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+        }
+
+        /* ── FADE IN ANIMATION ── */
+        .fade-up {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+
+        .fade-up.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- NAV -->
+    <nav>
+        <a href="/" class="nav-brand">
+            <img src="assets/img/twentymobilecrm-logo.png" alt="TwentyMobile">
+            TwentyMobile
+        </a>
+        <div class="nav-center">
+            <a href="#features" class="nav-link">Features</a>
+            <a href="#how-it-works" class="nav-link">How it works</a>
+            <a href="#faq" class="nav-link">FAQ &amp; Guides</a>
+            <a href="https://blog.luciosoft.it/" target="_blank" class="nav-link">Blog</a>
+            <a href="https://luciosoft.it/donate.html" target="_blank" class="nav-link" style="color: rgba(252,138,76,0.8);">☕ Support</a>
+        </div>
+        <div class="nav-right">
+            <a href="https://github.com/adlucio87/TwentyMobile" target="_blank" class="btn-ghost">
+                <i class="fa-brands fa-github"></i> GitHub
+            </a>
+            <a href="https://play.google.com/store/apps/details?id=com.luciosoft.pocketcrm&hl=en" target="_blank" class="btn-white">
+                <i class="fa-brands fa-google-play"></i> Get the app
+            </a>
+            <button id="theme-toggle" class="btn-ghost" title="Toggle theme">
+                <i class="fa-solid fa-sun" id="theme-icon"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <section class="hero" style="max-width:100%; padding-top:160px;">
+        <div class="hero-eyebrow">
+            <span></span> Open Source · AGPL-3.0 · v1.0
+        </div>
+        <h1>Your CRM.<br><em>In your pocket.</em></h1>
+        <p class="hero-sub">
+            The first native mobile client for Twenty CRM.
+            Connect to your self-hosted instance.
+            Own your data, completely.
+        </p>
+
+        <div class="disclaimer">
+            <i class="fa-solid fa-circle-info"></i>
+            Not affiliated with Twenty CRM — independent open-source project
+        </div>
+
+        <div class="hero-cta">
+            <a href="https://apps.apple.com/us/app/twentymoblie/id6760371090" target="_blank" class="btn-store btn-store-primary">
+                <i class="fa-brands fa-apple"></i> App Store
+            </a>
+            <a href="https://play.google.com/store/apps/details?id=com.luciosoft.pocketcrm&hl=en" target="_blank" class="btn-store btn-store-primary">
+                <i class="fa-brands fa-google-play"></i> Google Play
+            </a>
+            <a href="https://github.com/adlucio87/TwentyMobile" target="_blank" class="btn-store btn-store-secondary">
+                <i class="fa-brands fa-github"></i> View on GitHub
+            </a>
+        </div>
+
+        <!-- Phone slider -->
+        <div class="hero-visual">
+            <div class="phone-wrap side">
+                <div class="phone phone-small">
+                    <div class="phone-notch"></div>
+                    <img src="assets/img/screenshots/Screenshot_20260326-115155.png" alt="Companies" class="active">
+                </div>
+            </div>
+
+            <div class="phone-wrap">
+                <div class="phone" id="hero-phone">
+                    <div class="phone-notch"></div>
+                    <img src="assets/img/screenshots/Screenshot_20260326-115125.png" alt="Today" class="active"
+                        data-caption="Today Screen">
+                    <img src="assets/img/screenshots/Screenshot_20260326-115135.png" alt="Contacts"
+                        data-caption="Contacts">
+                    <img src="assets/img/screenshots/Screenshot_20260326-115205.png" alt="Tasks" data-caption="Tasks">
+                    <img src="assets/img/screenshots/Screenshot_20260326-115419.png" alt="Scanner"
+                        data-caption="Card Scanner">
+                    <img src="assets/img/screenshots/Screenshot_20260326-115502.png" alt="Dark Mode"
+                        data-caption="Dark Mode">
+                </div>
+            </div>
+
+            <div class="phone-wrap side">
+                <div class="phone phone-small">
+                    <div class="phone-notch"></div>
+                    <img src="assets/img/screenshots/Screenshot_20260326-115250.png" alt="Task detail" class="active">
+                </div>
+            </div>
+        </div>
+
+        <div class="slider-nav" id="hero-dots"></div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- FEATURES -->
+    <section id="features" style="max-width:1200px;">
+        <div class="fade-up">
+            <div class="section-label">Features</div>
+            <h2 class="section-title">Built for how<br>you actually work.</h2>
+            <p class="section-sub">Everything you need from your CRM, optimized for one-handed mobile use.</p>
+        </div>
+
+        <div class="bento fade-up">
+
+            <!-- Today Screen — large -->
+            <div class="bento-card col-7 card-highlight">
+                <div class="card-icon"><i class="fa-solid fa-sun"></i></div>
+                <div class="card-title">Today Screen</div>
+                <div class="card-desc">Your daily operations hub. Overdue tasks, today's priorities, tomorrow's agenda
+                    and recent contacts — all in one view every morning.</div>
+                <div class="card-visual">
+                    <img src="assets/img/screenshots/Screenshot_20260326-115125.png" alt="Today Screen">
+                </div>
+            </div>
+
+            <!-- Privacy -->
+            <div class="bento-card col-5">
+                <div class="card-icon"><i class="fa-solid fa-lock"></i></div>
+                <div class="card-title">100% Self-Hosted</div>
+                <div class="card-desc">Connect directly to your own Twenty CRM instance. No middleman. No data
+                    collection. Your API token is stored in the device's secure keychain.</div>
+                <div
+                    style="margin-top:32px; padding:20px; background:var(--bg-elevated); border-radius:10px; border:1px solid var(--border);">
+                    <div
+                        style="font-family:'Geist Mono',monospace; font-size:0.75rem; color:var(--text-tertiary); margin-bottom:12px;">
+                        YOUR DATA FLOW</div>
+                    <div
+                        style="display:flex; align-items:center; gap:8px; font-size:0.8rem; color:var(--text-secondary);">
+                        <span
+                            style="padding:4px 10px; background:var(--bg-card); border:1px solid var(--border); border-radius:6px;">📱
+                            App</span>
+                        <span style="color:var(--text-tertiary);">→</span>
+                        <span
+                            style="padding:4px 10px; background:var(--bg-card); border:1px solid var(--border); border-radius:6px;">🔒
+                            HTTPS</span>
+                        <span style="color:var(--text-tertiary);">→</span>
+                        <span
+                            style="padding:4px 10px; background:var(--bg-card); border:1px solid var(--border); border-radius:6px;">🗄️
+                            Your Server</span>
+                    </div>
+                    <div style="margin-top:12px; font-size:0.75rem; color:var(--text-tertiary);">We never see your data.
+                        Ever.</div>
+                </div>
+            </div>
+
+            <!-- Business Card Scanner -->
+            <div class="bento-card col-5">
+                <div class="card-icon"><i class="fa-solid fa-camera"></i></div>
+                <div class="card-title">Business Card Scanner</div>
+                <div class="card-desc">Point, shoot, done. On-device OCR extracts name, email, phone and company. Fully
+                    offline — no data leaves your device.</div>
+                <div class="card-phone-preview">
+                    <div class="mini-phone">
+                        <img src="assets/img/screenshots/Screenshot_20260326-115419.png" alt="Scanner">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tasks -->
+            <div class="bento-card col-7">
+                <div class="card-icon"><i class="fa-solid fa-circle-check"></i></div>
+                <div class="card-title">Smart Task Management</div>
+                <div class="card-desc">Tasks with due dates, time reminders and contact links. Local push notifications
+                    30 minutes before deadlines. Never miss a follow-up again.</div>
+                <div class="card-visual">
+                    <img src="assets/img/screenshots/Screenshot_20260326-115205.png" alt="Tasks">
+                </div>
+            </div>
+
+            <!-- Voice Notes -->
+            <div class="bento-card col-4">
+                <div class="card-icon"><i class="fa-solid fa-microphone"></i></div>
+                <div class="card-title">Voice-to-Text Notes</div>
+                <div class="card-desc">Record a voice note, get it transcribed on-device, and save it directly to your
+                    contact. No typing required.</div>
+            </div>
+
+            <!-- Dark Mode -->
+            <div class="bento-card col-4">
+                <div class="card-icon"><i class="fa-solid fa-circle-half-stroke"></i></div>
+                <div class="card-title">Dark & Light Mode</div>
+                <div class="card-desc">Follows your system preference automatically. Like this website.</div>
+                <div style="margin-top:20px; display:flex; gap:8px; justify-content:center;">
+                    <div class="mini-phone" style="height:180px; opacity:1;" id="preview-dark">
+                        <img src="assets/img/screenshots/Screenshot_20260326-115125.png" alt="Dark">
+                    </div>
+                    <div class="mini-phone"
+                        style="height:180px; opacity:0.4; transform:scale(0.9); transition:all 0.3s;"
+                        id="preview-light">
+                        <img src="assets/img/screenshots/Screenshot_20260326-115453.png" alt="Light">
+                    </div>
+                </div>
+                <div style="text-align:center; margin-top:12px; font-size:0.75rem; color:var(--text-tertiary); font-family:'Geist Mono',monospace;"
+                    id="theme-label">
+                    Currently showing: dark
+                </div>
+            </div>
+
+            <!-- Share vCard -->
+            <div class="bento-card col-4">
+                <div class="card-icon"><i class="fa-solid fa-share-nodes"></i></div>
+                <div class="card-title">Share as vCard</div>
+                <div class="card-desc">Export any contact as a .vcf file. Share via AirDrop, WhatsApp, email or save to
+                    your phone's address book.</div>
+            </div>
+
+            <!-- OAuth 2.0 PKCE -->
+            <div class="bento-card col-6">
+                <div class="card-icon"><i class="fa-solid fa-shield-halved"></i></div>
+                <div class="card-title">OAuth 2.0 PKCE &amp; Google SSO</div>
+                <div class="card-desc">Sign in with Google Workspace or web SSO via your system browser. RFC 7636 PKCE with rotating refresh tokens keeps credentials secure without third-party webviews.</div>
+            </div>
+
+            <!-- iOS 18+ Contacts Provider -->
+            <div class="bento-card col-6">
+                <div class="card-icon"><i class="fa-brands fa-apple"></i></div>
+                <div class="card-title">iOS 18+ Live Contacts Provider</div>
+                <div class="card-desc">Seamless integration with Apple's native Contacts app under a dedicated Twenty container. Zero iCloud duplication, automatic cleanup on logout, completely private.</div>
+            </div>
+
+        </div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- OPEN SOURCE -->
+    <div class="oss-section">
+        <div class="oss-inner">
+            <div class="fade-up">
+                <div class="section-label">Open Source</div>
+                <h2 class="section-title">Built in the open.<br>Forever.</h2>
+                <p class="section-sub" style="margin-bottom:0;">
+                    TwentyMobile is AGPL-3.0 licensed. Read the code, fork it, contribute to it. No black boxes.
+                </p>
+                <div class="oss-stats">
+                    <div class="stat-box">
+                        <div class="stat-number">AGPL</div>
+                        <div class="stat-label">License</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number">Flutter</div>
+                        <div class="stat-label">Framework</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number">iOS</div>
+                        <div class="stat-label">+ Android + macOS</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number">0</div>
+                        <div class="stat-label">Data collected</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="fade-up">
+                <div class="code-block">
+                    <span class="code-line code-comment"># Connect to your instance</span>
+                    <span class="code-line">&nbsp;</span>
+                    <span class="code-line"><span class="code-key">instance_url</span>: <span
+                            class="code-str">"https://your-server.com"</span></span>
+                    <span class="code-line"><span class="code-key">auth_methods</span>: <span
+                            class="code-str">["Google_SSO", "Email_2FA", "API_Key"]</span></span>
+                    <span class="code-line">&nbsp;</span>
+                    <span class="code-line code-comment"># Direct connection. You're in.</span>
+                    <span class="code-line">&nbsp;</span>
+                    <span class="code-line"><span class="code-key">data_stored_on_our_servers</span>: <span
+                            class="code-val">false</span></span>
+                    <span class="code-line"><span class="code-key">analytics_collected</span>: <span
+                            class="code-val">false</span></span>
+                    <span class="code-line"><span class="code-key">ads_shown</span>: <span
+                            class="code-val">false</span></span>
+                    <span class="code-line"><span class="code-key">open_source</span>: <span
+                            class="code-val">true</span></span>
+                </div>
+                <div style="margin-top:16px; display:flex; gap:12px;">
+                    <a href="https://github.com/adlucio87/TwentyMobile" target="_blank" class="btn-ghost"
+                        style="flex:1; justify-content:center;">
+                        <i class="fa-brands fa-github"></i> View on GitHub
+                    </a>
+                    <a href="https://privacy.luciosoft.it/twentymobilecrm/" target="_blank" class="btn-ghost"
+                        style="flex:1; justify-content:center;">
+                        <i class="fa-solid fa-shield"></i> Privacy Policy
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- HOW IT WORKS -->
+    <section id="how-it-works" style="max-width:1200px;">
+        <div class="fade-up">
+            <div class="section-label">How it works</div>
+            <h2 class="section-title">Up and running<br>in 3 steps.</h2>
+        </div>
+
+        <div class="steps fade-up">
+            <div class="step">
+                <div class="step-num">01</div>
+                <div class="step-title">Install the app</div>
+                <div class="step-desc">Download TwentyMobile from the App Store or Google Play. Free, no account
+                    required.</div>
+            </div>
+            <div class="step">
+                <div class="step-num">02</div>
+                <div class="step-title">Connect your instance</div>
+                <div class="step-desc">Enter your instance URL and sign in via Google / SSO (OAuth 2.0 PKCE), Email &amp; Password with 2FA, or Admin API Key.</div>
+            </div>
+            <div class="step">
+                <div class="step-num">03</div>
+                <div class="step-title">You're in</div>
+                <div class="step-desc">Your contacts, tasks and companies are instantly available. No sync delay, no
+                    loading screens.</div>
+            </div>
+        </div>
+
+        <div style="margin-top:16px; padding:20px 32px; background:var(--bg-card); border:1px solid var(--border); border-radius:12px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px;"
+            class="fade-up">
+            <div>
+                <div style="font-size:0.875rem; font-weight:600; margin-bottom:4px;">Want to try first?</div>
+                <div style="font-size:0.8rem; color:var(--text-secondary);">Use the built-in demo mode — no server
+                    required.</div>
+            </div>
+            <a href="#" class="btn-ghost">
+                <i class="fa-solid fa-play"></i> Try demo mode
+            </a>
+        </div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- FAQ & GUIDES -->
+    <section id="faq" class="faq-section" style="max-width:1100px;">
+        <div class="faq-header fade-up">
+            <div class="section-label">FAQ &amp; Guides</div>
+            <h2 class="section-title">Everything you need<br>to know.</h2>
+            <p class="section-sub">Step-by-step guides for Google / SSO OAuth setup, platform features on iOS &amp; Android, scanner privacy, and background alerts.</p>
+            
+            <!-- Intelligent Live Search Bar -->
+            <div class="faq-search-box">
+                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                <input type="search" id="faq-search" class="faq-search-input" placeholder="Search guides, setup steps, error solutions (e.g. 'oauth', 'redirect', 'ios contacts', 'scanner')..." autocomplete="off" spellcheck="false">
+                <button type="button" id="faq-clear" class="faq-clear-btn" title="Clear search">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Controls: Category Filter Pills & Count -->
+        <div class="faq-controls-row fade-up">
+            <div class="faq-categories" role="tablist" aria-label="FAQ categories">
+                <button type="button" class="faq-category-btn active" data-category="all">All Topics</button>
+                <button type="button" class="faq-category-btn" data-category="auth">🔐 Authentication &amp; Setup</button>
+                <button type="button" class="faq-category-btn" data-category="platform">📱 iOS &amp; Android</button>
+                <button type="button" class="faq-category-btn" data-category="contacts">📷 Contacts &amp; Scanner</button>
+                <button type="button" class="faq-category-btn" data-category="notifications">🔔 Notifications</button>
+                <button type="button" class="faq-category-btn" data-category="workflows">⚡ Workflows &amp; CRM</button>
+            </div>
+            <div class="faq-count" id="faq-count">Showing 13 of 13 guides</div>
+        </div>
+
+        <!-- Accordion FAQ Items (Native <details> with search indexing) -->
+        <div class="faq-accordion fade-up" id="faq-list">
+
+            <!-- 1. Google SSO OAuth Setup -->
+            <details class="faq-item" data-category="auth" data-keywords="google sso oauth 2.0 pkce login sign in application twentymobile client id redirect uri setup applications propagator callback">
+                <summary>
+                    <div class="faq-question-wrap">
+                        <span class="faq-badge">OAuth 2.0 PKCE</span>
+                        <span class="faq-badge badge-ios">iOS</span>
+                        <span class="faq-badge badge-android">Android</span>
+                        <div class="faq-question">How do I configure Google / SSO (OAuth 2.0 PKCE) with Twenty CRM?</div>
+                    </div>
+                    <i class="fa-solid fa-chevron-down faq-chevron"></i>
+                </summary>
+                <div class="faq-answer">
+                    <p>TwentyMobile signs in through Twenty CRM's native OAuth 2.0 authorization-code flow using <strong>PKCE (RFC 7636)</strong> opened in the system browser.</p>
+
+                    <div class="faq-callout tip" style="margin-bottom:16px;">
+                        <i class="fa-solid fa-wand-magic-sparkles" style="color:var(--brand-primary); margin-top:2px;"></i>
+                        <div>
+                            <strong>✨ Zero-Touch Automatic Setup (Twenty Cloud &amp; Supported Instances):</strong><br>
+                            If your Twenty CRM instance supports <strong>Dynamic Client Registration (RFC 7591)</strong> — standard on Twenty Cloud (<em>twenty.com</em>) — TwentyMobile <strong>registers the application automatically</strong> in the background! The Client ID is generated, securely saved, and pre-filled with zero manual configuration. You can skip the manual steps below and sign in immediately.
+                        </div>
+                    </div>
+
+                    <p><strong>Manual Setup (Fallback for Self-Hosted Instances):</strong><br>
+                    If your self-hosted instance does not have dynamic registration enabled, configure your application manually in 4 easy steps:</p>
+                    
+                    <ol>
+                        <li><strong>Open Twenty CRM in your browser:</strong> Log into your instance and go to <strong>Settings → Applications</strong>.</li>
+                        <li><strong>Create a new Application:</strong> Click <strong>Create Application</strong> (or <em>New Application</em>) and enter a name (e.g. <strong>"TwentyMobile"</strong>).</li>
+                        <li><strong>Register the Redirect URI:</strong> Copy the exact Redirect URI displayed in TwentyMobile's OAuth screen and paste it into the application settings on Twenty CRM:</li>
+                    </ol>
+
+                    <table class="faq-table">
+                        <thead>
+                            <tr>
+                                <th>Instance Setup</th>
+                                <th>Redirect URI to Register</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Single-workspace</strong> (default self-hosted)</td>
+                                <td><span class="faq-code-inline">https://&lt;your-instance&gt;/auth/oauth-propagator/callback</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Multi-workspace / Custom Cloud</strong></td>
+                                <td><span class="faq-code-inline">https://twentymobilecrm.luciosoft.it/oauth/callback</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="faq-callout tip">
+                        <i class="fa-solid fa-circle-check" style="color:var(--green); margin-top:2px;"></i>
+                        <div><strong>One-Tap Copy:</strong> You do not need to guess the URI: TwentyMobile automatically queries your instance capabilities and displays the exact Redirect URI to register with a one-tap copy button right on screen.</div>
+                    </div>
+
+                    <ol start="4">
+                        <li><strong>Obtain the Client ID:</strong> Save the application on Twenty CRM and copy the generated <strong>Client ID</strong> (and Client Secret, if issued).</li>
+                        <li><strong>Sign in from TwentyMobile:</strong> Paste the Client ID into TwentyMobile and tap <strong>Sign in with Browser</strong>. Authorize with your Google or SSO account: the system browser safely redirects back into the app using the registered <span class="faq-code-inline">pocketcrm://oauth/callback</span> scheme.</li>
+                    </ol>
+
+                    <div class="faq-callout note">
+                        <i class="fa-solid fa-circle-info" style="color:var(--brand-primary); margin-top:2px;"></i>
+                        <div>
+                            <strong>First-Time Login Note (Landing on Twenty Dashboard):</strong><br>
+                            If your browser is not already logged in to Twenty CRM, authenticating will take you to your workspace dashboard first. <strong>Do not close the browser.</strong> Simply tap your browser's <strong>Back (Indietro)</strong> button on Android (or edge-swipe / tap Cancel and reopen on iOS): Twenty CRM will detect your active session and present the <em>"Connect TwentyMobile to your account"</em> consent prompt. Click <strong>Authorize</strong> to finalize and return to the app!
+                        </div>
+                    </div>
+                </div>
+            </details>
+
+            <!-- 2. OAuth First Login Redirect & Dashboard Landing -->
+            <details class="faq-item" data-category="auth" data-keywords="redirect loop back button dashboard lands on twenty workspace connect app authorize prompt consent browser oauth google sso login">
+                <summary>
+                    <div class="faq-question-wrap">
+                        <span class="faq-badge">OAuth Troubleshooting</span>
+                        <span class="faq-badge badge-ios">iOS</span>
+                        <span class="faq-badge badge-android">Android</span>
+                        <div class="faq-question">Why does the browser land on my Twenty dashboard instead of redirecting back to the app?</div>
+                    </div>
+                    <i class="fa-solid fa-chevron-down faq-chevron"></i>
+                </summary>
+                <div class="faq-answer">
+                    <p>When authenticating through the system browser for the first time without an existing browser session, Twenty CRM's Single Page Application (SPA) routes successful logins to the workspace dashboard instead of remembering the initial authorization prompt.</p>
+                    
+                    <div class="faq-callout tip">
+                        <i class="fa-solid fa-lightbulb" style="color:var(--brand-primary); margin-top:2px;"></i>
+                        <div>
+                            <strong>How to complete authorization in 2 seconds:</strong>
+                            <ol style="margin: 8px 0 0 16px; padding: 0;">
+                                <li><strong>Do not close or panic</strong> when you see your workspace dashboard.</li>
+                                <li><strong>Navigate back to the authorization prompt:</strong>
+                                    <ul style="margin: 4px 0 6px 16px; padding: 0; list-style-type: disc;">
+                                        <li><strong>On Android:</strong> Tap the browser's <strong>Back (Indietro)</strong> button or use the back gesture.</li>
+                                        <li><strong>On iOS:</strong> Swipe from the left edge of the screen to the right to go back, <em>or</em> tap <strong>Cancel</strong> and tap <strong>Sign in with Browser</strong> again. Since Safari now retains your login session, Twenty CRM will open directly to the consent screen!</li>
+                                    </ul>
+                                </li>
+                                <li>Twenty CRM will recognize your authenticated session and display the consent modal: <em>"Connect TwentyMobile to your account"</em>.</li>
+                                <li>Click <strong>Authorize</strong>: the browser will immediately trigger the callback and return you to TwentyMobile logged in!</li>
+                            </ol>
+                        </div>
+                    </div>
+                    <p style="margin-top:12px; font-size:13px; color:var(--text-muted);">
+                        <em>Note: Once your browser has authenticated your session, subsequent logins or token refreshes will detect your session immediately and display the consent prompt directly without landing on the dashboard.</em>
+                    </p>
+                </div>
+            </details>
+
+            <!-- 3. Multiple TwentyMobile Applications after Reinstallation -->
+            <details class="faq-item" data-category="auth" data-keywords="multiple twentymobile applications settings client id duplicate reinstall uninstall dynamic client registration rfc 7591">
+                <summary>
+                    <div class="faq-question-wrap">
+                        <span class="faq-badge">OAuth &amp; Applications</span>
+                        <div class="faq-question">Why do I see multiple "TwentyMobile" applications in Twenty CRM Settings?</div>
+                    </div>
+                    <i class="fa-solid fa-chevron-down faq-chevron"></i>
+                </summary>
+                <div class="faq-answer">
+                    <p>TwentyMobile supports <strong>RFC 7591 Dynamic Client Registration</strong>. When connecting to a supported instance (like Twenty Cloud), the app registers itself automatically with the CRM and securely stores its assigned Client ID on your device.</p>
+                    <p>When you <strong>uninstall and reinstall</strong> TwentyMobile:</p>
+                    <ol>
+                        <li>Your device's operating system (iOS or Android) completely wipes the app's local secure storage, including the previous Client ID.</li>
+                        <li>On the fresh install, TwentyMobile detects no local credentials and automatically requests a new registration from Twenty CRM.</li>
+                        <li>Twenty CRM registers the new install with its own unique Client ID, resulting in a new "TwentyMobile" entry in <strong>Settings → Applications</strong>.</li>
+                    </ol>
+                    <div class="faq-callout tip">
+                        <i class="fa-solid fa-circle-check" style="color:var(--green); margin-top:2px;"></i>
+                        <div><strong>Safe to Clean Up:</strong> Only the newest application entry is used by your active install. Older entries from previous installations can be safely deleted in Twenty CRM under <em>Settings → Applications</em> at any time.</div>
+                    </div>
+                </div>
+            </details>
+
+            <!-- 4. Email & Password / 2FA / Captcha -->
+            <details class="faq-item" data-category="auth" data-keywords="email password login 2fa otp two factor authentication token turnstile recaptcha captcha cloudflare security">
+                <summary>
+                    <div class="faq-question-wrap">
+                        <span class="faq-badge">Email &amp; Password</span>
+                        <span class="faq-badge">2FA &amp; OTP</span>
+                        <div class="faq-question">Can I log in with standard Email and Password? Does it support 2FA and Captchas?</div>
+                    </div>
+                    <i class="fa-solid fa-chevron-down faq-chevron"></i>
+                </summary>
+                <div class="faq-answer">
+                    <p><strong>Yes, absolutely.</strong> Standard credentials login is fully supported for all workspace members and administrators.</p>
+                    <ul>
+                        <li><strong>Two-Factor Authentication (2FA / OTP):</strong> If your Twenty account has 2FA enabled, TwentyMobile automatically detects the pending challenge and opens a dedicated 6-digit OTP verification screen with smart clipboard pasting.</li>
+                        <li><strong>Automated Captcha Solving:</strong> If your Twenty CRM instance enforces Cloudflare Turnstile or Google reCAPTCHA, TwentyMobile resolves the verification challenge invisibly in the background so you never get blocked by security checks.</li>
+                        <li><strong>Workflow Execution:</strong> Logging in with Email &amp; Password provides a user-scoped JWT token, which is required if you plan to execute Twenty manual workflows.</li>
+                    </ul>
+                </div>
+            </details>
+
+            <!-- 3. API Key -->
+            <details class="faq-item" data-category="auth" data-keywords="api key token developer admin settings developers credentials permissions">
+                <summary>
+                    <div class="faq-question-wrap">
+                        <span class="faq-badge">API Key</span>
+                        <span class="faq-badge">Developers</span>
+                        <div class="faq-question">How do I connect using a Twenty CRM API Key?</div>
+                    </div>
+                    <i class="fa-solid fa-chevron-down faq-chevron"></i>
+                </summary>
+                <div class="faq-answer">
+                    <p>API Key authentication is ideal for quick administrator access or developer environments:</p>
+                    <ol>
+                        <li>In Twenty CRM, navigate to <strong>Settings → Developers → API Keys</strong>.</li>
+                        <li>Click <strong>Create API Key</strong>, assign your desired permissions (e.g. read/write access), and copy the secret token.</li>
+                        <li>In TwentyMobile, select <strong>Login with API Key</strong> and paste the key.</li>
+                    </ol>
+                    <div class="faq-callout note">
+                        <i class="fa-solid fa-info-circle" style="color:var(--blue); margin-top:2px;"></i>
+                        <div><strong>Upstream Workflow Limitation:</strong> Twenty CRM's GraphQL API restricts executing manual workflows when authenticated via an API Key (returns 403 Forbidden). For manual workflow triggers, use Email &amp; Password or Google SSO login.</div>
+                    </div>
+                </div>
+            </details>
+
+            <!-- 4. iOS 18+ Contacts Provider -->
+            <details class="faq-item" data-category="platform" data-keywords="ios 18 contacts provider apple native app iphone address book icloud privacy container toggle settings">
+                <summary>
+                    <div class="faq-question-wrap">
+                        <span class="faq-badge badge-ios">iOS 18+ Exclusive</span>
+                        <span class="faq-badge">Apple Contacts</span>
+                        <div class="faq-question">[iOS 18+] How do I display Twenty CRM people in the native Apple Contacts app?</div>
+                    </div>
+                    <i class="fa-solid fa-chevron-down faq-chevron"></i>
+                </summary>
+                <div class="faq-answer">
+                    <p>TwentyMobile supports Apple's native <strong>Contacts Provider API</strong> introduced in iOS 18:</p>
+                    <ol>
+                        <li>Open TwentyMobile and go to <strong>Settings → iOS Contacts</strong>.</li>
+                        <li>Toggle on <strong>"Show Twenty people in iOS Contacts"</strong>.</li>
+                        <li>Open the native Apple <strong>Contacts</strong> app on your iPhone or iPad: you will see a live, dedicated container named <strong>Twenty</strong>.</li>
+                    </ol>
+                    <div class="faq-callout tip">
+                        <i class="fa-solid fa-shield-check" style="color:var(--green); margin-top:2px;"></i>
+                        <div><strong>No iCloud Pollution:</strong> CRM contacts remain strictly in the live Twenty container. They are <em>not</em> merged into your personal iCloud address book. Disabling the toggle or logging out of TwentyMobile cleanly removes the container without leaving duplicate contacts behind.</div>
+                    </div>
+                </div>
+            </details>
+
+            <!-- 5. System Browser PKCE Security -->
+            <details class="faq-item" data-category="platform" data-keywords="security browser webview chrome custom tabs aswebauthenticationsession ephemeral sso google block privacy">
+                <summary>
+                    <div class="faq-question-wrap">
+                        <span class="faq-badge">Security</span>
+                        <span class="faq-badge badge-ios">iOS</span>
+                        <span class="faq-badge badge-android">Android</span>
+                        <div class="faq-question">[iOS &amp; Android] Why does TwentyMobile use the system browser instead of an in-app WebView for SSO?</div>
+                    </div>
+                    <i class="fa-solid fa-chevron-down faq-chevron"></i>
+                </summary>
+                <div class="faq-answer">
+                    <p>Embedded in-app WebViews present serious security concerns for federated login:</p>
+                    <ul>
+                        <li><strong>Protection Against Credential Sniffing:</strong> Embedded webviews allow host applications to inspect entered passwords and cookies. Major identity providers (including Google) intentionally block logins from generic WebViews with errors like <span class="faq-code-inline">disallowed_useragent</span>.</li>
+                        <li><strong>Native Platform Security:</strong> TwentyMobile uses <strong>Chrome Custom Tabs</strong> on Android and <strong>ASWebAuthenticationSession</strong> on iOS. Your credentials are typed strictly into Google or your SSO provider.</li>
+                        <li><strong>Ephemeral Isolation:</strong> Authentication sessions run with ephemeral flags, guaranteeing that shared or corporate devices never leak cookies or inherit previous users' accounts.</li>
+                    </ul>
+                </div>
+            </details>
+
+            <!-- 6. Business Card Scanner -->
+            <details class="faq-item" data-category="contacts" data-keywords="business card scanner camera ocr offline ai privacy name email phone company vcard photo gallery">
+                <summary>
+                    <div class="faq-question-wrap">
+                        <span class="faq-badge">Offline OCR</span>
+                        <span class="faq-badge badge-ios">iOS</span>
+                        <span class="faq-badge badge-android">Android</span>
+                        <div class="faq-question">How does the Business Card Scanner work? Does it send photos to external AI servers?</div>
+                    </div>
+                    <i class="fa-solid fa-chevron-down faq-chevron"></i>
+                </summary>
+                <div class="faq-answer">
+                    <p>The Business Card Scanner lets you capture new leads on the go in seconds:</p>
+                    <ol>
+                        <li>From the Contacts screen, tap the <strong>Scan Card</strong> button.</li>
+                        <li>Capture a photo of the card with your camera, or pick an existing image from your photo album.</li>
+                        <li>The on-device OCR engine parses full names, company, email addresses, phone numbers, and websites with smart heuristics.</li>
+                        <li>Review and edit any extracted fields, then tap save: TwentyMobile creates the contact in Twenty CRM immediately with optimistic UI updates.</li>
+                    </ol>
+                    <div class="faq-callout tip">
+                        <i class="fa-solid fa-lock" style="color:var(--green); margin-top:2px;"></i>
+                        <div><strong>100% Offline &amp; Private:</strong> OCR text recognition runs entirely on your smartphone's hardware. Your card photos and contact details are never sent to third-party AI APIs or external OCR cloud services.</div>
+                    </div>
+                </div>
+            </details>
+
+            <!-- 7. Notifications & Task Reminders -->
+            <details class="faq-item" data-category="notifications" data-keywords="task reminder notification push alerts background alarms due dates battery optimization doze android ios permission">
+                <summary>
+                    <div class="faq-question-wrap">
+                        <span class="faq-badge">Local Notifications</span>
+                        <span class="faq-badge badge-ios">iOS</span>
+                        <span class="faq-badge badge-android">Android</span>
+                        <div class="faq-question">How do task reminders and notifications work on iOS and Android?</div>
+                    </div>
+                    <i class="fa-solid fa-chevron-down faq-chevron"></i>
+                </summary>
+                <div class="faq-answer">
+                    <p>TwentyMobile schedules local push notifications directly on your phone so you never miss an important customer follow-up:</p>
+                    <ul>
+                        <li><strong>Schedule Timing:</strong> Tasks with scheduled due dates trigger a notification <strong>30 minutes before</strong> the deadline as well as at the exact due time.</li>
+                        <li><strong>Android Setup:</strong> Android aggressive power management (Doze mode) can delay alarms. For instant reminders, navigate to <em>Settings → Apps → TwentyMobile → Battery</em> and set it to <strong>"Unrestricted"</strong>.</li>
+                        <li><strong>iOS Setup:</strong> Ensure you accept the notification permission prompt during onboarding, or verify under <em>iOS Settings → TwentyMobile → Notifications</em>.</li>
+                    </ul>
+                </div>
+            </details>
+
+            <!-- 8. vCard Sharing -->
+            <details class="faq-item" data-category="contacts" data-keywords="vcard vcf export share airdrop whatsapp email contact card address book export">
+                <summary>
+                    <div class="faq-question-wrap">
+                        <span class="faq-badge">vCard (.vcf)</span>
+                        <span class="faq-badge">Sharing</span>
+                        <div class="faq-question">Can I export contacts or share them with colleagues via vCard (.vcf)?</div>
+                    </div>
+                    <i class="fa-solid fa-chevron-down faq-chevron"></i>
+                </summary>
+                <div class="faq-answer">
+                    <p><strong>Yes.</strong> From any Contact Detail view, tap the <strong>Share</strong> action in the top AppBar.</p>
+                    <p>TwentyMobile generates a standard RFC vCard file containing the contact's full name, linked company, emails, phone numbers, and address. You can send it instantly via AirDrop, WhatsApp, Telegram, email, or import it into your personal address book.</p>
+                </div>
+            </details>
+
+            <!-- 9. Manual Workflows Error -->
+            <details class="faq-item" data-category="workflows" data-keywords="workflow 403 forbidden error trigger manual button slide to execute graphql jwt api key">
+                <summary>
+                    <div class="faq-question-wrap">
+                        <span class="faq-badge">Workflows</span>
+                        <span class="faq-badge">Troubleshooting</span>
+                        <div class="faq-question">Why do I receive a 403 Forbidden error when triggering a manual workflow?</div>
+                    </div>
+                    <i class="fa-solid fa-chevron-down faq-chevron"></i>
+                </summary>
+                <div class="faq-answer">
+                    <p>In Twenty CRM, the backend GraphQL mutation for triggering manual workflows requires a verified <strong>User Identity (JWT token)</strong>.</p>
+                    <ul>
+                        <li>If you logged in using an <strong>API Key</strong>, Twenty CRM's server treats the connection as an automated system key and returns <span class="faq-code-inline">FORBIDDEN (403)</span> when attempting to run user workflows.</li>
+                        <li><strong>How to fix:</strong> Log out and reconnect using your <strong>Email &amp; Password</strong> or <strong>Google / SSO</strong>. This establishes a full user session and enables the interactive Slide-to-Execute workflow button.</li>
+                    </ul>
+                </div>
+            </details>
+
+            <!-- 10. Dynamic CRM Objects -->
+            <details class="faq-item" data-category="workflows" data-keywords="custom objects dynamic fields schema opportunities metadata graphql settings sort order">
+                <summary>
+                    <div class="faq-question-wrap">
+                        <span class="faq-badge">Dynamic Objects</span>
+                        <span class="faq-badge">GraphQL</span>
+                        <div class="faq-question">Does TwentyMobile support custom dynamic objects and custom fields created in Twenty?</div>
+                    </div>
+                    <i class="fa-solid fa-chevron-down faq-chevron"></i>
+                </summary>
+                <div class="faq-answer">
+                    <p><strong>Yes, with full schema introspection!</strong> TwentyMobile dynamically queries your Twenty CRM metadata schema over GraphQL.</p>
+                    <ul>
+                        <li><strong>Standard &amp; Custom Objects:</strong> In addition to Contacts, Companies, and Tasks, all custom workspace entities (such as Opportunities or custom tables) appear in the <strong>More</strong> tab.</li>
+                        <li><strong>Customizable Layout:</strong> Tap the ⚙ settings icon on any dynamic object detail view to toggle field visibility and adjust display order. Your preferences are persisted securely on your phone.</li>
+                        <li><strong>Composite Fields:</strong> Full support for complex data types including Currency, Address, Phone, and Relation Pickers (linking companies and contacts).</li>
+                    </ul>
+                </div>
+            </details>
+
+            <!-- 11. Data Privacy & Zero Tracking -->
+            <details class="faq-item" data-category="auth" data-keywords="privacy tracking telemetry servers self-hosted open source agpl keychain storage data">
+                <summary>
+                    <div class="faq-question-wrap">
+                        <span class="faq-badge">100% Self-Hosted</span>
+                        <span class="faq-badge">Zero Tracking</span>
+                        <div class="faq-question">Is any customer data or telemetry routed through Luciosoft servers?</div>
+                    </div>
+                    <i class="fa-solid fa-chevron-down faq-chevron"></i>
+                </summary>
+                <div class="faq-answer">
+                    <p><strong>No, zero CRM data, customer records, or credentials are ever collected or intermediated.</strong></p>
+                    <p>TwentyMobile connects directly from your mobile device to your own Twenty CRM instance over encrypted HTTPS. Sensitive tokens and credentials never leave your hardware-backed keychain (Apple Keychain / Android Keystore).</p>
+                    <p>The code is 100% open-source under the <strong>AGPL-3.0</strong> license on <a href="https://github.com/adlucio87/TwentyMobile" target="_blank" style="color:var(--text); text-decoration:underline;">GitHub</a> for full auditability.</p>
+                </div>
+            </details>
+
+            <!-- 12. Team Onboarding & Shared OAuth Application -->
+            <details class="faq-item" data-category="auth" data-keywords="team multi-user sso oauth client id magic duplicates clean applications delete self-healing">
+                <summary>
+                    <div class="faq-question-wrap">
+                        <span class="faq-badge">Team Onboarding</span>
+                        <span class="faq-badge">TwentyMobile Magic</span>
+                        <div class="faq-question">How does Single Sign-On (OAuth) work for teams? Will it create duplicate apps in Twenty CRM?</div>
+                    </div>
+                    <i class="fa-solid fa-chevron-down faq-chevron"></i>
+                </summary>
+                <div class="faq-answer">
+                    <p><strong>No duplicate apps are created — team onboarding is seamless and clean!</strong></p>
+                    <ul>
+                        <li><strong>Shared App per Workspace:</strong> When the first user or workspace admin connects TwentyMobile to their Twenty CRM instance via SSO / Google login, its verified Client ID is published to the workspace entry, so teammates reuse that same authorized application named <em>TwentyMobile</em> instead of creating their own.</li>
+                        <li><strong>Zero-Knowledge Shared Registry:</strong> Subsequent team members entering the same workspace URL automatically discover this pre-existing Client ID. They don't have to navigate to CRM Settings, create applications, or copy-paste UUIDs. Only applications that the instance itself confirms (and that are named <em>TwentyMobile</em>) are accepted, and lookups are rate-limited.</li>
+                        <li><strong>Self-Healing on Deletion:</strong> If a CRM admin ever deletes the <em>TwentyMobile</em> application in Twenty CRM (<em>Settings &rarr; Applications</em>), the next check detects the removal and purges the stale registry record. On instances that support Dynamic Client Registration the app re-provisions itself automatically; on self-hosted instances without it, TwentyMobile simply asks for a new Client ID.</li>
+                        <li><strong>Zero-Knowledge Guarantee:</strong> The shared registry only stores the public hostname mapped to the public Client ID UUID (plus timestamps and the previously overwritten IDs, for auditing). It never sees, stores, or handles secrets, passwords, access tokens, refresh tokens, user accounts, or CRM data. You can disable it entirely or self-host it with <em>--dart-define=OAUTH_REGISTRY_URL=</em>.</li>
+                    </ul>
+                </div>
+            </details>
+
+        </div>
+
+        <!-- Empty State for Search -->
+        <div class="faq-empty-state" id="faq-empty">
+            <i class="fa-solid fa-circle-question" style="font-size:2rem; color:var(--text-tertiary); margin-bottom:12px;"></i>
+            <p>No guides or FAQ matching your search query.</p>
+            <button type="button" class="btn-ghost" onclick="resetFaqSearch()">
+                <i class="fa-solid fa-rotate-left"></i> Reset Search &amp; Filters
+            </button>
+        </div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- CTA -->
+    <div class="cta-section">
+        <h2>Your CRM.<br><em>Finally mobile.</em></h2>
+        <p>Download TwentyMobile and take control of your customer relationships — anywhere.</p>
+        <div style="display:flex; justify-content:center; gap:12px; flex-wrap:wrap;">
+            <a href="https://apps.apple.com/us/app/twentymoblie/id6760371090" target="_blank" class="btn-store btn-store-primary">
+                <i class="fa-brands fa-apple"></i> Download on App Store
+            </a>
+            <a href="https://play.google.com/store/apps/details?id=com.luciosoft.pocketcrm&hl=en" target="_blank" class="btn-store btn-store-primary">
+                <i class="fa-brands fa-google-play"></i> Get it on Google Play
+            </a>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="footer-inner">
+            <div>
+                <div class="footer-brand">TwentyMobile <span>by Luciosoft</span></div>
+            </div>
+            <div class="footer-links">
+                <a href="#features">Features</a>
+                <a href="#how-it-works">How it works</a>
+                <a href="#faq">FAQ &amp; Guides</a>
+                <a href="https://luciosoft.it/">Luciosoft</a>
+                <a href="https://privacy.luciosoft.it/twentymobilecrm/">Privacy Policy</a>
+                <a href="https://github.com/adlucio87/TwentyMobile" target="_blank">GitHub</a>
+                <a href="https://blog.luciosoft.it/" target="_blank">Blog</a>
+                <a href="https://luciosoft.it/donate.html" target="_blank">☕ Support Us</a>
+                <a href="mailto:adlucio87@gmail.com">Contact</a>
+            </div>
+            <div class="footer-copy">
+                © 2026 Andrea Luciano · Not affiliated with Twenty CRM
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Hero Slider
+        const phone = document.getElementById('hero-phone');
+        const imgs = phone.querySelectorAll('img');
+        const dotsEl = document.getElementById('hero-dots');
+        let cur = 0, timer;
+
+        imgs.forEach((_, i) => {
+            const d = document.createElement('div');
+            d.className = 's-dot' + (i === 0 ? ' active' : '');
+            d.onclick = () => go(i);
+            dotsEl.appendChild(d);
+        });
+
+        const dots = dotsEl.querySelectorAll('.s-dot');
+
+        function go(n) {
+            imgs[cur].classList.remove('active');
+            dots[cur].classList.remove('active');
+            cur = n;
+            imgs[cur].classList.add('active');
+            dots[cur].classList.add('active');
+            clearInterval(timer);
+            timer = setInterval(() => go((cur + 1) % imgs.length), 3500);
+        }
+
+        timer = setInterval(() => go((cur + 1) % imgs.length), 3500);
+
+        // Fade up on scroll
+        const obs = new IntersectionObserver((entries) => {
+            entries.forEach(e => {
+                if (e.isIntersecting) {
+                    e.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.fade-up').forEach(el => obs.observe(el));
+
+        // Theme Toggle
+        const themeToggle = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+        const previewDark = document.getElementById('preview-dark');
+        const previewLight = document.getElementById('preview-light');
+        const themeLabel = document.getElementById('theme-label');
+
+        function setTheme(isDark) {
+            if (isDark) {
+                document.body.classList.remove('light');
+                if (themeIcon) {
+                    themeIcon.classList.remove('fa-moon');
+                    themeIcon.classList.add('fa-sun');
+                }
+                if (previewDark) {
+                    previewDark.style.opacity = '1';
+                    previewDark.style.transform = 'scale(1)';
+                }
+                if (previewLight) {
+                    previewLight.style.opacity = '0.4';
+                    previewLight.style.transform = 'scale(0.9)';
+                }
+                if (themeLabel) themeLabel.textContent = 'Currently showing: dark';
+                localStorage.setItem('theme', 'dark');
+            } else {
+                document.body.classList.add('light');
+                if (themeIcon) {
+                    themeIcon.classList.remove('fa-sun');
+                    themeIcon.classList.add('fa-moon');
+                }
+                if (previewDark) {
+                    previewDark.style.opacity = '0.4';
+                    previewDark.style.transform = 'scale(0.9)';
+                }
+                if (previewLight) {
+                    previewLight.style.opacity = '1';
+                    previewLight.style.transform = 'scale(1)';
+                }
+                if (themeLabel) themeLabel.textContent = 'Currently showing: light';
+                localStorage.setItem('theme', 'light');
+            }
+        }
+
+        themeToggle.addEventListener('click', () => {
+            const isCurrentlyLight = document.body.classList.contains('light');
+            setTheme(isCurrentlyLight); // If it's light, we want it to be dark (isDark=true)
+        });
+
+        // Initialize theme
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme) {
+            setTheme(savedTheme === 'dark');
+        } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
+            setTheme(false);
+        } else {
+            setTheme(true);
+        }
+
+        // ── FAQ INTELLIGENT SEARCH & CATEGORY FILTER ──
+        const faqSearchInput = document.getElementById('faq-search');
+        const faqClearBtn = document.getElementById('faq-clear');
+        const faqItems = document.querySelectorAll('.faq-item');
+        const faqCountEl = document.getElementById('faq-count');
+        const faqEmptyState = document.getElementById('faq-empty');
+        const faqCategoryBtns = document.querySelectorAll('.faq-category-btn');
+        let activeFaqCategory = 'all';
+
+        function filterFaq() {
+            const query = (faqSearchInput ? faqSearchInput.value : '').trim().toLowerCase();
+            let visibleCount = 0;
+
+            if (faqClearBtn) {
+                faqClearBtn.style.display = query ? 'block' : 'none';
+            }
+
+            faqItems.forEach(item => {
+                const category = item.dataset.category || '';
+                const keywords = (item.dataset.keywords || '').toLowerCase();
+                const questionEl = item.querySelector('.faq-question');
+                const answerEl = item.querySelector('.faq-answer');
+                const questionText = questionEl ? questionEl.textContent.toLowerCase() : '';
+                const answerText = answerEl ? answerEl.textContent.toLowerCase() : '';
+
+                const matchesCategory = (activeFaqCategory === 'all' || category === activeFaqCategory);
+                const matchesQuery = !query || questionText.includes(query) || answerText.includes(query) || keywords.includes(query);
+
+                if (matchesCategory && matchesQuery) {
+                    item.style.display = '';
+                    visibleCount++;
+                    // If user searched a term with 2+ characters, auto-expand to reveal the answer!
+                    if (query.length >= 2) {
+                        item.open = true;
+                    }
+                } else {
+                    item.style.display = 'none';
+                    if (query.length >= 2) {
+                        item.open = false;
+                    }
+                }
+            });
+
+            if (faqCountEl) {
+                faqCountEl.textContent = `Showing ${visibleCount} of ${faqItems.length} guides`;
+            }
+            if (faqEmptyState) {
+                faqEmptyState.style.display = visibleCount === 0 ? 'block' : 'none';
+            }
+        }
+
+        if (faqSearchInput) {
+            faqSearchInput.addEventListener('input', filterFaq);
+        }
+
+        if (faqClearBtn) {
+            faqClearBtn.addEventListener('click', () => {
+                faqSearchInput.value = '';
+                filterFaq();
+                faqSearchInput.focus();
+            });
+        }
+
+        faqCategoryBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                faqCategoryBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                activeFaqCategory = btn.dataset.category || 'all';
+                filterFaq();
+            });
+        });
+
+        window.resetFaqSearch = function () {
+            if (faqSearchInput) faqSearchInput.value = '';
+            activeFaqCategory = 'all';
+            faqCategoryBtns.forEach(b => {
+                if (b.dataset.category === 'all') b.classList.add('active');
+                else b.classList.remove('active');
+            });
+            filterFaq();
+        };
+    </script>
+
+</body>
+
+</html>

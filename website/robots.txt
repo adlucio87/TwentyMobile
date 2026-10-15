@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://twentymobilecrm.luciosoft.it/sitemap.xml
