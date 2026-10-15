@@ -187,7 +187,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
               return authMethodAsync.when(
                 data: (method) {
-                  final isEmail = method == 'email';
+                  final isUserSession = method == 'email' || method == 'sso';
+                  final badgeColor = method == 'sso'
+                      ? Colors.blue
+                      : (method == 'email' ? Colors.green : Theme.of(context).colorScheme.primary);
+                  final badgeText = method == 'sso'
+                      ? l10n.googleSsoBadge
+                      : (method == 'email' ? l10n.personalAccount : l10n.apiKeyAdmin);
+
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -196,22 +203,20 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                             decoration: BoxDecoration(
-                              color: isEmail ? Colors.green.withValues(alpha: 0.1) : Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                              color: badgeColor.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: Text(
-                              isEmail
-                                  ? (l10n.personalAccount)
-                                  : (l10n.apiKeyAdmin),
+                              badgeText,
                               style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                                color: isEmail ? Colors.green : Theme.of(context).colorScheme.primary,
+                                color: badgeColor,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
                           ),
                         ],
                       ),
-                      if (!isEmail) ...[
+                      if (!isUserSession) ...[
                         const SizedBox(height: 8),
                         // An API key has no user behind it: let the person say who they are, so the
                         // greeting and "my tasks" are theirs and not the first workspace member's.
@@ -229,7 +234,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                           onTap: () => _chooseApiKeyMember(context, ref),
                         ),
                       ],
-                      if (isEmail) ...[
+                      if (isUserSession) ...[
                         const SizedBox(height: 16),
                         userNameAsync.when(
                           data: (name) => name.isNotEmpty

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
+import 'package:pocketcrm/core/auth/login_completion.dart';
 import 'package:pocketcrm/core/di/providers.dart';
-import 'package:pocketcrm/core/di/auth_state.dart';
 import 'package:pocketcrm/core/localization/l10n_extension.dart';
+import 'package:pocketcrm/core/utils/error_utils.dart';
 import 'package:pocketcrm/data/connectors/twenty_connector.dart';
 import 'package:pocketcrm/presentation/shared/clipboard_paste.dart';
 import 'package:pocketcrm/presentation/shared/language_button.dart';
@@ -169,22 +169,13 @@ class _ApiTokenScreenState extends ConsumerState<ApiTokenScreen> {
       final authService = ref.read(authServiceProvider);
       await authService.loginWithApiKey(baseUrl, token);
 
-      // Salva il token e aggiorna authState → il router si occuperà del redirect
-      await ref.read(authStateProvider.notifier).login(token);
-      ref.invalidate(crmRepositoryProvider);
-      ref.invalidate(authMethodProvider);
-      ref.invalidate(currentUserNameProvider);
-
-      if (mounted) context.go('/onboarding/notifications');
+      if (!mounted) return;
+      await completeSignIn(ref, context, accessToken: token);
     } catch (e, stackTrace) {
       debugPrint('CONNECTION ERROR: $e');
       Sentry.captureException(e, stackTrace: stackTrace);
       if (mounted) {
-        String message = e.toString();
-        if (message.startsWith('Exception: ')) {
-          message = message.substring(11);
-        }
-        setState(() => _error = message);
+        setState(() => _error = userFacingError(e));
       }
     } finally {
       _isTesting = false;

@@ -255,5 +255,19 @@
   "selectLanguage": "Sprache auswählen",
   "paste": "Einfügen",
   "pastedFromClipboard": "Aus der Zwischenablage eingefügt",
-  "clipboardEmpty": "Zwischenablage ist leer"
+  "clipboardEmpty": "Zwischenablage ist leer",
+  "loginWithGoogleSso": "Mit Google / SSO anmelden",
+  "loginWithGoogleSsoDesc": "Authentifizierung über Google Workspace oder Web Single Sign-On.",
+  "googleSsoBadge": "Google / SSO",
+  "webAuthTitle": "Google / SSO-Anmeldung",
+  "completingSignIn": "Anmeldung wird abgeschlossen...",
+  "oauthClientIdTitle": "OAuth-Client-ID",
+  "oauthClientIdSubtitle": "Erstellen Sie eine OAuth-Anwendung auf Ihrer Twenty-Instanz (Einstellungen → Anwendungen) und fügen Sie deren Client-ID hier ein.",
+  "oauthClientIdRequired": "OAuth-Client-ID eingeben",
+  "oauthClientIdHint": "z. B. 123e4567-e89b-12d3-a456-426614174000",
+  "oauthNoAutoRegistrationNotice": "Diese Instanz unterstützt keine automatische Client-Registrierung. Erstellen Sie eine OAuth-Anwendung auf Ihrer Twenty-Instanz (Einstellungen → Anwendungen) und fügen Sie deren Client-ID unten ein.",
+  "openInBrowser": "Mit Browser anmelden",
+  "checkingConfiguration": "Serverkonfiguration wird überprüft...",
+  "redirectUriLabel": "Redirect-URI für Twenty:",
+  "copiedToClipboard": "In die Zwischenablage kopiert"
 }

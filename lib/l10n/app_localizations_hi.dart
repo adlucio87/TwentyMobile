@@ -804,4 +804,50 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get clipboardEmpty => 'क्लिपबोर्ड खाली है';
+
+  @override
+  String get loginWithGoogleSso => 'Google / SSO से लॉगिन करें';
+
+  @override
+  String get loginWithGoogleSsoDesc =>
+      'Google Workspace या वेब सिंगल साइन-ऑन के माध्यम से प्रमाणित करें।';
+
+  @override
+  String get googleSsoBadge => 'Google / SSO';
+
+  @override
+  String get webAuthTitle => 'Google / SSO लॉगिन';
+
+  @override
+  String get completingSignIn => 'साइन इन पूरा किया जा रहा है...';
+
+  @override
+  String get oauthClientIdTitle => 'OAuth क्लाइंट आईडी';
+
+  @override
+  String get oauthClientIdSubtitle =>
+      'अपने Twenty इंस्टेंस पर एक OAuth एप्लिकेशन बनाएं (सेटिंग्स → एप्लिकेशन) और उसकी क्लाइंट आईडी यहाँ पेस्ट करें।';
+
+  @override
+  String get oauthClientIdRequired => 'OAuth क्लाइंट आईडी दर्ज करें';
+
+  @override
+  String get oauthClientIdHint => 'उदा. 123e4567-e89b-12d3-a456-426614174000';
+
+  @override
+  String get oauthNoAutoRegistrationNotice =>
+      'यह इंस्टेंस स्वचालित क्लाइंट पंजीकरण का समर्थन नहीं करता। अपने Twenty इंस्टेंस पर एक OAuth एप्लिकेशन बनाएं (सेटिंग्स → एप्लिकेशन) और उसकी क्लाइंट आईडी नीचे पेस्ट करें।';
+
+  @override
+  String get openInBrowser => 'ब्राउज़र से साइन इन करें';
+
+  @override
+  String get checkingConfiguration =>
+      'सर्वर कॉन्फ़िगरेशन की जाँच की जा रही है...';
+
+  @override
+  String get redirectUriLabel => 'Twenty के लिए पुनर्निर्देशन URI:';
+
+  @override
+  String get copiedToClipboard => 'क्लिपबोर्ड पर कॉपी किया गया';
 }

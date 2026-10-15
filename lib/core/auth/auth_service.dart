@@ -1,6 +1,9 @@
+import 'package:flutter/foundation.dart';
 import 'package:pocketcrm/data/connectors/base_graphql_connector.dart';
 import 'package:pocketcrm/core/utils/storage_service.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:pocketcrm/core/auth/oauth_client_store.dart';
+import 'package:pocketcrm/core/auth/oauth_token_client.dart';
 import 'package:pocketcrm/core/auth/two_factor_exception.dart';
 import 'package:pocketcrm/core/network/custom_http_client.dart';
 
@@ -11,11 +14,23 @@ import 'package:pocketcrm/domain/services/ios_contacts_provider_service.dart';
 class AuthService {
   final StorageService _storage;
 
+  /// OAuth endpoints (discovery, token, registration) shared with the PKCE login.
+  final OAuthTokenClient _oauthTokenClient;
+
+  /// Per-instance OAuth client credentials, required by the refresh grant.
+  final OAuthClientStore _oauthClientStore;
+
   /// Mutex for refresh — prevents concurrent refresh attempts from
   /// different callers (lifecycle handler, connector, router).
   Future<bool>? _refreshFuture;
 
-  AuthService(this._storage);
+  AuthService(
+    StorageService storage, {
+    OAuthTokenClient? oauthTokenClient,
+    OAuthClientStore? oauthClientStore,
+  })  : _storage = storage,
+        _oauthTokenClient = oauthTokenClient ?? OAuthTokenClient(),
+        _oauthClientStore = oauthClientStore ?? OAuthClientStore(storage);
 
   Future<void> loginWithCredentials(
     String instanceUrl,
@@ -79,6 +94,25 @@ class AuthService {
     final loginToken = loginData['loginToken']['token'] as String;
 
     // Step 2: Exchange login token for access + refresh tokens
+    await loginWithLoginToken(
+      instanceUrl: instanceUrl,
+      loginToken: loginToken,
+      authMethod: 'email',
+    );
+
+    await _storage.write(key: 'auth_email', value: email);
+    await _storage.write(key: 'auth_password', value: password);
+  }
+
+  /// Exchanges a loginToken (obtained via Google OAuth, SSO, or email credentials)
+  /// for access and refresh tokens, fetches user profile info, and persists the session.
+  Future<void> loginWithLoginToken({
+    required String instanceUrl,
+    required String loginToken,
+    required String authMethod,
+  }) async {
+    final client = _createUnauthenticatedClient(instanceUrl);
+
     final tokenOptions = MutationOptions(
       document: gql(getAuthTokensFromLoginTokenMutation),
       variables: {
@@ -90,7 +124,6 @@ class AuthService {
     final tokenResult = await client.mutate(tokenOptions);
 
     if (tokenResult.hasException) {
-      // Check if 2FA is required
       final exception = tokenResult.exception;
       if (exception != null) {
         final graphqlErrors = exception.graphqlErrors;
@@ -102,6 +135,7 @@ class AuthService {
           throw TwoFactorRequiredException(
             loginToken: loginToken,
             instanceUrl: instanceUrl,
+            authMethod: authMethod,
           );
         }
       }
@@ -118,12 +152,55 @@ class AuthService {
     final refreshToken = tokens['refreshToken']['token'] as String;
     final expiresAt = tokens['accessOrWorkspaceAgnosticToken']['expiresAt'] as String;
 
-    // Now fetch user info with the new access token
-    final authedMetadataClient = _createAuthenticatedMetadataClient(instanceUrl, accessToken);
-    String userFirstName = '';
-    String userLastName = '';
-    String userMemberId = '';
+    await loginWithDirectTokens(
+      instanceUrl: instanceUrl,
+      accessToken: accessToken,
+      refreshToken: refreshToken,
+      expiresAt: expiresAt,
+      authMethod: authMethod,
+    );
+  }
+
+  /// Stores direct access & refresh tokens (e.g. from cookies or token exchange)
+  /// and fetches the user's workspace member info.
+  ///
+  /// [authMethod] must be explicit (`sso`, `email`, …) so a caller that forgets
+  /// it cannot silently mislabel the session.
+  Future<void> loginWithDirectTokens({
+    required String instanceUrl,
+    required String accessToken,
+    required String refreshToken,
+    required String authMethod,
+    String? expiresAt,
+  }) async {
+    final effectiveExpiresAt = expiresAt ??
+        DateTime.now().toUtc().add(const Duration(hours: 1)).toIso8601String();
+
+    final member = await _fetchWorkspaceMember(instanceUrl, accessToken);
+
+    await _storage.write(key: 'api_token', value: accessToken);
+    await _storage.write(key: 'refresh_token', value: refreshToken);
+    await _storage.write(key: 'token_expires_at', value: effectiveExpiresAt);
+    await _storage.write(key: 'auth_method', value: authMethod);
+    await _storage.write(key: 'user_member_id', value: member.id);
+    await _storage.write(key: 'user_first_name', value: member.firstName);
+    await _storage.write(key: 'user_last_name', value: member.lastName);
+
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('token_expires_at', effectiveExpiresAt);
+  }
+
+  /// Reads the signed-in workspace member (id + name) through an authenticated
+  /// metadata client.
+  ///
+  /// The profile is non-critical: any failure yields empty values so the caller
+  /// still keeps a valid session instead of aborting the login.
+  Future<({String id, String firstName, String lastName})> _fetchWorkspaceMember(
+    String instanceUrl,
+    String accessToken,
+  ) async {
     try {
+      final client = _createAuthenticatedMetadataClient(instanceUrl, accessToken);
       const meQuery = r'''
         query Me {
           currentUser {
@@ -134,41 +211,30 @@ class AuthService {
           }
         }
       ''';
-      final meResult = await authedMetadataClient.query(
-        QueryOptions(document: gql(meQuery)),
+      final result = await client.query(QueryOptions(document: gql(meQuery)));
+      final member = result.data?['currentUser']?['workspaceMember'];
+      if (member == null) return (id: '', firstName: '', lastName: '');
+      final name = member['name'];
+      return (
+        id: member['id'] as String? ?? '',
+        firstName: name?['firstName'] as String? ?? '',
+        lastName: name?['lastName'] as String? ?? '',
       );
-      final member = meResult.data?['currentUser']?['workspaceMember'];
-      if (member != null) {
-        userMemberId = member['id'] as String? ?? '';
-        final name = member['name'];
-        if (name != null) {
-          userFirstName = name['firstName'] as String? ?? '';
-          userLastName = name['lastName'] as String? ?? '';
-        }
-      }
     } catch (_) {
-      // Non-critical: user name fetch failed, continue anyway
+      return (id: '', firstName: '', lastName: '');
     }
-
-    await _storage.write(key: 'api_token', value: accessToken);
-    await _storage.write(key: 'refresh_token', value: refreshToken);
-    await _storage.write(key: 'token_expires_at', value: expiresAt);
-    await _storage.write(key: 'auth_method', value: 'email');
-    await _storage.write(key: 'auth_email', value: email);
-    await _storage.write(key: 'auth_password', value: password);
-    await _storage.write(key: 'user_member_id', value: userMemberId);
-    await _storage.write(key: 'user_first_name', value: userFirstName);
-    await _storage.write(key: 'user_last_name', value: userLastName);
-
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('token_expires_at', expiresAt);
   }
 
   /// Complete 2FA login by sending the OTP code alongside the loginToken.
+  ///
+  /// [authMethod] is the method that started the flow (`email` or `sso`) and is
+  /// persisted as-is, so an SSO login that requires 2FA is not relabelled as
+  /// an email login.
   Future<void> loginWithOTP({
     required String instanceUrl,
     required String loginToken,
     required String otp,
+    required String authMethod,
   }) async {
     final client = _createUnauthenticatedClient(instanceUrl);
 
@@ -201,46 +267,17 @@ class AuthService {
     final refreshToken = tokens['refreshToken']['token'] as String;
     final expiresAt = tokens['accessOrWorkspaceAgnosticToken']['expiresAt'] as String;
 
-    // Fetch user info
-    final authedMetadataClient = _createAuthenticatedMetadataClient(instanceUrl, accessToken);
-    String userFirstName = '';
-    String userLastName = '';
-    String userMemberId = '';
-    try {
-      const meQuery = r'''
-        query Me {
-          currentUser {
-            workspaceMember {
-              id
-              name { firstName lastName }
-            }
-          }
-        }
-      ''';
-      final meResult = await authedMetadataClient.query(
-        QueryOptions(document: gql(meQuery)),
-      );
-      final member = meResult.data?['currentUser']?['workspaceMember'];
-      if (member != null) {
-        userMemberId = member['id'] as String? ?? '';
-        final name = member['name'];
-        if (name != null) {
-          userFirstName = name['firstName'] as String? ?? '';
-          userLastName = name['lastName'] as String? ?? '';
-        }
-      }
-    } catch (_) {
-      // Non-critical: user name fetch failed
-    }
+    final member = await _fetchWorkspaceMember(instanceUrl, accessToken);
 
     await _storage.write(key: 'api_token', value: accessToken);
     await _storage.write(key: 'refresh_token', value: refreshToken);
     await _storage.write(key: 'token_expires_at', value: expiresAt);
-    await _storage.write(key: 'auth_method', value: 'email');
-    await _storage.write(key: 'user_member_id', value: userMemberId);
-    await _storage.write(key: 'user_first_name', value: userFirstName);
-    await _storage.write(key: 'user_last_name', value: userLastName);
+    await _storage.write(key: 'auth_method', value: authMethod);
+    await _storage.write(key: 'user_member_id', value: member.id);
+    await _storage.write(key: 'user_first_name', value: member.firstName);
+    await _storage.write(key: 'user_last_name', value: member.lastName);
     await _storage.delete(key: 'pending_2fa_login_token');
+    await _storage.delete(key: 'pending_2fa_auth_method');
 
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('token_expires_at', expiresAt);
@@ -273,6 +310,20 @@ class AuthService {
       return false;
     }
 
+    final authMethod = await _storage.read(key: 'auth_method');
+
+    // OAuth sessions (SSO/PKCE) are renewed with the standard
+    // `grant_type=refresh_token` grant declared in the discovery document.
+    // `renewToken` only understands the login tokens minted by /metadata, so
+    // using it here made every OAuth session die after ~1h and fall back to a
+    // silent logout (no email/password is stored for SSO).
+    if (authMethod == 'sso') {
+      return _refreshOAuthSession(
+        instanceUrl: instanceUrl,
+        refreshToken: refreshToken,
+      );
+    }
+
     final client = _createUnauthenticatedClient(instanceUrl);
 
     final options = MutationOptions(
@@ -295,6 +346,7 @@ class AuthService {
           return true;
         } on TwoFactorRequiredException catch (e) {
           await _storage.write(key: 'pending_2fa_login_token', value: e.loginToken);
+          await _storage.write(key: 'pending_2fa_auth_method', value: e.authMethod);
           return false;
         } catch (_) {
           await logout();
@@ -321,6 +373,56 @@ class AuthService {
     await prefs.setString('token_expires_at', expiresAt);
 
     return true;
+  }
+
+  /// Renews an OAuth session with `POST /oauth/token` +
+  /// `grant_type=refresh_token`.
+  ///
+  /// The refresh token is rotated by Twenty, so the value returned here is
+  /// always persisted: replaying a consumed token would end the session.
+  Future<bool> _refreshOAuthSession({
+    required String instanceUrl,
+    required String refreshToken,
+  }) async {
+    final clientId = await _oauthClientStore.readClientId(instanceUrl);
+
+    if (clientId == null || clientId.isEmpty) {
+      debugPrint(
+        '[AuthService] OAuth refresh skipped: no client id stored for $instanceUrl',
+      );
+      await logout();
+      return false;
+    }
+
+    try {
+      final tokens = await _oauthTokenClient.refreshTokens(
+        instanceUrl: instanceUrl,
+        clientId: clientId,
+        refreshToken: refreshToken,
+        clientSecret: await _oauthClientStore.readClientSecret(instanceUrl),
+      );
+
+      final expiresAt = DateTime.now()
+          .toUtc()
+          .add(Duration(seconds: tokens.expiresIn))
+          .toIso8601String();
+
+      await _storage.write(key: 'api_token', value: tokens.accessToken);
+      await _storage.write(
+        key: 'refresh_token',
+        value: tokens.refreshToken.isNotEmpty ? tokens.refreshToken : refreshToken,
+      );
+      await _storage.write(key: 'token_expires_at', value: expiresAt);
+
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('token_expires_at', expiresAt);
+
+      return true;
+    } catch (e) {
+      debugPrint('[AuthService] OAuth refresh failed: $e');
+      await logout();
+      return false;
+    }
   }
 
   Future<bool> isTokenExpired() async {
@@ -355,6 +457,10 @@ class AuthService {
     await _storage.delete(key: BaseGraphQLConnector.apiKeyMemberNameKey);
     await _storage.delete(key: 'is_demo_mode');
     await _storage.delete(key: 'pending_2fa_login_token');
+    await _storage.delete(key: 'pending_2fa_auth_method');
+    // Client credentials live per instance now; only the global key written by
+    // older versions is dropped here (see OAuthClientStore).
+    await _storage.delete(key: OAuthClientStore.legacyClientIdKey);
 
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('token_expires_at');

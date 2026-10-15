@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:pocketcrm/core/auth/web_auth_session_cleaner.dart';
 import 'package:pocketcrm/core/di/providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -27,6 +28,9 @@ class AuthState extends _$AuthState {
     final storage = ref.read(storageServiceProvider);
     await storage.delete(key: 'api_token');
     await storage.delete(key: 'is_demo_mode');
+    // Drop the embedded web-login session too: leaving the cookie jar behind
+    // would let a later SSO attempt silently re-authenticate.
+    await WebAuthSessionCleaner.clear();
     state = const AsyncValue.data(false);
   }
 }

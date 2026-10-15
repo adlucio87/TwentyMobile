@@ -39,7 +39,7 @@ class BaseGraphQLConnector {
   /// picked — then all tasks are shown, as before.
   Future<String?> getCurrentMemberId() async {
     final authMethod = await storageService.read(key: 'auth_method') ?? 'api_key';
-    if (authMethod != 'email') {
+    if (authMethod != 'email' && authMethod != 'sso') {
       return storageService.read(key: apiKeyMemberIdKey);
     }
 
@@ -208,7 +208,7 @@ class BaseGraphQLConnector {
   Future<bool> _doRefresh() async {
     final authMethod = await storageService.read(key: 'auth_method') ?? 'api_key';
 
-    if (authMethod != 'email') return false; // API keys don't need refresh
+    if (authMethod != 'email' && authMethod != 'sso') return false; // API keys don't need refresh
 
     final isSuccess = await authService!.refreshAccessToken();
     if (isSuccess) {

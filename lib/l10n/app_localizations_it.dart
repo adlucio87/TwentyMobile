@@ -808,4 +808,49 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get clipboardEmpty => 'Gli appunti sono vuoti';
+
+  @override
+  String get loginWithGoogleSso => 'Accedi con Google / SSO';
+
+  @override
+  String get loginWithGoogleSsoDesc =>
+      'Autenticati tramite Google Workspace o Single Sign-On web.';
+
+  @override
+  String get googleSsoBadge => 'Google / SSO';
+
+  @override
+  String get webAuthTitle => 'Accesso Google / SSO';
+
+  @override
+  String get completingSignIn => 'Completamento accesso in corso...';
+
+  @override
+  String get oauthClientIdTitle => 'Client ID OAuth';
+
+  @override
+  String get oauthClientIdSubtitle =>
+      'Crea un\'applicazione OAuth sulla tua istanza Twenty (Impostazioni → Applicazioni) e incolla qui il suo Client ID.';
+
+  @override
+  String get oauthClientIdRequired => 'Inserisci il Client ID OAuth';
+
+  @override
+  String get oauthClientIdHint => 'es. 123e4567-e89b-12d3-a456-426614174000';
+
+  @override
+  String get oauthNoAutoRegistrationNotice =>
+      'Questa istanza non supporta la registrazione automatica del client. Crea un\'applicazione OAuth sulla tua istanza Twenty (Impostazioni → Applicazioni) e incolla il suo Client ID qui sotto.';
+
+  @override
+  String get openInBrowser => 'Accedi con il browser';
+
+  @override
+  String get checkingConfiguration => 'Verifica configurazione server...';
+
+  @override
+  String get redirectUriLabel => 'URI di redirect per Twenty:';
+
+  @override
+  String get copiedToClipboard => 'Copiato negli appunti';
 }

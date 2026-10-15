@@ -17,6 +17,7 @@ import 'package:pocketcrm/domain/models/workflow_run.dart';
 import 'package:pocketcrm/domain/models/workspace_member.dart';
 import 'package:pocketcrm/core/auth/auth_service.dart';
 import 'package:pocketcrm/core/auth/captcha_service.dart';
+import 'package:pocketcrm/core/auth/oauth_pkce_service.dart';
 import 'package:pocketcrm/domain/repositories/crm_repository.dart';
 import 'package:pocketcrm/domain/services/ios_contacts_provider_service.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -46,6 +47,15 @@ AuthService authService(AuthServiceRef ref) {
 CaptchaService captchaService(CaptchaServiceRef ref) {
   return CaptchaService();
 }
+
+final oauthPkceServiceProvider = Provider<OAuthPkceService>((ref) {
+  final storage = ref.watch(storageServiceProvider);
+  final auth = ref.watch(authServiceProvider);
+  return OAuthPkceService(
+    storageService: storage,
+    authService: auth,
+  );
+});
 
 @Riverpod(keepAlive: true)
 Future<String> authMethod(AuthMethodRef ref) async {
@@ -588,7 +598,7 @@ class TaskContacts extends _$TaskContacts {
 Future<String> currentUserName(CurrentUserNameRef ref) async {
   final storage = ref.watch(storageServiceProvider);
   final authMethod = await storage.read(key: 'auth_method');
-  if (authMethod == 'email') {
+  if (authMethod == 'email' || authMethod == 'sso') {
     final firstName = await storage.read(key: 'user_first_name') ?? '';
     final lastName = await storage.read(key: 'user_last_name') ?? '';
     if (firstName.isEmpty && lastName.isEmpty) return '';

@@ -81,6 +81,18 @@
 			<string>https</string>
 			<string>http</string>
 		</array>
-
+		<key>CFBundleURLTypes</key>
+		<array>
+			<dict>
+				<key>CFBundleTypeRole</key>
+				<string>Editor</string>
+				<key>CFBundleURLName</key>
+				<string>com.luciosoft.pocketcrm</string>
+				<key>CFBundleURLSchemes</key>
+				<array>
+					<string>pocketcrm</string>
+				</array>
+			</dict>
+		</array>
 	</dict>
 </plist>

@@ -803,6 +803,51 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get clipboardEmpty => 'Clipboard is empty';
+
+  @override
+  String get loginWithGoogleSso => 'Login with Google / SSO';
+
+  @override
+  String get loginWithGoogleSsoDesc =>
+      'Authenticate via Google Workspace or web Single Sign-On.';
+
+  @override
+  String get googleSsoBadge => 'Google / SSO';
+
+  @override
+  String get webAuthTitle => 'Google / SSO Login';
+
+  @override
+  String get completingSignIn => 'Completing sign in...';
+
+  @override
+  String get oauthClientIdTitle => 'OAuth Client ID';
+
+  @override
+  String get oauthClientIdSubtitle =>
+      'Create an OAuth application on your Twenty instance (Settings → Applications) and paste its Client ID here.';
+
+  @override
+  String get oauthClientIdRequired => 'Enter the OAuth Client ID';
+
+  @override
+  String get oauthClientIdHint => 'e.g. 123e4567-e89b-12d3-a456-426614174000';
+
+  @override
+  String get oauthNoAutoRegistrationNotice =>
+      'This instance does not support automatic client registration. Create an OAuth application on your Twenty instance (Settings → Applications) and paste its Client ID below.';
+
+  @override
+  String get openInBrowser => 'Sign in with Browser';
+
+  @override
+  String get checkingConfiguration => 'Checking server configuration...';
+
+  @override
+  String get redirectUriLabel => 'Redirect URI for Twenty:';
+
+  @override
+  String get copiedToClipboard => 'Copied to clipboard';
 }
 
 /// The translations for English, as used in the United Kingdom (`en_GB`).
@@ -1604,4 +1649,49 @@ class AppLocalizationsEnGb extends AppLocalizationsEn {
 
   @override
   String get clipboardEmpty => 'Clipboard is empty';
+
+  @override
+  String get loginWithGoogleSso => 'Login with Google / SSO';
+
+  @override
+  String get loginWithGoogleSsoDesc =>
+      'Authenticate via Google Workspace or web Single Sign-On.';
+
+  @override
+  String get googleSsoBadge => 'Google / SSO';
+
+  @override
+  String get webAuthTitle => 'Google / SSO Login';
+
+  @override
+  String get completingSignIn => 'Completing sign in...';
+
+  @override
+  String get oauthClientIdTitle => 'OAuth Client ID';
+
+  @override
+  String get oauthClientIdSubtitle =>
+      'Create an OAuth application on your Twenty instance (Settings → Applications) and paste its Client ID here.';
+
+  @override
+  String get oauthClientIdRequired => 'Enter the OAuth Client ID';
+
+  @override
+  String get oauthClientIdHint => 'e.g. 123e4567-e89b-12d3-a456-426614174000';
+
+  @override
+  String get oauthNoAutoRegistrationNotice =>
+      'This instance does not support automatic client registration. Create an OAuth application on your Twenty instance (Settings → Applications) and paste its Client ID below.';
+
+  @override
+  String get openInBrowser => 'Sign in with Browser';
+
+  @override
+  String get checkingConfiguration => 'Checking server configuration...';
+
+  @override
+  String get redirectUriLabel => 'Redirect URI for Twenty:';
+
+  @override
+  String get copiedToClipboard => 'Copied to clipboard';
 }

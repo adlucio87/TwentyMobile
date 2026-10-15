@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:pocketcrm/core/di/auth_state.dart';
+import 'package:pocketcrm/core/auth/login_completion.dart';
 import 'package:pocketcrm/core/di/providers.dart';
 import 'package:pocketcrm/core/localization/l10n_extension.dart';
+import 'package:pocketcrm/core/utils/error_utils.dart';
 import 'package:pocketcrm/presentation/shared/clipboard_paste.dart';
 import 'package:pocketcrm/presentation/shared/language_button.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
@@ -16,10 +17,15 @@ class OtpScreen extends ConsumerStatefulWidget {
   final String instanceUrl;
   final String loginToken;
 
+  /// Auth method that started the flow (`email` or `sso`). Carried through so
+  /// the completed session keeps the correct label.
+  final String authMethod;
+
   const OtpScreen({
     super.key,
     required this.instanceUrl,
     required this.loginToken,
+    this.authMethod = 'email',
   });
 
   @override
@@ -89,33 +95,19 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
         instanceUrl: widget.instanceUrl,
         loginToken: widget.loginToken,
         otp: otp,
+        authMethod: widget.authMethod,
       );
 
-      final storage = ref.read(storageServiceProvider);
-      final token = await storage.read(key: 'api_token');
-      if (token != null) {
-        await ref.read(authStateProvider.notifier).login(token);
-      }
-
-      ref.invalidate(crmRepositoryProvider);
-      ref.invalidate(authMethodProvider);
-      ref.invalidate(currentUserNameProvider);
-
-      if (mounted) {
-        context.go('/onboarding/notifications');
-      }
+      if (!mounted) return;
+      await completeSignIn(ref, context);
     } catch (e, stackTrace) {
       debugPrint('OTP ERROR: $e');
       Sentry.captureException(e, stackTrace: stackTrace);
       if (mounted) {
         HapticFeedback.heavyImpact();
         _otpController.clear();
-        String message = e.toString();
-        if (message.startsWith('Exception: ')) {
-          message = message.substring(11);
-        }
         setState(() {
-          _error = message;
+          _error = userFacingError(e);
           _isLoading = false;
           _hasSubmitted = false;
         });

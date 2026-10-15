@@ -18,6 +18,7 @@ import 'package:pocketcrm/core/di/providers.dart';
 import 'package:pocketcrm/presentation/onboarding/notification_permission_screen.dart';
 import 'package:pocketcrm/presentation/onboarding/auth_method_screen.dart';
 import 'package:pocketcrm/presentation/onboarding/email_login_screen.dart';
+import 'package:pocketcrm/presentation/onboarding/oauth_login_screen.dart';
 import 'package:pocketcrm/presentation/onboarding/otp_screen.dart';
 import 'package:pocketcrm/presentation/dynamic_objects/custom_objects_screen.dart';
 import 'package:pocketcrm/presentation/dynamic_objects/dynamic_list_screen.dart';
@@ -28,6 +29,17 @@ part 'router.g.dart';
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 late GoRouter appRouterInstance;
+
+/// Builds the OTP location for a pending 2FA challenge, preserving the auth
+/// method that started the flow so an SSO login that needs 2FA is not
+/// relabelled as an email login.
+String _otpLocation(String loginToken, String? instanceUrl, String? authMethod) {
+  final encodedUrl = Uri.encodeComponent(instanceUrl ?? '');
+  return '/onboarding/otp'
+      '?loginToken=$loginToken'
+      '&instanceUrl=$encodedUrl'
+      '&authMethod=${authMethod ?? 'email'}';
+}
 
 @riverpod
 GoRouter appRouter(AppRouterRef ref) {
@@ -62,7 +74,8 @@ GoRouter appRouter(AppRouterRef ref) {
         final pending2fa = await storage.read(key: 'pending_2fa_login_token');
         if (pending2fa != null) {
           final instanceUrl = await storage.read(key: 'instance_url');
-          return '/onboarding/otp?loginToken=$pending2fa&instanceUrl=${Uri.encodeComponent(instanceUrl ?? '')}';
+          final pendingMethod = await storage.read(key: 'pending_2fa_auth_method');
+          return _otpLocation(pending2fa, instanceUrl, pendingMethod);
         }
         return '/onboarding';
       }
@@ -80,14 +93,15 @@ GoRouter appRouter(AppRouterRef ref) {
         final authService = ref.read(authServiceProvider);
         final storage = ref.read(storageServiceProvider);
         final method = await storage.read(key: 'auth_method');
-        if (method == 'email') {
+        if (method == 'email' || method == 'sso') {
           if (await authService.isTokenExpired()) {
             final refreshed = await authService.refreshAccessToken();
             if (!refreshed) {
               final pending2fa = await storage.read(key: 'pending_2fa_login_token');
               if (pending2fa != null) {
                 final instanceUrl = await storage.read(key: 'instance_url');
-                return '/onboarding/otp?loginToken=$pending2fa&instanceUrl=${Uri.encodeComponent(instanceUrl ?? '')}';
+                final pendingMethod = await storage.read(key: 'pending_2fa_auth_method');
+                return _otpLocation(pending2fa, instanceUrl, pendingMethod);
               }
               // Force auth state update so the router knows user is logged out
               ref.read(authStateProvider.notifier).logout();
@@ -118,6 +132,10 @@ GoRouter appRouter(AppRouterRef ref) {
         builder: (context, state) => const AuthMethodScreen(),
       ),
       GoRoute(
+        path: '/onboarding/sso',
+        builder: (context, state) => const OAuthLoginScreen(),
+      ),
+      GoRoute(
         path: '/onboarding/email',
         builder: (context, state) => const EmailLoginScreen(),
       ),
@@ -126,9 +144,11 @@ GoRouter appRouter(AppRouterRef ref) {
         builder: (context, state) {
           final loginToken = state.uri.queryParameters['loginToken'] ?? '';
           final instanceUrl = state.uri.queryParameters['instanceUrl'] ?? '';
+          final authMethod = state.uri.queryParameters['authMethod'] ?? 'email';
           return OtpScreen(
             instanceUrl: instanceUrl,
             loginToken: loginToken,
+            authMethod: authMethod,
           );
         },
       ),

@@ -38,6 +38,18 @@ class AuthMethodScreen extends StatelessWidget {
               const SizedBox(height: 32),
               _buildMethodCard(
                 context,
+                key: const Key('auth_method_sso_card'),
+                title: l10n.loginWithGoogleSso,
+                description: l10n.loginWithGoogleSsoDesc,
+                icon: Icons.public,
+                badgeText: l10n.googleSsoBadge,
+                badgeColor: Colors.blue,
+                onTap: () => context.push('/onboarding/sso'),
+              ),
+              const SizedBox(height: 16),
+              _buildMethodCard(
+                context,
+                key: const Key('auth_method_email_card'),
                 title: l10n.loginWithAccount,
                 description: l10n.loginWithAccountDesc,
                 icon: Icons.person,
@@ -48,6 +60,7 @@ class AuthMethodScreen extends StatelessWidget {
               const SizedBox(height: 16),
               _buildMethodCard(
                 context,
+                key: const Key('auth_method_token_card'),
                 title: l10n.loginWithApiKey,
                 description: l10n.loginWithApiKeyDesc,
                 icon: Icons.key,
@@ -64,6 +77,7 @@ class AuthMethodScreen extends StatelessWidget {
 
   Widget _buildMethodCard(
     BuildContext context, {
+    Key? key,
     required String title,
     required String description,
     required IconData icon,
@@ -74,6 +88,7 @@ class AuthMethodScreen extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Card(
+      key: key,
       elevation: 0,
       margin: EdgeInsets.zero,
       shape: RoundedRectangleBorder(

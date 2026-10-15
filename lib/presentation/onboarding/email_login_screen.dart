@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:pocketcrm/core/auth/login_completion.dart';
 import 'package:pocketcrm/core/auth/two_factor_exception.dart';
-import 'package:pocketcrm/core/di/auth_state.dart';
 import 'package:pocketcrm/presentation/onboarding/otp_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:pocketcrm/core/di/providers.dart';
 import 'package:pocketcrm/core/localization/l10n_extension.dart';
+import 'package:pocketcrm/core/utils/error_utils.dart';
 import 'package:pocketcrm/presentation/shared/language_button.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
@@ -75,20 +76,8 @@ class _EmailLoginScreenState extends ConsumerState<EmailLoginScreen> {
         captchaToken: captchaToken,
       );
 
-      final token = await storage.read(key: 'api_token');
-      if (token != null) {
-        await ref.read(authStateProvider.notifier).login(token);
-      }
-
-      // AuthState Provider and Router handle the navigation once the tokens are saved.
-      // But we invalidate crmRepository to re-init
-      ref.invalidate(crmRepositoryProvider);
-      ref.invalidate(authMethodProvider);
-      ref.invalidate(currentUserNameProvider);
-
-      if (mounted) {
-        context.go('/onboarding/notifications');
-      }
+      if (!mounted) return;
+      await completeSignIn(ref, context);
     } on TwoFactorRequiredException catch (e) {
       // 2FA required — navigate to OTP screen with the loginToken
       if (mounted) {
@@ -117,8 +106,8 @@ class _EmailLoginScreenState extends ConsumerState<EmailLoginScreen> {
           message = l10n.unableToReachServer;
         } else if (message.contains('password login is disabled')) {
           message = l10n.passwordLoginDisabled;
-        } else if (message.startsWith('Exception: ')) {
-          message = message.substring(11);
+        } else {
+          message = userFacingError(e);
         }
         setState(() => _error = message);
       }

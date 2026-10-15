@@ -32,12 +32,21 @@ void main() {
 
     test('does NOT write sensitive keys to Hive', () async {
       await storageService.write(key: 'api_token', value: 'secret123');
+      await storageService.write(key: 'refresh_token', value: 'refresh123');
+      await storageService.write(key: 'auth_password', value: 'password123');
+      await storageService.write(
+        key: 'pending_2fa_login_token',
+        value: 'pending123',
+      );
       await storageService.write(
         key: 'instance_url',
         value: 'https://example.com',
       );
 
       expect(box.get('api_token'), null);
+      expect(box.get('refresh_token'), null);
+      expect(box.get('auth_password'), null);
+      expect(box.get('pending_2fa_login_token'), null);
       expect(box.get('instance_url'), null);
     });
 

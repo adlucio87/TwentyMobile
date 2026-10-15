@@ -7,7 +7,17 @@ class StorageService {
   final Box<String> _box;
   final Map<String, String> _cache = {};
 
-  static const _sensitiveKeys = {'api_token', 'instance_url'};
+  static const _sensitiveKeys = {
+    'api_token',
+    'refresh_token',
+    'auth_password',
+    'pending_2fa_login_token',
+    'instance_url',
+  };
+
+  /// Prefixes of keys whose value is a credential, so they never fall back to
+  /// the plaintext Hive store (see [OAuthClientStore]).
+  static const _sensitiveKeyPrefixes = {'oauth_client_secret'};
 
   // Android options con migrazione automatica da legacy cipher e reset on error
   static const _androidOptions = AndroidOptions(
@@ -30,7 +40,9 @@ class StorageService {
     );
   }
 
-  bool _isSensitive(String key) => _sensitiveKeys.contains(key);
+  bool _isSensitive(String key) =>
+      _sensitiveKeys.contains(key) ||
+      _sensitiveKeyPrefixes.any(key.startsWith);
 
   // ---------------------------------------------------------------------------
   // WRITE

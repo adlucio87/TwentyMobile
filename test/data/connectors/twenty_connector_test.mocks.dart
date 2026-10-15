@@ -478,12 +478,14 @@ class MockAuthService extends _i1.Mock implements _i7.AuthService {
     required String? instanceUrl,
     required String? loginToken,
     required String? otp,
+    required String? authMethod,
   }) =>
       (super.noSuchMethod(
             Invocation.method(#loginWithOTP, [], {
               #instanceUrl: instanceUrl,
               #loginToken: loginToken,
               #otp: otp,
+              #authMethod: authMethod,
             }),
             returnValue: _i5.Future<void>.value(),
             returnValueForMissingStub: _i5.Future<void>.value(),

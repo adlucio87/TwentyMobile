@@ -255,5 +255,19 @@
   "selectLanguage": "Sélectionner la langue",
   "paste": "Coller",
   "pastedFromClipboard": "Contenu collé depuis le presse-papiers",
-  "clipboardEmpty": "Le presse-papiers est vide"
+  "clipboardEmpty": "Le presse-papiers est vide",
+  "loginWithGoogleSso": "Connexion avec Google / SSO",
+  "loginWithGoogleSsoDesc": "Authentifiez-vous via Google Workspace ou Single Sign-On web.",
+  "googleSsoBadge": "Google / SSO",
+  "webAuthTitle": "Connexion Google / SSO",
+  "completingSignIn": "Finalisation de la connexion...",
+  "oauthClientIdTitle": "Identifiant client OAuth",
+  "oauthClientIdSubtitle": "Créez une application OAuth sur votre instance Twenty (Paramètres → Applications) et collez son identifiant client ici.",
+  "oauthClientIdRequired": "Saisissez l'identifiant client OAuth",
+  "oauthClientIdHint": "ex. 123e4567-e89b-12d3-a456-426614174000",
+  "oauthNoAutoRegistrationNotice": "Cette instance ne prend pas en charge l'enregistrement automatique du client. Créez una application OAuth sur votre instance Twenty (Paramètres → Applications) et collez son identifiant client ci-dessous.",
+  "openInBrowser": "Se connecter avec le navigateur",
+  "checkingConfiguration": "Vérification de la configuration du serveur...",
+  "redirectUriLabel": "URI de redirection pour Twenty :",
+  "copiedToClipboard": "Copié dans le presse-papiers"
 }

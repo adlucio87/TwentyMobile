@@ -38,7 +38,7 @@ class AppLifecycleHandler with WidgetsBindingObserver {
     final method = await storage.read(key: 'auth_method');
 
     // API key auth doesn't expire
-    if (method != 'email') return;
+    if (method != 'email' && method != 'sso') return;
 
     final authService = _ref.read(authServiceProvider);
 

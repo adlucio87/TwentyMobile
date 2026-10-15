@@ -171,7 +171,7 @@ class TwentyWorkflowRepository {
       'workflowVersionId': workflowId,
       'payload': <String, dynamic>{
         'recordId': recordId,
-        if (payload != null) ...payload,
+        ...?payload,
       },
     };
 

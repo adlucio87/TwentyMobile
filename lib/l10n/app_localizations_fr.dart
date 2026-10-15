@@ -811,4 +811,50 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get clipboardEmpty => 'Le presse-papiers est vide';
+
+  @override
+  String get loginWithGoogleSso => 'Connexion avec Google / SSO';
+
+  @override
+  String get loginWithGoogleSsoDesc =>
+      'Authentifiez-vous via Google Workspace ou Single Sign-On web.';
+
+  @override
+  String get googleSsoBadge => 'Google / SSO';
+
+  @override
+  String get webAuthTitle => 'Connexion Google / SSO';
+
+  @override
+  String get completingSignIn => 'Finalisation de la connexion...';
+
+  @override
+  String get oauthClientIdTitle => 'Identifiant client OAuth';
+
+  @override
+  String get oauthClientIdSubtitle =>
+      'Créez une application OAuth sur votre instance Twenty (Paramètres → Applications) et collez son identifiant client ici.';
+
+  @override
+  String get oauthClientIdRequired => 'Saisissez l\'identifiant client OAuth';
+
+  @override
+  String get oauthClientIdHint => 'ex. 123e4567-e89b-12d3-a456-426614174000';
+
+  @override
+  String get oauthNoAutoRegistrationNotice =>
+      'Cette instance ne prend pas en charge l\'enregistrement automatique du client. Créez una application OAuth sur votre instance Twenty (Paramètres → Applications) et collez son identifiant client ci-dessous.';
+
+  @override
+  String get openInBrowser => 'Se connecter avec le navigateur';
+
+  @override
+  String get checkingConfiguration =>
+      'Vérification de la configuration du serveur...';
+
+  @override
+  String get redirectUriLabel => 'URI de redirection pour Twenty :';
+
+  @override
+  String get copiedToClipboard => 'Copié dans le presse-papiers';
 }

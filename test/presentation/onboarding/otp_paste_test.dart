@@ -23,6 +23,7 @@ class _RejectingAuthService extends AuthService {
     required String instanceUrl,
     required String loginToken,
     required String otp,
+    required String authMethod,
   }) async {
     throw Exception('Invalid code');
   }

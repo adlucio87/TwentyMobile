@@ -1640,6 +1640,90 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Clipboard is empty'**
   String get clipboardEmpty;
+
+  /// No description provided for @loginWithGoogleSso.
+  ///
+  /// In en, this message translates to:
+  /// **'Login with Google / SSO'**
+  String get loginWithGoogleSso;
+
+  /// No description provided for @loginWithGoogleSsoDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Authenticate via Google Workspace or web Single Sign-On.'**
+  String get loginWithGoogleSsoDesc;
+
+  /// No description provided for @googleSsoBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Google / SSO'**
+  String get googleSsoBadge;
+
+  /// No description provided for @webAuthTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Google / SSO Login'**
+  String get webAuthTitle;
+
+  /// No description provided for @completingSignIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Completing sign in...'**
+  String get completingSignIn;
+
+  /// No description provided for @oauthClientIdTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'OAuth Client ID'**
+  String get oauthClientIdTitle;
+
+  /// No description provided for @oauthClientIdSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Create an OAuth application on your Twenty instance (Settings → Applications) and paste its Client ID here.'**
+  String get oauthClientIdSubtitle;
+
+  /// No description provided for @oauthClientIdRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the OAuth Client ID'**
+  String get oauthClientIdRequired;
+
+  /// No description provided for @oauthClientIdHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. 123e4567-e89b-12d3-a456-426614174000'**
+  String get oauthClientIdHint;
+
+  /// No description provided for @oauthNoAutoRegistrationNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'This instance does not support automatic client registration. Create an OAuth application on your Twenty instance (Settings → Applications) and paste its Client ID below.'**
+  String get oauthNoAutoRegistrationNotice;
+
+  /// No description provided for @openInBrowser.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in with Browser'**
+  String get openInBrowser;
+
+  /// No description provided for @checkingConfiguration.
+  ///
+  /// In en, this message translates to:
+  /// **'Checking server configuration...'**
+  String get checkingConfiguration;
+
+  /// No description provided for @redirectUriLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Redirect URI for Twenty:'**
+  String get redirectUriLabel;
+
+  /// No description provided for @copiedToClipboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Copied to clipboard'**
+  String get copiedToClipboard;
 }
 
 class _AppLocalizationsDelegate

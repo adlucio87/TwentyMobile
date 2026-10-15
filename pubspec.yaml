@@ -65,6 +65,8 @@ dependencies:
   gql: ^1.0.1
   http: ^1.6.0
   flutter_inappwebview: ^6.0.0
+  flutter_web_auth_2: ^5.1.0
+  crypto: ^3.0.7
 
 
 dev_dependencies:

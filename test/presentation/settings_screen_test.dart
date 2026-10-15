@@ -56,6 +56,19 @@ void main() {
       expect(find.text('Change login method'), findsOneWidget);
     });
 
+    testWidgets('Renders SSO badge and user information when auth method is sso', (WidgetTester tester) async {
+      await tester.pumpWidget(createWidgetUnderTest(
+        authMethod: 'sso',
+        userName: 'John Doe',
+      ));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Account'), findsOneWidget);
+      expect(find.text('Google / SSO'), findsOneWidget);
+      expect(find.text('John Doe'), findsOneWidget);
+      expect(find.text('Change login method'), findsOneWidget);
+    });
+
     testWidgets('Renders API Key badge and an unset "I am" row when auth method is api_key', (WidgetTester tester) async {
       await tester.pumpWidget(createWidgetUnderTest(
         authMethod: 'api_key',

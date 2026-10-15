@@ -107,9 +107,8 @@ class _EditFieldsSheetState extends ConsumerState<EditFieldsSheet> {
               child: ReorderableListView.builder(
                 scrollController: scrollController,
                 itemCount: _currentOrder.length,
-                onReorder: (oldIndex, newIndex) {
+                onReorderItem: (oldIndex, newIndex) {
                   setState(() {
-                    if (oldIndex < newIndex) newIndex -= 1;
                     final item = _currentOrder.removeAt(oldIndex);
                     _currentOrder.insert(newIndex, item);
                   });

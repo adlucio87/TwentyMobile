@@ -255,5 +255,19 @@
   "selectLanguage": "भाषा चुनें",
   "paste": "चिपकाएँ",
   "pastedFromClipboard": "क्लिपबोर्ड से पेस्ट किया गया",
-  "clipboardEmpty": "क्लिपबोर्ड खाली है"
+  "clipboardEmpty": "क्लिपबोर्ड खाली है",
+  "loginWithGoogleSso": "Google / SSO से लॉगिन करें",
+  "loginWithGoogleSsoDesc": "Google Workspace या वेब सिंगल साइन-ऑन के माध्यम से प्रमाणित करें।",
+  "googleSsoBadge": "Google / SSO",
+  "webAuthTitle": "Google / SSO लॉगिन",
+  "completingSignIn": "साइन इन पूरा किया जा रहा है...",
+  "oauthClientIdTitle": "OAuth क्लाइंट आईडी",
+  "oauthClientIdSubtitle": "अपने Twenty इंस्टेंस पर एक OAuth एप्लिकेशन बनाएं (सेटिंग्स → एप्लिकेशन) और उसकी क्लाइंट आईडी यहाँ पेस्ट करें।",
+  "oauthClientIdRequired": "OAuth क्लाइंट आईडी दर्ज करें",
+  "oauthClientIdHint": "उदा. 123e4567-e89b-12d3-a456-426614174000",
+  "oauthNoAutoRegistrationNotice": "यह इंस्टेंस स्वचालित क्लाइंट पंजीकरण का समर्थन नहीं करता। अपने Twenty इंस्टेंस पर एक OAuth एप्लिकेशन बनाएं (सेटिंग्स → एप्लिकेशन) और उसकी क्लाइंट आईडी नीचे पेस्ट करें।",
+  "openInBrowser": "ब्राउज़र से साइन इन करें",
+  "checkingConfiguration": "सर्वर कॉन्फ़िगरेशन की जाँच की जा रही है...",
+  "redirectUriLabel": "Twenty के लिए पुनर्निर्देशन URI:",
+  "copiedToClipboard": "क्लिपबोर्ड पर कॉपी किया गया"
 }
