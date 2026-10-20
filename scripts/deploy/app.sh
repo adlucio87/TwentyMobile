@@ -10,6 +10,7 @@ BUMP_MODE="patch" # default: bump patch and build number (e.g. 1.0.16+42 -> 1.0.
 CUSTOM_VERSION=""
 SYNC_STORE=false
 UPLOAD_BINARY=false
+PREVIEW_STORE=false
 
 # Parse arguments
 while [[ $# -gt 0 ]]; do
@@ -35,6 +36,10 @@ while [[ $# -gt 0 ]]; do
             BUMP_MODE="custom"
             shift 2
             ;;
+        --preview)
+            PREVIEW_STORE=true
+            shift
+            ;;
         --store)
             SYNC_STORE=true
             shift
@@ -45,7 +50,7 @@ while [[ $# -gt 0 ]]; do
             ;;
         *)
             echo "❌ Parametro sconosciuto: $1"
-            echo "Uso: $0 [all|android|ios] [--bump patch|minor|build|none] [--version X.Y.Z+BUILD] [--store] [--upload]"
+            echo "Uso: $0 [all|android|ios] [--bump patch|minor|build|none] [--version X.Y.Z+BUILD] [--preview] [--store] [--upload]"
             exit 1
             ;;
     esac
@@ -107,6 +112,17 @@ bump_version() {
 }
 
 bump_version
+
+if [ "$PREVIEW_STORE" = true ]; then
+    echo ""
+    echo "========================================="
+    echo "   Anteprima Scheda Store (Pre-approvazione)"
+    echo "========================================="
+    STORE_PREVIEW_SH="$PROJECT_ROOT/scripts/store/preview.sh"
+    if [ -x "$STORE_PREVIEW_SH" ]; then
+        "$STORE_PREVIEW_SH"
+    fi
+fi
 
 echo ""
 echo "=========================================="
