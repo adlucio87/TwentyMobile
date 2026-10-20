@@ -5,14 +5,17 @@ Stile premium ispirato a SendToReader e personalizzato con palette Twenty CRM:
   - Badge a pillola in vetro satinato con icona
   - Titoli ad alto contrasto con accento cromatico
   - Cornici dispositivi rifinite (iPhone con Dynamic Island, iPad, Phone, Tablet)
+  - Slide 1..5: screenshot nativi Android per Android, iPhone/iPad per iOS
+  - Slide 6: composizione multi-dispositivo con acquisizione e crop del biglietto da visita
+             + verifica e creazione automatica del contatto nel CRM (OCR)
 
 Output layout conforme a store-kit:
   store/screenshots/<locale>/
-    android_phone/slide_1.png .. slide_5.png
-    android_tablet_7/slide_1.png .. slide_5.png
-    android_tablet_10/slide_1.png .. slide_5.png
-    ios_iphone_6_5/slide_1.png .. slide_5.png
-    ios_ipad_13/slide_1.png .. slide_5.png
+    android_phone/slide_1.png .. slide_6.png
+    android_tablet_7/slide_1.png .. slide_6.png
+    android_tablet_10/slide_1.png .. slide_6.png
+    ios_iphone_6_5/slide_1.png .. slide_6.png
+    ios_ipad_13/slide_1.png .. slide_6.png
     featureGraphic.png (1024x500)
     icon.png (512x512)
 """
@@ -25,10 +28,11 @@ from PIL import Image, ImageDraw, ImageFont, ImageFilter
 ROOT = Path("/Volumes/SSD 990 PRO/Developments/Works/pocketcrm")
 IPHONE_RAW = ROOT / "assets/screenshot/iphone"
 IPAD_RAW = ROOT / "assets/screenshot/ipad"
+ANDROID_RAW = ROOT / "website/assets/img/screenshots"
 ICON_RAW = ROOT / "assets/images/logo.png"
 OUT_BASE = ROOT / "store/screenshots"
 
-# 5 schermate per telefono e tablet
+# 5 schermate singole per ciascun ambiente
 IPHONE_SOURCES = [
     IPHONE_RAW / "Simulator Screenshot - iPhone 16 - 2026-04-15 at 20.49.23.png", # 1: Today Dashboard
     IPHONE_RAW / "Simulator Screenshot - iPhone 16 - 2026-04-15 at 20.49.33.png", # 2: Contacts & Leads
@@ -44,6 +48,18 @@ IPAD_SOURCES = [
     IPAD_RAW / "Simulator Screenshot - iPad Pro 13-inch (M4) - 2026-04-15 at 21.05.05.png", # 4: Tasks & Follow-ups
     IPAD_RAW / "Simulator Screenshot - iPad Pro 13-inch (M4) - 2026-04-15 at 21.05.11.png", # 5: CRM Card & Quick Details
 ]
+
+ANDROID_SOURCES = [
+    ANDROID_RAW / "Screenshot_20260326-115125.png", # 1: Today Dashboard
+    ANDROID_RAW / "Screenshot_20260326-115135.png", # 2: Contacts & Leads
+    ANDROID_RAW / "Screenshot_20260326-115155.png", # 3: Companies & Pipeline
+    ANDROID_RAW / "Screenshot_20260326-115205.png", # 4: Tasks & Follow-ups
+    ANDROID_RAW / "Screenshot_20260326-115316.png", # 5: Quick Actions & Twenty Direct Connect
+]
+
+# Slide 6: Biglietti da Visita & Creazione Automatica Contatti (2 immagini combinate)
+CARD_SCAN_RAW = ANDROID_RAW / "Screenshot_20260326-115419.png" # Crop business card
+CARD_FORM_RAW = ANDROID_RAW / "Screenshot_20260326-115434.png" # Verify data / Create contact
 
 LOCALES = ["en-US", "it-IT", "es-ES", "fr-FR", "de-DE", "pt-BR", "pl-PL", "ru-RU", "tr-TR"]
 
@@ -74,6 +90,11 @@ COPY = {
                 "badge": "SELF-HOSTED FREEDOM",
                 "title": "100% Private CRM",
                 "subtitle": "Connect directly to your Twenty instance.\nZero trackers, open source and secure."
+            },
+            {
+                "badge": "AI CARD SCANNER",
+                "title": "Scan & Auto-Create",
+                "subtitle": "Capture paper business cards and create\nCRM contacts automatically with OCR."
             }
         ],
         "fg_title": "TwentyMobile",
@@ -106,6 +127,11 @@ COPY = {
                 "badge": "SELF-HOSTED FREEDOM",
                 "title": "100% Privacy e Controllo",
                 "subtitle": "Collegamento diretto alla tua istanza Twenty.\nNessun intermediario, open source e sicuro."
+            },
+            {
+                "badge": "SCANNER BIGLIETTI",
+                "title": "Scansiona & Crea Subito",
+                "subtitle": "Inquadra biglietti da visita cartacei e crea\ncontatti nel CRM con riconoscimento OCR."
             }
         ],
         "fg_title": "TwentyMobile",
@@ -138,6 +164,11 @@ COPY = {
                 "badge": "TOTAL PRIVACIDAD",
                 "title": "CRM 100% Autoalojado",
                 "subtitle": "Conexión directa a tu servidor Twenty.\nSin intermediarios, seguro y de código abierto."
+            },
+            {
+                "badge": "ESCÁNER DE TARJETAS",
+                "title": "Escanea y Crea Contactos",
+                "subtitle": "Captura tarjetas de visita y crea contactos\nen Twenty CRM al instante con OCR."
             }
         ],
         "fg_title": "TwentyMobile",
@@ -170,6 +201,11 @@ COPY = {
                 "badge": "LIBERTÉ SELF-HOSTED",
                 "title": "CRM 100% Privé",
                 "subtitle": "Connexion directe à votre instance Twenty.\nZéro traceur, sécurisé et open source."
+            },
+            {
+                "badge": "SCANNER DE CARTES",
+                "title": "Numérisez & Créez",
+                "subtitle": "Scannez des cartes de visite et créez des\ncontacts dans Twenty CRM grâce à l'OCR."
             }
         ],
         "fg_title": "TwentyMobile",
@@ -202,6 +238,11 @@ COPY = {
                 "badge": "SELF-HOSTED FREIHEIT",
                 "title": "100% Private Daten",
                 "subtitle": "Direkte Verbindung zu deinem Twenty CRM.\nKeine Tracker, sicher und Open Source."
+            },
+            {
+                "badge": "VISITENKARTEN-SCANNER",
+                "title": "Scannen & Erstellen",
+                "subtitle": "Visitenkarten erfassen und Kontakte\nsofort per OCR in Twenty CRM anlegen."
             }
         ],
         "fg_title": "TwentyMobile",
@@ -234,6 +275,11 @@ COPY = {
                 "badge": "LIBERDADE SELF-HOSTED",
                 "title": "CRM 100% Privado",
                 "subtitle": "Conexão direta ao seu servidor Twenty.\nSem intermediários e código aberto."
+            },
+            {
+                "badge": "SCANNER DE CARTÕES",
+                "title": "Escanear & Criar",
+                "subtitle": "Digitalize cartões de visita e crie contatos\nno Twenty CRM instantaneamente via OCR."
             }
         ],
         "fg_title": "TwentyMobile",
@@ -266,6 +312,11 @@ COPY = {
                 "badge": "PEŁNA PRYWATNOŚĆ",
                 "title": "100% Self-Hosted CRM",
                 "subtitle": "Bezpośrednie połączenie z Twoim Twenty CRM.\nBez pośredników, bezpiecznie i open source."
+            },
+            {
+                "badge": "SKANER WIZYTÓWEK",
+                "title": "Skanuj i Utwórz",
+                "subtitle": "Skanuj wizytówki i twórz kontakty\nw Twenty CRM automatycznie przez OCR."
             }
         ],
         "fg_title": "TwentyMobile",
@@ -298,6 +349,11 @@ COPY = {
                 "badge": "ПОЛНАЯ ПРИВАТНОСТЬ",
                 "title": "100% Self-Hosted CRM",
                 "subtitle": "Прямое подключение к вашему Twenty CRM.\nБез трекеров, безопасно и открытый код."
+            },
+            {
+                "badge": "СКАНЕР ВИЗИТОК",
+                "title": "Сканируйте и создавайте",
+                "subtitle": "Сканируйте визитки и мгновенно\nсоздавайте контакты в Twenty CRM с OCR."
             }
         ],
         "fg_title": "TwentyMobile",
@@ -330,6 +386,11 @@ COPY = {
                 "badge": "GİZLİLİK VE ÖZGÜRLÜK",
                 "title": "%100 Özel Twenty CRM",
                 "subtitle": "Kendi Twenty CRM sunucunuza doğrudan bağlanın.\nAracı yok, güvenli ve açık kaynak."
+            },
+            {
+                "badge": "KARTVİZİT TARAYICI",
+                "title": "Tara ve Otomatik Ekle",
+                "subtitle": "Kartvizitleri tarayın ve OCR ile\nTwenty CRM içinde anında kişi oluşturun."
             }
         ],
         "fg_title": "TwentyMobile",
@@ -387,7 +448,6 @@ def get_font(size, bold=False):
     for p in candidates:
         if os.path.exists(p):
             try:
-                # index 1 in Helvetica.ttc is Bold, index 0 is Regular
                 idx = 1 if (bold and p.endswith(".ttc")) else 0
                 return ImageFont.truetype(p, size, index=idx)
             except Exception:
@@ -402,7 +462,6 @@ def create_twenty_gradient(w, h):
     """Crea uno sfondo deep onyx con sfumature e bagliori radiali blu elettrico / cobalto."""
     base = Image.new("RGBA", (w, h), (11, 12, 16, 255))
     
-    # Glow orbs layer
     glow = Image.new("RGBA", (w, h), (0, 0, 0, 0))
     g_draw = ImageDraw.Draw(glow)
     
@@ -439,27 +498,24 @@ def add_rounded_corners(im, rad):
 
 
 def draw_iphone_bezel_decorations(draw, frame_w, frame_thickness):
-    # Dynamic Island
     island_w = int(frame_w * 0.28)
     island_h = int(frame_thickness * 1.8)
     island_x = (frame_w - island_w) // 2
     island_y = frame_thickness + 12
     draw.rounded_rectangle([island_x, island_y, island_x + island_w, island_y + island_h], radius=island_h//2, fill=(0, 0, 0, 255))
     
-    # Outer side buttons
     draw.rounded_rectangle([frame_w - 3, 260, frame_w, 420], radius=2, fill=(90, 95, 105, 255))
     draw.rounded_rectangle([0, 220, 3, 310], radius=2, fill=(90, 95, 105, 255))
     draw.rounded_rectangle([0, 330, 3, 430], radius=2, fill=(90, 95, 105, 255))
 
 
-def render_mockup(cfg_profile, slide_idx, text_data, raw_screen_path, out_file):
+def render_headers(canvas, cfg_profile, text_data):
+    """Renderizza badge, titolo e sottotitolo comuni."""
     w = cfg_profile["canvas_w"]
     h = cfg_profile["canvas_h"]
-    
-    canvas = create_twenty_gradient(w, h)
     draw = ImageDraw.Draw(canvas)
     
-    # 1. Badge a pillola in vetro satinato (#4F8EF7)
+    # 1. Badge
     badge_text = text_data["badge"].upper()
     b_font = get_font(cfg_profile["badge_size"], bold=True)
     b_bbox = draw.textbbox((0, 0), badge_text, font=b_font)
@@ -473,7 +529,6 @@ def render_mockup(cfg_profile, slide_idx, text_data, raw_screen_path, out_file):
     pill_x = (w - pill_w) // 2
     pill_y = cfg_profile["badge_y"]
     
-    # Pill background + glow border
     pill_overlay = Image.new("RGBA", (w, h), (0, 0, 0, 0))
     p_draw = ImageDraw.Draw(pill_overlay)
     p_draw.rounded_rectangle(
@@ -485,23 +540,17 @@ def render_mockup(cfg_profile, slide_idx, text_data, raw_screen_path, out_file):
     )
     canvas.paste(pill_overlay, (0, 0), pill_overlay)
     
-    # Pill text (#60A5FA)
     draw = ImageDraw.Draw(canvas)
-    draw.text(
-        (pill_x + pad_h, pill_y + pad_v - 2),
-        badge_text,
-        font=b_font,
-        fill=(96, 165, 250)
-    )
+    draw.text((pill_x + pad_h, pill_y + pad_v - 2), badge_text, font=b_font, fill=(96, 165, 250))
     
-    # 2. Titolo Grande (#FFFFFF con accento Twenty CRM)
+    # 2. Titolo
     title_text = text_data["title"]
     t_font = get_font(cfg_profile["title_size"], bold=True)
     t_bbox = draw.textbbox((0, 0), title_text, font=t_font)
     t_w = t_bbox[2] - t_bbox[0]
     draw.text(((w - t_w) // 2, cfg_profile["title_y"]), title_text, font=t_font, fill=(255, 255, 255))
     
-    # 3. Sottotitolo (#A1A1AA)
+    # 3. Sottotitolo
     sub_lines = text_data["subtitle"].split("\n")
     s_font = get_font(cfg_profile["sub_size"], bold=False)
     for i, line in enumerate(sub_lines):
@@ -509,30 +558,31 @@ def render_mockup(cfg_profile, slide_idx, text_data, raw_screen_path, out_file):
         s_w = s_bbox[2] - s_bbox[0]
         line_y = cfg_profile["sub_y"] + i * cfg_profile["sub_lh"]
         draw.text(((w - s_w) // 2, line_y), line, font=s_font, fill=(161, 161, 170))
-        
-    # 4. Rendering Schermo & Cornice Dispositivo
-    raw_img = Image.open(raw_screen_path).convert("RGBA")
+
+
+def render_mockup(cfg_profile, slide_idx, text_data, raw_screen_path, out_file):
+    w = cfg_profile["canvas_w"]
+    h = cfg_profile["canvas_h"]
+    canvas = create_twenty_gradient(w, h)
+    render_headers(canvas, cfg_profile, text_data)
     
+    # Schermo & Cornice
+    raw_img = Image.open(raw_screen_path).convert("RGBA")
     target_w = cfg_profile["target_w"]
     aspect = raw_img.height / raw_img.width
     target_h = int(target_w * aspect)
     resized_screen = raw_img.resize((target_w, target_h), Image.Resampling.LANCZOS)
     
-    # Arrotondamento angoli dello screenshot
     scr_radius = cfg_profile["screenshot_radius"]
     rounded_screen = add_rounded_corners(resized_screen, scr_radius)
     
-    # Spessore cornice dispositivo
     thickness = max(14, int(target_w * 0.022))
     frame_w = target_w + thickness * 2
     frame_h = target_h + thickness * 2
     frame_rad = cfg_profile["frame_radius"]
     
-    # Creazione cornice scura rifinita
     frame_img = Image.new("RGBA", (frame_w, frame_h), (0, 0, 0, 0))
     f_draw = ImageDraw.Draw(frame_img)
-    
-    # Bordo esterno in titanio scuro (#1E2028 con stroke #383C4A)
     f_draw.rounded_rectangle(
         [0, 0, frame_w, frame_h],
         radius=frame_rad,
@@ -544,23 +594,21 @@ def render_mockup(cfg_profile, slide_idx, text_data, raw_screen_path, out_file):
     if cfg_profile["is_ios"]:
         draw_iphone_bezel_decorations(f_draw, frame_w, thickness)
         
-    # Incolla lo screenshot all'interno della cornice
     frame_img.paste(rounded_screen, (thickness, thickness), rounded_screen)
     
-    # Aggiungi Home Indicator in basso
+    # Home Indicator
     home_w = int(target_w * 0.35)
     home_h = max(4, int(thickness * 0.35))
     home_x = (frame_w - home_w) // 2
     home_y = frame_h - thickness - int(home_h * 2.5)
     f_draw.rounded_rectangle([home_x, home_y, home_x + home_w, home_y + home_h], radius=home_h//2, fill=(255, 255, 255, 180))
     
-    # Ombra elegante sotto al dispositivo
+    # Ombra
     shadow = Image.new("RGBA", (frame_w + 100, frame_h + 100), (0, 0, 0, 0))
     sh_draw = ImageDraw.Draw(shadow)
     sh_draw.rounded_rectangle([50, 50, frame_w + 50, frame_h + 50], radius=frame_rad, fill=(0, 0, 0, 160))
     shadow = shadow.filter(ImageFilter.GaussianBlur(radius=35))
     
-    # Posiziona il dispositivo centrato
     pos_x = (w - frame_w) // 2
     pos_y = cfg_profile["frame_y"]
     
@@ -572,18 +620,93 @@ def render_mockup(cfg_profile, slide_idx, text_data, raw_screen_path, out_file):
     canvas_rgba.convert("RGB").save(out_file, "PNG", optimize=True)
 
 
+def render_dual_mockup(cfg_profile, slide_idx, text_data, raw_screen_left, raw_screen_right, out_file):
+    """Renderizza una composizione a doppio dispositivo per la Slide 6 (Biglietti da visita + Contatto)."""
+    w = cfg_profile["canvas_w"]
+    h = cfg_profile["canvas_h"]
+    canvas = create_twenty_gradient(w, h)
+    render_headers(canvas, cfg_profile, text_data)
+    
+    scale = 0.65 if not cfg_profile["is_tablet"] else 0.52
+    single_w = int(cfg_profile["target_w"] * scale)
+    
+    def build_frame(raw_path):
+        raw_img = Image.open(raw_path).convert("RGBA")
+        aspect = raw_img.height / raw_img.width
+        sw = single_w
+        sh = int(sw * aspect)
+        resized = raw_img.resize((sw, sh), Image.Resampling.LANCZOS)
+        
+        scr_rad = int(cfg_profile["screenshot_radius"] * scale)
+        frame_rad = int(cfg_profile["frame_radius"] * scale)
+        rounded_scr = add_rounded_corners(resized, scr_rad)
+        
+        thick = max(10, int(sw * 0.024))
+        fw = sw + thick * 2
+        fh = sh + thick * 2
+        
+        f_img = Image.new("RGBA", (fw, fh), (0, 0, 0, 0))
+        fd = ImageDraw.Draw(f_img)
+        fd.rounded_rectangle([0, 0, fw, fh], radius=frame_rad, fill=(24, 26, 34, 255), outline=(56, 60, 74, 255), width=max(2, int(w * 0.002)))
+        
+        if cfg_profile["is_ios"]:
+            iw = int(fw * 0.28)
+            ih = int(thick * 1.8)
+            fd.rounded_rectangle([(fw - iw)//2, thick + 8, (fw + iw)//2, thick + 8 + ih], radius=ih//2, fill=(0, 0, 0, 255))
+            
+        f_img.paste(rounded_scr, (thick, thick), rounded_scr)
+        
+        hw = int(sw * 0.35)
+        hh = max(3, int(thick * 0.35))
+        fd.rounded_rectangle([(fw - hw)//2, fh - thick - int(hh*2), (fw + hw)//2, fh - thick - hh], radius=hh//2, fill=(255, 255, 255, 180))
+        return f_img
+
+    dev_left = build_frame(raw_screen_left)
+    dev_right = build_frame(raw_screen_right)
+    
+    # Ombre
+    sh_l = Image.new("RGBA", (dev_left.width + 60, dev_left.height + 60), (0, 0, 0, 0))
+    ImageDraw.Draw(sh_l).rounded_rectangle([30, 30, dev_left.width + 30, dev_left.height + 30], radius=35, fill=(0, 0, 0, 140))
+    sh_l = sh_l.filter(ImageFilter.GaussianBlur(radius=25))
+    
+    sh_r = Image.new("RGBA", (dev_right.width + 80, dev_right.height + 80), (0, 0, 0, 0))
+    ImageDraw.Draw(sh_r).rounded_rectangle([40, 40, dev_right.width + 40, dev_right.height + 40], radius=40, fill=(0, 0, 0, 190))
+    sh_r = sh_r.filter(ImageFilter.GaussianBlur(radius=30))
+    
+    if cfg_profile["is_tablet"]:
+        left_x = int(w * 0.16)
+        right_x = int(w * 0.50)
+        left_y = cfg_profile["frame_y"] + int(h * 0.02)
+        right_y = cfg_profile["frame_y"]
+    else:
+        left_x = int(w * 0.07)
+        right_x = int(w * 0.41)
+        left_y = cfg_profile["frame_y"] + int(h * 0.035)
+        right_y = cfg_profile["frame_y"]
+        
+    canvas_rgba = canvas.convert("RGBA")
+    
+    # Posiziona Dispositivo Sinistro (Crop Biglietto)
+    canvas_rgba.paste(sh_l, (left_x - 30, left_y - 20), sh_l)
+    canvas_rgba.paste(dev_left, (left_x, left_y), dev_left)
+    
+    # Posiziona Dispositivo Destro (Verifica e Crea Contatto in primo piano)
+    canvas_rgba.paste(sh_r, (right_x - 40, right_y - 25), sh_r)
+    canvas_rgba.paste(dev_right, (right_x, right_y), dev_right)
+    
+    out_file.parent.mkdir(parents=True, exist_ok=True)
+    canvas_rgba.convert("RGB").save(out_file, "PNG", optimize=True)
+
+
 def generate_feature_graphic(loc_dir, copy_item, icon_src):
     """Feature Graphic Google Play 1024x500 in puro stile Twenty CRM."""
     w, h = 1024, 500
     fg = create_twenty_gradient(w, h)
-    draw = ImageDraw.Draw(fg)
     
-    # Icona quadrata arrotondata 210x210
     icon_img = Image.open(icon_src).convert("RGBA")
     icon_img = icon_img.resize((210, 210), Image.Resampling.LANCZOS)
     icon_img = add_rounded_corners(icon_img, 46)
     
-    # Ombra icona
     shadow = Image.new("RGBA", (230, 230), (0, 0, 0, 0))
     s_draw = ImageDraw.Draw(shadow)
     s_draw.rounded_rectangle([0, 0, 230, 230], radius=50, fill=(0, 0, 0, 120))
@@ -595,7 +718,6 @@ def generate_feature_graphic(loc_dir, copy_item, icon_src):
     
     draw = ImageDraw.Draw(fg_rgba)
     
-    # Badge superiore "TWENTY CRM NATIVE CLIENT"
     b_font = get_font(18, bold=True)
     badge_text = "TWENTY CRM • OPEN SOURCE CLIENT"
     b_bbox = draw.textbbox((0, 0), badge_text, font=b_font)
@@ -603,15 +725,12 @@ def generate_feature_graphic(loc_dir, copy_item, icon_src):
     draw.rounded_rectangle([320, 140, 320 + b_w + 32, 172], radius=16, fill=(79, 142, 247, 45), outline=(96, 165, 250, 160), width=2)
     draw.text((336, 146), badge_text, font=b_font, fill=(96, 165, 250))
     
-    # Titolo "TwentyMobile"
     t_font = get_font(56, bold=True)
     draw.text((320, 185), copy_item["fg_title"], font=t_font, fill=(255, 255, 255))
     
-    # Sottotitolo "Your CRM, Your Data"
     s_font = get_font(30, bold=False)
     draw.text((320, 258), copy_item["fg_sub"], font=s_font, fill=(161, 161, 170))
     
-    # Pill features in basso
     f_font = get_font(20, bold=True)
     draw.text((320, 315), copy_item["fg_badge"], font=f_font, fill=(79, 142, 247))
     
@@ -620,7 +739,7 @@ def generate_feature_graphic(loc_dir, copy_item, icon_src):
 
 
 def main():
-    print("🎨 Generazione Mockup TwentyMobile (Pillow puro)...")
+    print("🎨 Generazione Mockup TwentyMobile (Pillow puro) — 6 slide per dispositivo...")
     
     total_imgs = 0
     for loc in LOCALES:
@@ -639,16 +758,31 @@ def main():
         icon_master.save(icon_dest, "PNG")
         total_imgs += 1
         
-        # 3. Le 5 slide per ciascuno dei 5 profili dispositivo
+        # 3. Le 6 slide per ciascuno dei 5 profili dispositivo
         for prof_name, prof_cfg in PROFILES.items():
-            sources = IPAD_SOURCES if prof_cfg["is_tablet"] else IPHONE_SOURCES
+            # Scelta screenshot nativi: iPad per iPad, iPhone per iPhone, Android per Android
+            if prof_cfg["is_ios"]:
+                single_sources = IPHONE_SOURCES
+            elif prof_cfg["is_tablet"]:
+                single_sources = IPAD_SOURCES
+            else:
+                single_sources = ANDROID_SOURCES
+                
+            # Slide 1..5: Schermo singolo
             for s_idx in range(5):
                 s_copy = loc_copy["slides"][s_idx]
-                raw_path = sources[s_idx]
+                raw_path = single_sources[s_idx]
                 out_path = loc_dir / prof_name / f"slide_{s_idx + 1}.png"
                 render_mockup(prof_cfg, s_idx, s_copy, raw_path, out_path)
                 total_imgs += 1
-            print(f"  ✓ {prof_name} (5 slide)")
+                
+            # Slide 6: Biglietti da Visita & Auto Creazione Contatti (Composizione doppia)
+            s_copy_6 = loc_copy["slides"][5]
+            out_path_6 = loc_dir / prof_name / "slide_6.png"
+            render_dual_mockup(prof_cfg, 5, s_copy_6, CARD_SCAN_RAW, CARD_FORM_RAW, out_path_6)
+            total_imgs += 1
+            
+            print(f"  ✓ {prof_name} (6 slide)")
             
     print(f"\n🎉 Generazione completata con successo! Totale immagini create: {total_imgs} in {OUT_BASE}")
 
