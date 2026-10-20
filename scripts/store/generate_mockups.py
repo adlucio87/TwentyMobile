@@ -699,11 +699,11 @@ def render_dual_mockup(cfg_profile, slide_idx, text_data, raw_screen_left, raw_s
 
 
 def generate_feature_graphic(loc_dir, copy_item, icon_src):
-    """Feature Graphic Google Play 1024x500 in puro stile Twenty CRM."""
+    """Feature Graphic Google Play 1024x500 pulita e minimale in stile Twenty CRM."""
     w, h = 1024, 500
     fg = create_twenty_gradient(w, h)
     
-    # Pulizia dell'icona: elimina bordi bianchi esterni tramite maschera pulita
+    # Pulizia perfetta dell'icona: elimina bordi bianchi esterni tramite maschera pulita
     icon_master = Image.open(icon_src).convert("RGBA")
     mask = Image.new("L", icon_master.size, 0)
     m_draw = ImageDraw.Draw(mask)
@@ -716,66 +716,29 @@ def generate_feature_graphic(loc_dir, copy_item, icon_src):
     icon_clean = Image.new("RGBA", icon_master.size, (0, 0, 0, 0))
     icon_clean.paste(icon_master, (0, 0), mask)
     
-    icon_sz = 200
+    icon_sz = 210
     icon_img = icon_clean.resize((icon_sz, icon_sz), Image.Resampling.LANCZOS)
-    icon_pos = (75, 150)
+    icon_pos = (85, 145)
     
-    # Bagliore luminoso Twenty CRM centrato dietro all'icona (nessun contorno nero)
-    glow = Image.new("RGBA", (w, h), (0, 0, 0, 0))
-    g_draw = ImageDraw.Draw(glow)
-    cx, cy = icon_pos[0] + icon_sz // 2, icon_pos[1] + icon_sz // 2
-    for r in range(140, 80, -4):
-        alpha = int(45 * ((140 - r) / 60.0))
-        g_draw.ellipse([cx - r, cy - r, cx + r, cy + r], fill=(79, 142, 247, alpha))
-        
     fg_rgba = fg.convert("RGBA")
-    fg_rgba = Image.alpha_composite(fg_rgba, glow)
-    
-    # Incolla l'icona con un bordo satinato elegante
+    # Incolla l'icona pura e pulita: nessun contorno blu, nessuna ombra nera/alone
     fg_rgba.paste(icon_img, icon_pos, icon_img)
     draw = ImageDraw.Draw(fg_rgba)
-    icon_rad = int(icon_sz * 0.22)
-    draw.rounded_rectangle(
-        [icon_pos[0], icon_pos[1], icon_pos[0] + icon_sz, icon_pos[1] + icon_sz],
-        radius=icon_rad,
-        outline=(79, 142, 247, 190),
-        width=2
-    )
     
-    # 1. Badge "TWENTY CRM • OPEN SOURCE CLIENT"
-    # Grande (24px), nitido, ad alto contrasto su pillola navy satinata
-    b_font = get_font(24, bold=True)
-    badge_text = "TWENTY CRM • OPEN SOURCE CLIENT"
-    b_bbox = draw.textbbox((0, 0), badge_text, font=b_font)
-    b_w = b_bbox[2] - b_bbox[0]
-    b_h = b_bbox[3] - b_bbox[1]
+    # Blocco testi centrato più in alto, allineato con la sommità del logo
+    tx = 335
     
-    bx = 310
-    by = 135
-    b_pad_h = 24
-    b_pad_v = 8
-    badge_rect = [bx, by, bx + b_w + b_pad_h * 2, by + b_h + b_pad_v * 2]
+    # 1. Titolo "TwentyMobile" (grande, bianco brillante, posizionato più in alto)
+    t_font = get_font(68, bold=True)
+    draw.text((tx, 145), copy_item["fg_title"], font=t_font, fill=(255, 255, 255))
     
-    draw.rounded_rectangle(
-        badge_rect,
-        radius=14,
-        fill=(16, 24, 40, 245),
-        outline=(96, 165, 250, 255),
-        width=2
-    )
-    draw.text((bx + b_pad_h, by + b_pad_v - 1), badge_text, font=b_font, fill=(255, 255, 255))
-    
-    # 2. Titolo "TwentyMobile"
-    t_font = get_font(62, bold=True)
-    draw.text((310, 195), copy_item["fg_title"], font=t_font, fill=(255, 255, 255))
-    
-    # 3. Sottotitolo
+    # 2. Sottotitolo
     s_font = get_font(32, bold=False)
-    draw.text((310, 275), copy_item["fg_sub"], font=s_font, fill=(203, 213, 225))
+    draw.text((tx, 230), copy_item["fg_sub"], font=s_font, fill=(203, 213, 225))
     
-    # 4. Feature points in basso
+    # 3. Punti chiave (privato, self-hosted, open source)
     f_font = get_font(22, bold=True)
-    draw.text((310, 335), copy_item["fg_badge"], font=f_font, fill=(96, 165, 250))
+    draw.text((tx, 290), copy_item["fg_badge"], font=f_font, fill=(96, 165, 250))
     
     out_png = loc_dir / "featureGraphic.png"
     fg_rgba.convert("RGB").save(out_png, "PNG", optimize=True)
