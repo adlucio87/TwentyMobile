@@ -699,7 +699,7 @@ def render_dual_mockup(cfg_profile, slide_idx, text_data, raw_screen_left, raw_s
 
 
 def generate_feature_graphic(loc_dir, copy_item, icon_src):
-    """Feature Graphic Google Play 1024x500 pulita e minimale in stile Twenty CRM."""
+    """Feature Graphic Google Play 1024x500 con Safe Area e ampi margini esterni (~15%)."""
     w, h = 1024, 500
     fg = create_twenty_gradient(w, h)
     
@@ -716,29 +716,29 @@ def generate_feature_graphic(loc_dir, copy_item, icon_src):
     icon_clean = Image.new("RGBA", icon_master.size, (0, 0, 0, 0))
     icon_clean.paste(icon_master, (0, 0), mask)
     
-    icon_sz = 210
+    # Icona con margini safe aumentati: x = 145 (14.2% margine sinistro)
+    icon_sz = 190
     icon_img = icon_clean.resize((icon_sz, icon_sz), Image.Resampling.LANCZOS)
-    icon_pos = (85, 145)
+    icon_pos = (145, 155)
     
     fg_rgba = fg.convert("RGBA")
-    # Incolla l'icona pura e pulita: nessun contorno blu, nessuna ombra nera/alone
     fg_rgba.paste(icon_img, icon_pos, icon_img)
     draw = ImageDraw.Draw(fg_rgba)
     
-    # Blocco testi centrato più in alto, allineato con la sommità del logo
-    tx = 335
+    # Blocco testi con safe area: margine sinistro tx = 380, ben distante da tutti i bordi
+    tx = 380
     
-    # 1. Titolo "TwentyMobile" (grande, bianco brillante, posizionato più in alto)
-    t_font = get_font(68, bold=True)
-    draw.text((tx, 145), copy_item["fg_title"], font=t_font, fill=(255, 255, 255))
+    # 1. Titolo "TwentyMobile" (grande, bianco brillante, allineato con il logo)
+    t_font = get_font(64, bold=True)
+    draw.text((tx, 155), copy_item["fg_title"], font=t_font, fill=(255, 255, 255))
     
     # 2. Sottotitolo
-    s_font = get_font(32, bold=False)
-    draw.text((tx, 230), copy_item["fg_sub"], font=s_font, fill=(203, 213, 225))
+    s_font = get_font(30, bold=False)
+    draw.text((tx, 238), copy_item["fg_sub"], font=s_font, fill=(203, 213, 225))
     
     # 3. Punti chiave (privato, self-hosted, open source)
-    f_font = get_font(22, bold=True)
-    draw.text((tx, 290), copy_item["fg_badge"], font=f_font, fill=(96, 165, 250))
+    f_font = get_font(20, bold=True)
+    draw.text((tx, 295), copy_item["fg_badge"], font=f_font, fill=(96, 165, 250))
     
     out_png = loc_dir / "featureGraphic.png"
     fg_rgba.convert("RGB").save(out_png, "PNG", optimize=True)
