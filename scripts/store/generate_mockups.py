@@ -703,36 +703,79 @@ def generate_feature_graphic(loc_dir, copy_item, icon_src):
     w, h = 1024, 500
     fg = create_twenty_gradient(w, h)
     
-    icon_img = Image.open(icon_src).convert("RGBA")
-    icon_img = icon_img.resize((210, 210), Image.Resampling.LANCZOS)
-    icon_img = add_rounded_corners(icon_img, 46)
+    # Pulizia dell'icona: elimina bordi bianchi esterni tramite maschera pulita
+    icon_master = Image.open(icon_src).convert("RGBA")
+    mask = Image.new("L", icon_master.size, 0)
+    m_draw = ImageDraw.Draw(mask)
+    inset = 14
+    rad = int((icon_master.width - inset * 2) * 0.22)
+    m_draw.rounded_rectangle(
+        [inset, inset, icon_master.width - inset, icon_master.height - inset],
+        radius=rad, fill=255
+    )
+    icon_clean = Image.new("RGBA", icon_master.size, (0, 0, 0, 0))
+    icon_clean.paste(icon_master, (0, 0), mask)
     
-    shadow = Image.new("RGBA", (230, 230), (0, 0, 0, 0))
-    s_draw = ImageDraw.Draw(shadow)
-    s_draw.rounded_rectangle([0, 0, 230, 230], radius=50, fill=(0, 0, 0, 120))
-    shadow = shadow.filter(ImageFilter.GaussianBlur(radius=15))
+    icon_sz = 200
+    icon_img = icon_clean.resize((icon_sz, icon_sz), Image.Resampling.LANCZOS)
+    icon_pos = (75, 150)
     
+    # Bagliore luminoso Twenty CRM centrato dietro all'icona (nessun contorno nero)
+    glow = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    g_draw = ImageDraw.Draw(glow)
+    cx, cy = icon_pos[0] + icon_sz // 2, icon_pos[1] + icon_sz // 2
+    for r in range(140, 80, -4):
+        alpha = int(45 * ((140 - r) / 60.0))
+        g_draw.ellipse([cx - r, cy - r, cx + r, cy + r], fill=(79, 142, 247, alpha))
+        
     fg_rgba = fg.convert("RGBA")
-    fg_rgba.paste(shadow, (65, 135), shadow)
-    fg_rgba.paste(icon_img, (75, 145), icon_img)
+    fg_rgba = Image.alpha_composite(fg_rgba, glow)
     
+    # Incolla l'icona con un bordo satinato elegante
+    fg_rgba.paste(icon_img, icon_pos, icon_img)
     draw = ImageDraw.Draw(fg_rgba)
+    icon_rad = int(icon_sz * 0.22)
+    draw.rounded_rectangle(
+        [icon_pos[0], icon_pos[1], icon_pos[0] + icon_sz, icon_pos[1] + icon_sz],
+        radius=icon_rad,
+        outline=(79, 142, 247, 190),
+        width=2
+    )
     
-    b_font = get_font(18, bold=True)
+    # 1. Badge "TWENTY CRM • OPEN SOURCE CLIENT"
+    # Grande (24px), nitido, ad alto contrasto su pillola navy satinata
+    b_font = get_font(24, bold=True)
     badge_text = "TWENTY CRM • OPEN SOURCE CLIENT"
     b_bbox = draw.textbbox((0, 0), badge_text, font=b_font)
     b_w = b_bbox[2] - b_bbox[0]
-    draw.rounded_rectangle([320, 140, 320 + b_w + 32, 172], radius=16, fill=(79, 142, 247, 45), outline=(96, 165, 250, 160), width=2)
-    draw.text((336, 146), badge_text, font=b_font, fill=(96, 165, 250))
+    b_h = b_bbox[3] - b_bbox[1]
     
-    t_font = get_font(56, bold=True)
-    draw.text((320, 185), copy_item["fg_title"], font=t_font, fill=(255, 255, 255))
+    bx = 310
+    by = 135
+    b_pad_h = 24
+    b_pad_v = 8
+    badge_rect = [bx, by, bx + b_w + b_pad_h * 2, by + b_h + b_pad_v * 2]
     
-    s_font = get_font(30, bold=False)
-    draw.text((320, 258), copy_item["fg_sub"], font=s_font, fill=(161, 161, 170))
+    draw.rounded_rectangle(
+        badge_rect,
+        radius=14,
+        fill=(16, 24, 40, 245),
+        outline=(96, 165, 250, 255),
+        width=2
+    )
+    draw.text((bx + b_pad_h, by + b_pad_v - 1), badge_text, font=b_font, fill=(255, 255, 255))
     
-    f_font = get_font(20, bold=True)
-    draw.text((320, 315), copy_item["fg_badge"], font=f_font, fill=(79, 142, 247))
+    # 2. Titolo "TwentyMobile"
+    t_font = get_font(62, bold=True)
+    draw.text((310, 195), copy_item["fg_title"], font=t_font, fill=(255, 255, 255))
+    
+    # 3. Sottotitolo
+    s_font = get_font(32, bold=False)
+    draw.text((310, 275), copy_item["fg_sub"], font=s_font, fill=(203, 213, 225))
+    
+    # 4. Feature points in basso
+    f_font = get_font(22, bold=True)
+    draw.text((310, 335), copy_item["fg_badge"], font=f_font, fill=(96, 165, 250))
     
     out_png = loc_dir / "featureGraphic.png"
     fg_rgba.convert("RGB").save(out_png, "PNG", optimize=True)
