@@ -1,0 +1,17 @@
+{
+  "name": "TwentyMobile",
+  "ios_bundle_id": "com.luciosoft.pocketcrm",
+  "android_package": "com.luciosoft.pocketcrm",
+  "platforms": ["ios", "android"],
+  "source_locale": "en-US",
+  "locales": ["en-US", "it-IT", "es-ES", "fr-FR", "de-DE", "pt-BR", "pl-PL", "ru-RU", "tr-TR"],
+  "ios_locale_map": {
+    "it-IT": "it",
+    "pl-PL": "pl",
+    "ru-RU": "ru",
+    "tr-TR": "tr"
+  },
+  "support_url": "https://twentymobilecrm.luciosoft.it/",
+  "marketing_url": "https://luciosoft.it/",
+  "privacy_url": "https://privacy.luciosoft.it/twentymobilecrm/"
+}

@@ -1,0 +1,4 @@
+• Geliştirilmiş OAuth 2.0 PKCE ve SSO giriş desteği.
+• Twenty CRM senkronizasyon performansında artış.
+• Kartvizit tarayıcı optimizasyonları ve hızlı kayıt.
+• Kararlılık iyileştirmeleri ve arayüz güncellemeleri.

@@ -1,0 +1,1 @@
+Connect directly to your Twenty CRM instance on the go. 100% private, native and open source.

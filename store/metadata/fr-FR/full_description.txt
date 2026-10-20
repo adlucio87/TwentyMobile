@@ -1,0 +1,27 @@
+TwentyMobile — Votre CRM, vos données.
+La première application mobile native pour Twenty CRM. Connectez-vous directement à votre instance auto-hébergée et gérez vos prospects, clients et opportunités où que vous soyez.
+
+VOS DONNÉES RESTENT LES VÔTRES
+TwentyMobile communique exclusivement avec votre propre serveur Twenty CRM. Aucun serveur intermédiaire, aucune collecte de données et aucun abonnement requis.
+
+ÉCRAN AUJOURD'HUI — VOTRE QG QUOTIDIEN
+Démarrez chaque journée avec une vue claire sur vos priorités : tâches en retard, priorités du jour, agenda de demain et contacts récents réunis en un seul endroit.
+
+CONTACTS ET ENTREPRISES
+Accédez à toutes vos données clients. Recherchez, filtrez, appelez ou envoyez des emails en un clic depuis votre téléphone ou tablette.
+
+OPPORTUNITÉS ET OBJETS PERSONNALISÉS
+L'application s'adapte à votre espace de travail : gérez les opportunités de vente, formulaires dynamiques et relations personnalisées.
+
+SCANNER DE CARTES DE VISITE
+Scannez n'importe quelle carte de visite avec votre appareil photo pour extraire instantanément le nom, l'email, le téléphone et l'entreprise directement dans Twenty CRM.
+
+RAPPELS ET TÂCHES
+Planifiez des rappels pour ne jamais manquer une relance client grâce aux notifications push locales.
+
+FONCTIONNALITÉS :
+• Contacts, Entreprises, Opportunités, Tâches et Notes
+• Compatibilité complète avec les objets sur mesure de Twenty CRM
+• Scanner de cartes de visite sur l'appareil
+• Thèmes sombre et clair modernes
+• Mode démo disponible sans configuration préalable.

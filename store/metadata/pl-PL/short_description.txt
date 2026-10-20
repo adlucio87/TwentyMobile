@@ -1,0 +1,1 @@
+Natywna aplikacja dla Twenty CRM. Self-hosted, prywatna i open source.

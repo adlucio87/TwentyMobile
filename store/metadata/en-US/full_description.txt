@@ -1,0 +1,34 @@
+TwentyMobile — Your CRM, Your Data.
+The first native mobile app for Twenty CRM. Connect directly to your self-hosted instance and manage your business relationships on the go — privately, securely, without compromise.
+
+YOUR DATA STAYS YOURS
+TwentyMobile connects directly to your own Twenty CRM instance. No third-party proxy servers, no tracking, no subscription fees. Your contacts, your rules.
+
+TODAY SCREEN — YOUR DAILY HQ
+Start every morning with a clear view of what matters most. Overdue tasks, today's priorities, tomorrow's agenda and recent contacts — all in one unified, responsive place.
+
+CONTACTS & COMPANIES PIPELINE
+Access all your standard and custom workspace tables right from your pocket. Search, filter, call, email, or navigate to companies with a single tap.
+
+OPPORTUNITIES & CUSTOM OBJECTS
+PocketCRM adapts to your CRM setup, not the other way around. Access standard and custom tables (such as Opportunities or custom reports) defined on your Twenty server with dynamic form layouts and smart relation pickers.
+
+SCAN BUSINESS CARDS
+Point your camera at any paper business card and TwentyMobile instantly extracts name, email, phone and company. Save directly into your CRM with zero manual data entry.
+
+SMART REMINDERS & TASKS
+Set due dates and times on your tasks and receive local push notifications before deadlines. Never miss a critical customer follow-up again.
+
+HIGHLIGHTS:
+• Contacts, Companies, Opportunities, Tasks and Notes
+• Full support for custom objects and dynamic schemas
+• Business card scanner with on-device text recognition
+• Offline cache & background sync
+• Dark and Light theme matching Twenty CRM aesthetic
+• Universal: iPhone, iPad, and Mac
+
+PRIVACY FIRST
+TwentyMobile is 100% open source. All network traffic travels strictly between your device and your Twenty CRM server.
+
+REQUIREMENTS:
+A running Twenty CRM instance (self-hosted or cloud managed). Get started at twenty.com. Use the built-in demo mode to explore the app instantly without setup.

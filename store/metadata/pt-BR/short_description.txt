@@ -1,0 +1,1 @@
+App móvel nativo para Twenty CRM. Self-hosted, privado e open source.

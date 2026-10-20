@@ -49,3 +49,7 @@ pubspec.lock
 # Firebase & Backend
 .firebase/
 backend/node_modules/
+
+# store-kit (artefatti locali)
+store/.build/
+store/.pulled/

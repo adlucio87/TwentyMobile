@@ -1,0 +1,4 @@
+• Ulepszone wsparcie logowania OAuth 2.0 PKCE i SSO.
+• Zoptymalizowana prędkość synchronizacji z Twenty CRM.
+• Usprawnienia skanera wizytówek biznesowych.
+• Poprawki stabilności i interfejsu użytkownika.

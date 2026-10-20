@@ -1,0 +1,1 @@
+CRM,twenty,self-hosted,kontakte,vertrieb,open source,leads,firmen,scanner,aufgaben,kunden

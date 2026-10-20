@@ -8,6 +8,8 @@ set -e
 TARGET="all"
 BUMP_MODE="patch" # default: bump patch and build number (e.g. 1.0.16+42 -> 1.0.17+43)
 CUSTOM_VERSION=""
+SYNC_STORE=false
+UPLOAD_BINARY=false
 
 # Parse arguments
 while [[ $# -gt 0 ]]; do
@@ -33,9 +35,17 @@ while [[ $# -gt 0 ]]; do
             BUMP_MODE="custom"
             shift 2
             ;;
+        --store)
+            SYNC_STORE=true
+            shift
+            ;;
+        --upload|--internal)
+            UPLOAD_BINARY=true
+            shift
+            ;;
         *)
             echo "❌ Parametro sconosciuto: $1"
-            echo "Uso: $0 [all|android|ios] [--bump patch|minor|build|none] [--version X.Y.Z+BUILD]"
+            echo "Uso: $0 [all|android|ios] [--bump patch|minor|build|none] [--version X.Y.Z+BUILD] [--store] [--upload]"
             exit 1
             ;;
     esac
@@ -164,3 +174,35 @@ echo ""
 echo "=========================================="
 echo "🎉 Build $NEW_VERSION completata con successo!"
 echo "=========================================="
+
+if [ "$SYNC_STORE" = true ]; then
+    echo ""
+    echo "========================================="
+    echo "   Sincronizzazione Store (Metadati & Immagini)"
+    echo "========================================="
+    STORE_SH="$PROJECT_ROOT/scripts/store/push.sh"
+    if [ -x "$STORE_SH" ]; then
+        if [ "$TARGET" == "android" ]; then
+            "$STORE_SH" --android
+        elif [ "$TARGET" == "ios" ]; then
+            "$STORE_SH" --ios
+        else
+            "$STORE_SH"
+        fi
+    else
+        echo "⚠️  scripts/store/push.sh non trovato, skip sync."
+    fi
+fi
+
+if [ "$UPLOAD_BINARY" = true ]; then
+    echo ""
+    echo "========================================="
+    echo "   Upload Binario (Internal Test / TestFlight)"
+    echo "========================================="
+    UPLOAD_SH="$PROJECT_ROOT/scripts/store/upload_binary.sh"
+    if [ -x "$UPLOAD_SH" ]; then
+        "$UPLOAD_SH" "$TARGET"
+    else
+        echo "⚠️  scripts/store/upload_binary.sh non trovato, skip upload."
+    fi
+fi
