@@ -64,6 +64,9 @@ android {
                 signingConfig = signingConfigs.getByName("debug")
             }
             proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
+            ndk {
+                debugSymbolLevel = "FULL"
+            }
         }
     }
 }
