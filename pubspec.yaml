@@ -122,6 +122,8 @@ flutter:
   assets:
     - assets/images/logo.png
     - assets/images/logo_ios.png
+    - assets/images/android_icon_foreground.png
+    - assets/images/android_icon_background.png
     - google_fonts/
 
 flutter_launcher_icons:
@@ -129,6 +131,8 @@ flutter_launcher_icons:
   ios: true
   image_path: "assets/images/logo.png"
   image_path_ios: "assets/images/logo_ios.png"
+  adaptive_icon_background: "assets/images/android_icon_background.png"
+  adaptive_icon_foreground: "assets/images/android_icon_foreground.png"
   min_sdk_android: 21
   remove_alpha_ios: true
 
