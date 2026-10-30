@@ -144,12 +144,13 @@ build_android() {
     echo "🤖 Compilazione Android Release"
     echo "=========================================="
     
+    mkdir -p build/app/outputs/symbols
     echo "▶ Compilazione AppBundle (.aab)..."
-    flutter build appbundle --release
+    flutter build appbundle --release --obfuscate --split-debug-info=build/app/outputs/symbols
     echo "✅ AppBundle generato con successo: build/app/outputs/bundle/release/app-release.aab"
     
     echo "▶ Compilazione APK (.apk)..."
-    flutter build apk --release
+    flutter build apk --release --obfuscate --split-debug-info=build/app/outputs/symbols
     echo "✅ APK generato con successo: build/app/outputs/flutter-apk/app-release.apk"
 }
 
@@ -162,13 +163,14 @@ build_ios() {
     echo "▶ Verifica CocoaPods (ios/Podfile)..."
     (cd ios && pod install)
     
+    mkdir -p build/app/outputs/symbols
     echo "▶ Compilazione iOS Release Archive & IPA..."
-    if flutter build ipa --release; then
+    if flutter build ipa --release --obfuscate --split-debug-info=build/app/outputs/symbols; then
         echo "✅ IPA generato con successo: build/ios/ipa/TwentyMobile.ipa"
     else
         echo "⚠️  'flutter build ipa' richiede un profilo di provisioning di distribuzione App Store configurato in Xcode."
         echo "▶ Compilazione archivio release (senza codesign manuale)..."
-        flutter build ios --release --no-codesign
+        flutter build ios --release --no-codesign --obfuscate --split-debug-info=build/app/outputs/symbols
         echo "✅ iOS Release Archive generato con successo in build/ios/iphoneos/Runner.app"
     fi
 }
