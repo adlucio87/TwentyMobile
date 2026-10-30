@@ -1,11 +1,29 @@
+import 'dart:convert';
 import 'dart:ui' show VoidCallback;
 import 'package:flutter/foundation.dart';
 import 'package:gql/language.dart' show parseString;
 import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:http/http.dart' as http;
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:pocketcrm/core/auth/auth_service.dart';
 import 'package:pocketcrm/core/network/custom_http_client.dart';
 import 'package:pocketcrm/core/utils/storage_service.dart';
+
+enum InstanceValidationError {
+  unreachable,
+  notTwentyInstance,
+  invalidUrl,
+}
+
+class InstanceValidationException implements Exception {
+  final InstanceValidationError error;
+  final String? details;
+
+  const InstanceValidationException(this.error, [this.details]);
+
+  @override
+  String toString() => 'InstanceValidationException($error, $details)';
+}
 
 class BaseGraphQLConnector {
   final GraphQLClient client;
@@ -370,6 +388,138 @@ class BaseGraphQLConnector {
     }
 
     return true;
+  }
+
+  static bool _isConnectionRefusalOrUnreachable(Object e) {
+    final s = e.toString().toLowerCase();
+    return s.contains('failed host lookup') ||
+        s.contains('nodename nor servname provided') ||
+        s.contains('connection refused') ||
+        s.contains('network is unreachable');
+  }
+
+  /// Validates that [rawUrl] points to a reachable, responsive Twenty CRM instance.
+  /// Normalizes the URL (auto-prepends https:// if needed, strips trailing slashes).
+  /// Returns the normalized URL if valid, or throws [InstanceValidationException].
+  static Future<String> validateInstance(
+    String rawUrl, {
+    http.Client? httpClient,
+  }) async {
+    var url = rawUrl.trim();
+    if (url.isEmpty) {
+      throw const InstanceValidationException(
+        InstanceValidationError.invalidUrl,
+        'URL cannot be empty',
+      );
+    }
+
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+      url = 'https://$url';
+    }
+
+    url = url.replaceAll(RegExp(r'/+$'), '');
+
+    final uri = Uri.tryParse(url);
+    if (uri == null || !uri.hasAuthority || uri.host.isEmpty) {
+      throw const InstanceValidationException(
+        InstanceValidationError.invalidUrl,
+        'Invalid URL format',
+      );
+    }
+
+    final client = httpClient ?? TimeoutHttpClient(timeoutDuration: const Duration(seconds: 10));
+    try {
+      // 1. Try /healthz (NestJS Terminus endpoint)
+      try {
+        final res = await client
+            .get(Uri.parse('$url/healthz'))
+            .timeout(const Duration(seconds: 8));
+        if (res.statusCode == 200) {
+          try {
+            final json = jsonDecode(res.body);
+            if (json is Map && (json['status'] == 'ok' || json.containsKey('status'))) {
+              return url;
+            }
+          } catch (_) {}
+        }
+      } catch (e) {
+        if (_isConnectionRefusalOrUnreachable(e)) {
+          throw InstanceValidationException(
+            InstanceValidationError.unreachable,
+            e.toString(),
+          );
+        }
+      }
+
+      // 2. Try /client-config (Twenty frontend config)
+      try {
+        final res = await client
+            .get(Uri.parse('$url/client-config'))
+            .timeout(const Duration(seconds: 8));
+        if (res.statusCode == 200) {
+          try {
+            final json = jsonDecode(res.body);
+            if (json is Map &&
+                (json.containsKey('appVersion') ||
+                    json.containsKey('authProviders') ||
+                    json.containsKey('billing') ||
+                    json.containsKey('captcha') ||
+                    json.containsKey('isMultiWorkspaceEnabled'))) {
+              return url;
+            }
+          } catch (_) {}
+        }
+      } catch (e) {
+        if (_isConnectionRefusalOrUnreachable(e)) {
+          throw InstanceValidationException(
+            InstanceValidationError.unreachable,
+            e.toString(),
+          );
+        }
+      }
+
+      // 3. Try /metadata (Twenty unauthenticated GraphQL metadata endpoint)
+      try {
+        final res = await client
+            .post(
+              Uri.parse('$url/metadata'),
+              headers: {'Content-Type': 'application/json'},
+              body: jsonEncode({'query': '{ __typename }'}),
+            )
+            .timeout(const Duration(seconds: 8));
+        if (res.statusCode == 200) {
+          try {
+            final json = jsonDecode(res.body);
+            if (json is Map && json.containsKey('data')) {
+              return url;
+            }
+          } catch (_) {}
+        }
+      } catch (e) {
+        if (_isConnectionRefusalOrUnreachable(e)) {
+          throw InstanceValidationException(
+            InstanceValidationError.unreachable,
+            e.toString(),
+          );
+        }
+      }
+
+      throw const InstanceValidationException(
+        InstanceValidationError.notTwentyInstance,
+        'Server did not respond with expected Twenty CRM signatures',
+      );
+    } on InstanceValidationException {
+      rethrow;
+    } catch (e) {
+      throw InstanceValidationException(
+        InstanceValidationError.unreachable,
+        e.toString(),
+      );
+    } finally {
+      if (httpClient == null) {
+        client.close();
+      }
+    }
   }
 }
 

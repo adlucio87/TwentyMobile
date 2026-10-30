@@ -856,4 +856,11 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get copiedToClipboard => 'In die Zwischenablage kopiert';
+
+  @override
+  String get invalidTwentyInstance =>
+      'Die URL scheint keine gültige Twenty CRM-Instanz zu sein. Bitte überprüfen Sie die Adresse.';
+
+  @override
+  String get verifyingServer => 'Server wird überprüft...';
 }

@@ -5,6 +5,7 @@ import 'package:pocketcrm/core/di/providers.dart';
 import 'package:pocketcrm/core/di/auth_state.dart';
 import 'package:pocketcrm/core/config/demo_config.dart';
 import 'package:pocketcrm/core/localization/l10n_extension.dart';
+import 'package:pocketcrm/data/connectors/twenty_connector.dart';
 import 'package:pocketcrm/presentation/shared/snackbar_helper.dart';
 import 'package:pocketcrm/presentation/shared/language_button.dart';
 
@@ -21,6 +22,7 @@ class _InstanceSetupScreenState extends ConsumerState<InstanceSetupScreen> {
   final _formKey = GlobalKey<FormState>();
   bool _isDemoLoading = false;
   bool _isNextLoading = false;
+  String? _error;
 
   @override
   void initState() {
@@ -135,58 +137,55 @@ class _InstanceSetupScreenState extends ConsumerState<InstanceSetupScreen> {
                   hintText: l10n.instanceUrlHint,
                   prefixIcon: const Icon(Icons.link),
                 ),
+                onChanged: (_) {
+                  if (_error != null) {
+                    setState(() => _error = null);
+                  }
+                },
                 validator: (val) {
-                  if (val == null || val.isEmpty) {
+                  if (val == null || val.trim().isEmpty) {
                     return l10n.enterValidUrl;
                   }
-                  if (!Uri.parse(val).isAbsolute) {
-                    return l10n.urlMustStartWithHttp;
+                  var trimmed = val.trim();
+                  if (!trimmed.startsWith('http://') && !trimmed.startsWith('https://')) {
+                    trimmed = 'https://$trimmed';
+                  }
+                  final uri = Uri.tryParse(trimmed);
+                  if (uri == null || !uri.hasAuthority || uri.host.isEmpty) {
+                    return l10n.enterValidUrl;
                   }
                   return null;
                 },
               ),
+              if (_error != null) ...[
+                const SizedBox(height: 12),
+                Text(
+                  _error!,
+                  style: TextStyle(color: Theme.of(context).colorScheme.error),
+                ),
+              ],
               const Spacer(),
               ElevatedButton(
-                onPressed: (_isNextLoading || _isDemoLoading)
-                    ? null
-                    : () async {
-                        if (_formKey.currentState!.validate()) {
-                          setState(() => _isNextLoading = true);
-                          try {
-                            final storage = ref.read(storageServiceProvider);
-                            // Rimuovi slash finale
-                            var url = _controller.text.trim();
-                            if (url.endsWith('/')) {
-                              url = url.substring(0, url.length - 1);
-                            }
-
-                            // URL is format-validated by the TextFormField.
-                            // Full connection validation (URL + Token) happens in the next screen.
-
-                            await storage.write(
-                              key: 'instance_url',
-                              value: url,
-                            );
-                            await storage.delete(key: 'is_demo_mode');
-                            if (context.mounted) {
-                              context.push('/onboarding/method');
-                              await _trackServerConnection(url, isDemo: false);
-                            }
-                          } finally {
-                            if (mounted) {
-                              setState(() => _isNextLoading = false);
-                            }
-                          }
-                        }
-                      },
+                onPressed: (_isNextLoading || _isDemoLoading) ? null : _submitUrl,
                 child: _isNextLoading
-                    ? const SizedBox(
-                        height: 20,
-                        width: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: Colors.white,
-                        ),
+                    ? Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Text(
+                            l10n.verifyingServer,
+                            style: const TextStyle(color: Colors.white),
+                          ),
+                        ],
                       )
                     : Text(l10n.next),
               ),
@@ -205,8 +204,68 @@ class _InstanceSetupScreenState extends ConsumerState<InstanceSetupScreen> {
     );
   }
 
+  Future<void> _submitUrl() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    setState(() {
+      _isNextLoading = true;
+      _error = null;
+    });
+
+    try {
+      final storage = ref.read(storageServiceProvider);
+      final rawUrl = _controller.text.trim();
+      final validatedUrl = await TwentyConnector.validateInstance(rawUrl);
+
+      _controller.text = validatedUrl;
+
+      await storage.write(
+        key: 'instance_url',
+        value: validatedUrl,
+      );
+      await storage.delete(key: 'is_demo_mode');
+      if (mounted) {
+        context.push('/onboarding/method');
+        await _trackServerConnection(
+          validatedUrl,
+          isDemo: false,
+        );
+      }
+    } on InstanceValidationException catch (e) {
+      if (mounted) {
+        final l10n = context.l10n;
+        final String message;
+        switch (e.error) {
+          case InstanceValidationError.unreachable:
+            message = l10n.unableToReachServer;
+            break;
+          case InstanceValidationError.notTwentyInstance:
+            message = l10n.invalidTwentyInstance;
+            break;
+          case InstanceValidationError.invalidUrl:
+            message = l10n.enterValidUrl;
+            break;
+        }
+        setState(() => _error = message);
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(
+          () => _error = context.l10n.unableToReachServer,
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isNextLoading = false);
+      }
+    }
+  }
+
   Future<void> _connectDemo() async {
-    setState(() => _isDemoLoading = true);
+    setState(() {
+      _isDemoLoading = true;
+      _error = null;
+    });
 
     try {
       final storage = ref.read(storageServiceProvider);

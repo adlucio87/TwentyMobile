@@ -848,6 +848,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get copiedToClipboard => 'Copied to clipboard';
+
+  @override
+  String get invalidTwentyInstance =>
+      'The URL does not appear to be a valid Twenty CRM instance. Please check the address.';
+
+  @override
+  String get verifyingServer => 'Verifying server...';
 }
 
 /// The translations for English, as used in the United Kingdom (`en_GB`).
@@ -1694,4 +1701,11 @@ class AppLocalizationsEnGb extends AppLocalizationsEn {
 
   @override
   String get copiedToClipboard => 'Copied to clipboard';
+
+  @override
+  String get invalidTwentyInstance =>
+      'The URL does not appear to be a valid Twenty CRM instance. Please check the address.';
+
+  @override
+  String get verifyingServer => 'Verifying server...';
 }

@@ -305,5 +305,7 @@
   "openInBrowser": "Sign in with Browser",
   "checkingConfiguration": "Checking server configuration...",
   "redirectUriLabel": "Redirect URI for Twenty:",
-  "copiedToClipboard": "Copied to clipboard"
+  "copiedToClipboard": "Copied to clipboard",
+  "invalidTwentyInstance": "The URL does not appear to be a valid Twenty CRM instance. Please check the address.",
+  "verifyingServer": "Verifying server..."
 }

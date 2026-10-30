@@ -106,6 +106,10 @@ class _EmailLoginScreenState extends ConsumerState<EmailLoginScreen> {
           message = l10n.unableToReachServer;
         } else if (message.contains('password login is disabled')) {
           message = l10n.passwordLoginDisabled;
+        } else if (message.contains('ResponseFormatException') ||
+            message.contains('FormatException') ||
+            message.contains('Unexpected character')) {
+          message = l10n.invalidTwentyInstance;
         } else {
           message = userFacingError(e);
         }

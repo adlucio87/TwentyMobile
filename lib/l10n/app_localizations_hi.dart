@@ -850,4 +850,11 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get copiedToClipboard => 'क्लिपबोर्ड पर कॉपी किया गया';
+
+  @override
+  String get invalidTwentyInstance =>
+      'यह URL एक मान्य Twenty CRM इंस्टेंस प्रतीत नहीं होता है। कृपया पता जांचें।';
+
+  @override
+  String get verifyingServer => 'सर्वर सत्यापित किया जा रहा है...';
 }

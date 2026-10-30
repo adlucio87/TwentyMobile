@@ -1,8 +1,12 @@
 import 'dart:ui' show VoidCallback;
 import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:http/http.dart' as http;
 import 'package:pocketcrm/core/auth/auth_service.dart';
 import 'package:pocketcrm/core/utils/storage_service.dart';
 import 'package:pocketcrm/data/connectors/base_graphql_connector.dart';
+
+export 'base_graphql_connector.dart'
+    show InstanceValidationError, InstanceValidationException;
 import 'package:pocketcrm/data/repositories/twenty_company_repository.dart';
 import 'package:pocketcrm/data/repositories/twenty_contact_repository.dart';
 import 'package:pocketcrm/data/repositories/twenty_note_repository.dart';
@@ -73,6 +77,12 @@ class TwentyConnector implements CRMRepository {
 
   static Future<bool> testConnection(String baseUrl, String apiToken) =>
       BaseGraphQLConnector.testConnection(baseUrl, apiToken);
+
+  static Future<String> validateInstance(
+    String rawUrl, {
+    http.Client? httpClient,
+  }) =>
+      BaseGraphQLConnector.validateInstance(rawUrl, httpClient: httpClient);
 
   // ── Auth & Profile ──
   @override

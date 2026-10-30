@@ -1724,6 +1724,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Copied to clipboard'**
   String get copiedToClipboard;
+
+  /// No description provided for @invalidTwentyInstance.
+  ///
+  /// In en, this message translates to:
+  /// **'The URL does not appear to be a valid Twenty CRM instance. Please check the address.'**
+  String get invalidTwentyInstance;
+
+  /// No description provided for @verifyingServer.
+  ///
+  /// In en, this message translates to:
+  /// **'Verifying server...'**
+  String get verifyingServer;
 }
 
 class _AppLocalizationsDelegate

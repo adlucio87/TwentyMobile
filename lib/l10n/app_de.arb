@@ -269,5 +269,7 @@
   "openInBrowser": "Mit Browser anmelden",
   "checkingConfiguration": "Serverkonfiguration wird überprüft...",
   "redirectUriLabel": "Redirect-URI für Twenty:",
-  "copiedToClipboard": "In die Zwischenablage kopiert"
+  "copiedToClipboard": "In die Zwischenablage kopiert",
+  "invalidTwentyInstance": "Die URL scheint keine gültige Twenty CRM-Instanz zu sein. Bitte überprüfen Sie die Adresse.",
+  "verifyingServer": "Server wird überprüft..."
 }

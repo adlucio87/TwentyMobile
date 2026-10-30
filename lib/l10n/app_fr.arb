@@ -269,5 +269,7 @@
   "openInBrowser": "Se connecter avec le navigateur",
   "checkingConfiguration": "Vérification de la configuration du serveur...",
   "redirectUriLabel": "URI de redirection pour Twenty :",
-  "copiedToClipboard": "Copié dans le presse-papiers"
+  "copiedToClipboard": "Copié dans le presse-papiers",
+  "invalidTwentyInstance": "L'URL ne semble pas être une instance Twenty CRM valide. Veuillez vérifier l'adresse.",
+  "verifyingServer": "Vérification du serveur..."
 }

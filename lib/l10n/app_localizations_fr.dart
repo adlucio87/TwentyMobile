@@ -857,4 +857,11 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get copiedToClipboard => 'Copié dans le presse-papiers';
+
+  @override
+  String get invalidTwentyInstance =>
+      'L\'URL ne semble pas être une instance Twenty CRM valide. Veuillez vérifier l\'adresse.';
+
+  @override
+  String get verifyingServer => 'Vérification du serveur...';
 }
