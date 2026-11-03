@@ -1,1 +1,1 @@
-Connect directly to your Twenty CRM instance on the go. 100% private, native and open source.
+Venti — Mobile CRM for Twenty. Connect directly to your Twenty instance on the go. 100% private, native and open source.

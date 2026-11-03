@@ -1,1 +1,1 @@
-Клиент для Twenty CRM. Self-hosted, приватный и с открытым кодом.
+Venti — Mobile CRM для Twenty. Быстрый, self-hosted, приватный и открытый код.

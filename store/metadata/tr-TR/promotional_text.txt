@@ -1,1 +1,1 @@
-Twenty CRM sunucunuza doğrudan bağlanın. %100 gizli, yerel ve açık kaynak.
+Venti — Twenty için Mobile CRM. Twenty sunucunuza hareket halindeyken doğrudan bağlanın. %100 gizli ve açık kaynak.

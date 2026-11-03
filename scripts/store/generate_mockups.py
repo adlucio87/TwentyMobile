@@ -22,6 +22,7 @@ Output layout conforme a store-kit:
 import math
 import os
 import shutil
+import sys
 from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
 
@@ -97,7 +98,7 @@ COPY = {
                 "subtitle": "Capture paper business cards and create\nCRM contacts automatically with OCR."
             }
         ],
-        "fg_title": "TwentyMobile",
+        "fg_title": "venti",
         "fg_sub": "Your CRM, Your Data",
         "fg_badge": "Self-Hosted • 100% Private • Open Source"
     },
@@ -134,7 +135,7 @@ COPY = {
                 "subtitle": "Inquadra biglietti da visita cartacei e crea\ncontatti nel CRM con riconoscimento OCR."
             }
         ],
-        "fg_title": "TwentyMobile",
+        "fg_title": "venti",
         "fg_sub": "Il tuo CRM, i tuoi dati",
         "fg_badge": "Self-Hosted • 100% Privato • Open Source"
     },
@@ -171,7 +172,7 @@ COPY = {
                 "subtitle": "Captura tarjetas de visita y crea contactos\nen Twenty CRM al instante con OCR."
             }
         ],
-        "fg_title": "TwentyMobile",
+        "fg_title": "venti",
         "fg_sub": "Tu CRM, tus propios datos",
         "fg_badge": "Self-Hosted • 100% Privado • Open Source"
     },
@@ -208,7 +209,7 @@ COPY = {
                 "subtitle": "Scannez des cartes de visite et créez des\ncontacts dans Twenty CRM grâce à l'OCR."
             }
         ],
-        "fg_title": "TwentyMobile",
+        "fg_title": "venti",
         "fg_sub": "Votre CRM, vos données",
         "fg_badge": "Self-Hosted • 100% Privé • Open Source"
     },
@@ -245,7 +246,7 @@ COPY = {
                 "subtitle": "Visitenkarten erfassen und Kontakte\nsofort per OCR in Twenty CRM anlegen."
             }
         ],
-        "fg_title": "TwentyMobile",
+        "fg_title": "venti",
         "fg_sub": "Dein CRM, deine Daten",
         "fg_badge": "Self-Hosted • 100% Privat • Open Source"
     },
@@ -282,7 +283,7 @@ COPY = {
                 "subtitle": "Digitalize cartões de visita e crie contatos\nno Twenty CRM instantaneamente via OCR."
             }
         ],
-        "fg_title": "TwentyMobile",
+        "fg_title": "venti",
         "fg_sub": "Seu CRM, seus dados",
         "fg_badge": "Self-Hosted • 100% Privado • Open Source"
     },
@@ -319,7 +320,7 @@ COPY = {
                 "subtitle": "Skanuj wizytówki i twórz kontakty\nw Twenty CRM automatycznie przez OCR."
             }
         ],
-        "fg_title": "TwentyMobile",
+        "fg_title": "venti",
         "fg_sub": "Twój CRM, Twoje dane",
         "fg_badge": "Self-Hosted • 100% Prywatności • Open Source"
     },
@@ -356,7 +357,7 @@ COPY = {
                 "subtitle": "Сканируйте визитки и мгновенно\nсоздавайте контакты в Twenty CRM с OCR."
             }
         ],
-        "fg_title": "TwentyMobile",
+        "fg_title": "venti",
         "fg_sub": "Ваша CRM, ваши данные",
         "fg_badge": "Self-Hosted • 100% Приватно • Open Source"
     },
@@ -393,7 +394,7 @@ COPY = {
                 "subtitle": "Kartvizitleri tarayın ve OCR ile\nTwenty CRM içinde anında kişi oluşturun."
             }
         ],
-        "fg_title": "TwentyMobile",
+        "fg_title": "venti",
         "fg_sub": "Sizin CRM'iniz, Veriniz",
         "fg_badge": "Self-Hosted • %100 Gizli • Açık Kaynak"
     }
@@ -699,53 +700,71 @@ def render_dual_mockup(cfg_profile, slide_idx, text_data, raw_screen_left, raw_s
 
 
 def generate_feature_graphic(loc_dir, copy_item, icon_src):
-    """Feature Graphic Google Play 1024x500 con Safe Area e ampi margini esterni (~15%)."""
+    """Feature Graphic Google Play 1024x500 con Safe Area, brand lockup e colori della home."""
     w, h = 1024, 500
     fg = create_twenty_gradient(w, h)
     
-    # Pulizia perfetta dell'icona: elimina bordi bianchi esterni tramite maschera pulita
+    # 1. Icona con squircle pulito e bordo sottile
     icon_master = Image.open(icon_src).convert("RGBA")
-    mask = Image.new("L", icon_master.size, 0)
-    m_draw = ImageDraw.Draw(mask)
-    inset = 14
-    rad = int((icon_master.width - inset * 2) * 0.22)
-    m_draw.rounded_rectangle(
-        [inset, inset, icon_master.width - inset, icon_master.height - inset],
-        radius=rad, fill=255
-    )
-    icon_clean = Image.new("RGBA", icon_master.size, (0, 0, 0, 0))
-    icon_clean.paste(icon_master, (0, 0), mask)
-    
-    # Icona con margini safe aumentati: x = 145 (14.2% margine sinistro)
     icon_sz = 190
-    icon_img = icon_clean.resize((icon_sz, icon_sz), Image.Resampling.LANCZOS)
-    icon_pos = (145, 155)
+    icon_resized = icon_master.resize((icon_sz, icon_sz), Image.Resampling.LANCZOS)
     
+    mask = Image.new("L", (icon_sz, icon_sz), 0)
+    m_draw = ImageDraw.Draw(mask)
+    rad = int(icon_sz * 0.22)
+    m_draw.rounded_rectangle([0, 0, icon_sz - 1, icon_sz - 1], radius=rad, fill=255)
+    
+    icon_clean = Image.new("RGBA", (icon_sz, icon_sz), (0, 0, 0, 0))
+    icon_clean.paste(icon_resized, (0, 0), mask)
+    
+    # Bordo sottile di rifinitura
+    b_draw = ImageDraw.Draw(icon_clean)
+    b_draw.rounded_rectangle([0, 0, icon_sz - 1, icon_sz - 1], radius=rad, outline=(255, 255, 255, 30), width=1)
+    
+    icon_pos = (140, 155)
     fg_rgba = fg.convert("RGBA")
-    fg_rgba.paste(icon_img, icon_pos, icon_img)
+    fg_rgba.paste(icon_clean, icon_pos, icon_clean)
     draw = ImageDraw.Draw(fg_rgba)
     
-    # Blocco testi con safe area: margine sinistro tx = 380, ben distante da tutti i bordi
-    tx = 380
+    # 2. Blocco Brand Lockup orizzontale (stile header della home)
+    tx = 365
+    ty = 152
     
-    # 1. Titolo "TwentyMobile" (grande, bianco brillante, allineato con il logo)
-    t_font = get_font(64, bold=True)
-    draw.text((tx, 155), copy_item["fg_title"], font=t_font, fill=(255, 255, 255))
+    # Nome brand "venti" minuscolo geometrico
+    font_venti = get_font(68, bold=True)
+    draw.text((tx, ty), copy_item["fg_title"], font=font_venti, fill=(255, 255, 255))
+    v_bbox = font_venti.getbbox(copy_item["fg_title"])
+    venti_w = v_bbox[2] - v_bbox[0]
     
-    # 2. Sottotitolo
-    s_font = get_font(30, bold=False)
-    draw.text((tx, 238), copy_item["fg_sub"], font=s_font, fill=(203, 213, 225))
+    # Barra verticale di separazione sottile
+    sep_x = tx + venti_w + 18
+    sep_y1 = ty + 12
+    sep_y2 = ty + 56
+    draw.line([(sep_x, sep_y1), (sep_x, sep_y2)], fill=(120, 130, 145), width=2)
     
-    # 3. Punti chiave (privato, self-hosted, open source)
+    # Specifica MOBILE CRM sopra e FOR TWENTY sotto
+    desc_x = sep_x + 18
+    font_desc1 = get_font(21, bold=True)
+    font_desc2 = get_font(17, bold=False)
+    draw.text((desc_x, ty + 10), "MOBILE CRM", font=font_desc1, fill=(255, 255, 255))
+    draw.text((desc_x, ty + 36), "FOR TWENTY", font=font_desc2, fill=(148, 163, 184))
+    
+    # 3. Sottotitolo localizzato (motto)
+    s_font = get_font(28, bold=False)
+    draw.text((tx, ty + 85), copy_item["fg_sub"], font=s_font, fill=(203, 213, 225))
+    
+    # 4. Punti chiave (badge: self-hosted, privato, open source)
     f_font = get_font(20, bold=True)
-    draw.text((tx, 295), copy_item["fg_badge"], font=f_font, fill=(96, 165, 250))
+    draw.text((tx, ty + 138), copy_item["fg_badge"], font=f_font, fill=(96, 165, 250))
     
     out_png = loc_dir / "featureGraphic.png"
     fg_rgba.convert("RGB").save(out_png, "PNG", optimize=True)
 
 
 def main():
-    print("🎨 Generazione Mockup TwentyMobile (Pillow puro) — 6 slide per dispositivo...")
+    assets_only = "--assets-only" in sys.argv
+    mode_str = "solo icone e feature graphic" if assets_only else "6 slide per dispositivo + asset"
+    print(f"🎨 Generazione Mockup venti (Pillow puro) — {mode_str}...")
     
     total_imgs = 0
     for loc in LOCALES:
@@ -757,13 +776,18 @@ def main():
         # 1. Feature Graphic (1024x500)
         generate_feature_graphic(loc_dir, loc_copy, ICON_RAW)
         total_imgs += 1
+        print("  ✓ featureGraphic.png")
         
         # 2. App Icon (512x512)
         icon_dest = loc_dir / "icon.png"
         icon_master = Image.open(ICON_RAW).convert("RGBA").resize((512, 512), Image.Resampling.LANCZOS)
         icon_master.save(icon_dest, "PNG")
         total_imgs += 1
+        print("  ✓ icon.png (512x512)")
         
+        if assets_only:
+            continue
+            
         # 3. Le 6 slide per ciascuno dei 5 profili dispositivo
         for prof_name, prof_cfg in PROFILES.items():
             # Scelta screenshot nativi: iPad per iPad, iPhone per iPhone, Android per Android

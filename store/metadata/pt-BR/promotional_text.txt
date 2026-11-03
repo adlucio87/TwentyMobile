@@ -1,1 +1,1 @@
-Conecte-se diretamente à sua instância do Twenty CRM. 100% privado e código aberto.
+Venti — Mobile CRM para Twenty. Conecte-se diretamente à sua instância do Twenty onde estiver. 100% privado e código aberto.

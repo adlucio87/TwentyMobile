@@ -1,1 +1,1 @@
-Twenty CRM için yerel mobil uygulama. Güvenli, gizli ve açık kaynak.
+Venti — Twenty için Mobile CRM. Hızlı, gizli, self-hosted ve açık kaynak.

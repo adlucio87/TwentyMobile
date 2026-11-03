@@ -1,1 +1,1 @@
-App mobile native pour Twenty CRM. Self-hosted, privée et open source.
+Venti — Mobile CRM pour Twenty. Rapide, self-hosted, privée et open source.
