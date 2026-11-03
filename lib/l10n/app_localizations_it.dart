@@ -9,7 +9,7 @@ class AppLocalizationsIt extends AppLocalizations {
   AppLocalizationsIt([String locale = 'it']) : super(locale);
 
   @override
-  String get appTitle => 'TwentyMobile';
+  String get appTitle => 'Venti';
 
   @override
   String get navHome => 'Home';

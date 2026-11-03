@@ -1,8 +1,8 @@
-TwentyMobile — Il tuo CRM, i tuoi dati.
+Venti — Mobile CRM per Twenty.
 La prima applicazione mobile nativa per Twenty CRM. Collegati direttamente alla tua istanza self-hosted e gestisci contatti, clienti e vendite ovunque ti trovi, in totale sicurezza e privacy.
 
 I TUOI DATI RESTANO TUOI
-TwentyMobile comunica in modo diretto ed esclusivo con la tua istanza Twenty CRM. Nessun server intermedio di terze parti, nessun tracciamento e nessun abbonamento nascosto. I tuoi contatti, le tue regole.
+Venti comunica in modo diretto ed esclusivo con la tua istanza Twenty CRM. Nessun server intermedio di terze parti, nessun tracciamento e nessun abbonamento nascosto. I tuoi contatti, le tue regole.
 
 SCHERMATA OGGI — IL TUO QUARTIER GENERALE
 Inizia la giornata con una visione limpida delle tue priorità: attività scadute, appuntamenti di oggi, agenda di domani e contatti recenti in un'unica interfaccia reattiva.
@@ -11,7 +11,7 @@ GESTIONE CONTATTI & AZIENDE
 Accedi a tutte le tabelle standard e personalizzate del tuo workspace. Cerca, filtra, chiama, invia email o visualizza la scheda completa dell'azienda con un solo tocco.
 
 OPPORTUNITÀ & OGGETTI PERSONALIZZATI
-TwentyMobile si adatta alla configurazione del tuo CRM: visualizza opportunità commerciali, campi personalizzati e relazioni collegate con selettori intelligenti e moduli dinamici.
+Venti si adatta alla configurazione del tuo CRM: visualizza opportunità commerciali, campi personalizzati e relazioni collegate con selettori intelligenti e moduli dinamici.
 
 SCANNER BIGLIETTI DA VISITA
 Inquadra un biglietto da visita con la fotocamera: l'app riconosce all'istante nome, email, numero di telefono e azienda, permettendoti di salvare il nuovo lead nel CRM in un attimo.

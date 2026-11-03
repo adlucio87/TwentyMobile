@@ -47,7 +47,7 @@ void main() {
     ) async {
       await _pumpWelcome(tester, const Size(412, 915));
 
-      expect(find.text('TwentyMobile'), findsOneWidget);
+      expect(find.text('Venti'), findsOneWidget);
       expect(find.text('Connect your CRM'), findsOneWidget);
       expect(find.textContaining('Your portable CRM'), findsOneWidget);
     });

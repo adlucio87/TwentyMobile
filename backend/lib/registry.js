@@ -284,7 +284,7 @@ async function verifyClientOnTwenty({
 function isTeamApplicationName(appName) {
   if (typeof appName !== 'string') return false;
   const normalized = appName.toLowerCase().replace(/[^a-z0-9]/g, '');
-  return normalized.includes('twentymobile') || normalized.includes('pocketcrm');
+  return normalized.includes('twentymobile') || normalized.includes('pocketcrm') || normalized.includes('venti');
 }
 
 // ---------------------------------------------------------------------------

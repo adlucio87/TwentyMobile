@@ -1,5 +1,5 @@
 {
-  "name": "TwentyMobile",
+  "name": "Venti",
   "ios_bundle_id": "com.luciosoft.pocketcrm",
   "android_package": "com.luciosoft.pocketcrm",
   "platforms": ["ios", "android"],

@@ -1,8 +1,8 @@
-TwentyMobile — Sizin CRM'iniz, sizin veriniz.
+Venti — Mobile CRM for Twenty.
 Twenty CRM için geliştirilen ilk yerel mobil uygulama. Kendi barındırdığınız (self-hosted) sunucunuza doğrudan bağlanın, müşteri ilişkilerinizi ve satışlarınızı güvenle yönetin.
 
 VERİLERİNİZ SİZİN KONTROLÜNÜZDE
-TwentyMobile yalnızca kendi Twenty CRM sunucunuzla iletişim kurar. Üçüncü taraf aracı sunucular, veri takibi veya abonelik ücreti yoktur.
+Venti yalnızca kendi Twenty CRM sunucunuzla iletişim kurar. Üçüncü taraf aracı sunucular, veri takibi veya abonelik ücreti yoktur.
 
 BUGÜN EKRANI — GÜNLÜK MERKEZİNİZ
 Güne en önemli önceliklerinizle başlayın: Geciken görevler, bugünün işleri, yarının ajandası ve son kişiler tek bir ekranda.
@@ -11,7 +11,7 @@ KİŞİLER VE ŞİRKETLER
 Çalışma alanınızdaki tüm standart ve özel tablolara erişin. Tek dokunuşla arayın, filtreleyin, arama yapın veya e-posta gönderin.
 
 FIRSATLAR VE ÖZEL NESNELER
-TwentyMobile iş akışınıza uyum sağlar: Satış fırsatlarını ve sunucunuzda tanımlı özel tabloları dinamik formlarla yönetin.
+Venti iş akışınıza uyum sağlar: Satış fırsatlarını ve sunucunuzda tanımlı özel tabloları dinamik formlarla yönetin.
 
 KARTVİZİT TARAYICI
 Kameranızı herhangi bir basılı kartvizite doğrultun; isim, e-posta, telefon ve şirketi anında CRM'inize kaydedin.

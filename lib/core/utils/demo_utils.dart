@@ -62,7 +62,7 @@ class _DemoBlockSheet extends ConsumerWidget {
               ),
               const SizedBox(height: 12),
               const Text(
-                'Connect your Twenty instance to use all TwentyMobile features.',
+                'Connect your Twenty instance to use all Venti features.',
                 textAlign: TextAlign.center,
                 style: TextStyle(color: Colors.grey),
               ),

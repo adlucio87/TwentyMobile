@@ -88,7 +88,7 @@ class VCardGenerator {
       debugPrint('Error generating vCard ADR: $e');
     }
 
-    buffer.writeln('NOTE:Aggiunto da TwentyMobile');
+    buffer.writeln('NOTE:Aggiunto da Venti');
     buffer.writeln('END:VCARD');
 
     return buffer.toString();

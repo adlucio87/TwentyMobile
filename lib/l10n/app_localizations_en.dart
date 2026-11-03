@@ -9,7 +9,7 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
-  String get appTitle => 'TwentyMobile';
+  String get appTitle => 'Venti';
 
   @override
   String get navHome => 'Home';
@@ -862,7 +862,7 @@ class AppLocalizationsEnGb extends AppLocalizationsEn {
   AppLocalizationsEnGb() : super('en_GB');
 
   @override
-  String get appTitle => 'TwentyMobile';
+  String get appTitle => 'Venti';
 
   @override
   String get navHome => 'Home';

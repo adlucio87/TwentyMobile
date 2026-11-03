@@ -1,8 +1,8 @@
-TwentyMobile — Seu CRM, seus dados.
+Venti — Mobile CRM for Twenty.
 O primeiro aplicativo móvel nativo para Twenty CRM. Conecte-se diretamente à sua instância auto-hospedada e gerencie relacionamentos comerciais onde estiver, com total privacidade e controle.
 
 SEUS DADOS SÃO SEUS
-O TwentyMobile comunica-se exclusivamente com o seu próprio servidor do Twenty CRM. Sem intermediários, sem rastreamento e sem mensalidades ocultas.
+O Venti comunica-se exclusivamente com o seu próprio servidor do Twenty CRM. Sem intermediários, sem rastreamento e sem mensalidades ocultas.
 
 TELA HOJE — SEU QG DIÁRIO
 Comece o dia com foco total: tarefas atrasadas, prioridades de hoje, agenda de amanhã e contatos recentes em um único painel.

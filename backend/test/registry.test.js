@@ -306,7 +306,7 @@ describe('verifyClientOnTwenty', () => {
 
 describe('isTeamApplicationName', () => {
   test('accepts the documented application names', () => {
-    ['TwentyMobile', 'TwentyMobile CRM', 'twenty mobile', 'PocketCRM'].forEach((name) => {
+    ['TwentyMobile', 'TwentyMobile CRM', 'twenty mobile', 'PocketCRM', 'Venti', 'venti', 'Venti - Mobile CRM for Twenty'].forEach((name) => {
       assert.equal(isTeamApplicationName(name), true, name);
     });
   });

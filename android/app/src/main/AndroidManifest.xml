@@ -17,7 +17,7 @@
     <uses-feature android:name="android.hardware.camera" android:required="false"/>
 
     <application
-        android:label="TwentyMobile"
+        android:label="Venti"
         android:name="${applicationName}"
         android:icon="@mipmap/launcher_icon">
         <activity

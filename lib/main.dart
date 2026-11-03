@@ -168,7 +168,7 @@ class _PocketCRMAppState extends ConsumerState<PocketCRMApp> {
     });
 
     return MaterialApp.router(
-      title: 'TwentyMobile',
+      title: 'Venti',
       theme: AppTheme.light(),
       darkTheme: AppTheme.dark(),
       themeMode: ref.watch(themeModeProvider),

@@ -1,1 +1,1 @@
-TwentyMobile: CRM Клиент
+Venti: Mobile CRM for Twenty

@@ -5,7 +5,7 @@
 		<key>CFBundleDevelopmentRegion</key>
 		<string>$(DEVELOPMENT_LANGUAGE)</string>
 		<key>CFBundleDisplayName</key>
-		<string>TwentyMobile</string>
+		<string>Venti</string>
 		<key>CFBundleExecutable</key>
 		<string>$(EXECUTABLE_NAME)</string>
 		<key>CFBundleIdentifier</key>
@@ -13,7 +13,7 @@
 		<key>CFBundleInfoDictionaryVersion</key>
 		<string>6.0</string>
 		<key>CFBundleName</key>
-		<string>TwentyMobile</string>
+		<string>Venti</string>
 		<key>CFBundlePackageType</key>
 		<string>APPL</string>
 		<key>CFBundleShortVersionString</key>
@@ -56,15 +56,15 @@
 		<key>ITSAppUsesNonExemptEncryption</key>
 		<false/>
 		<key>NSContactsUsageDescription</key>
-		<string>TwentyMobile can show your Twenty people in the iOS Contacts app and save a contact when you request it.</string>
+		<string>Venti can show your Twenty people in the iOS Contacts app and save a contact when you request it.</string>
 		<key>NSCameraUsageDescription</key>
-		<string>TwentyMobile uses the camera to scan business cards and create contacts automatically.</string>
+		<string>Venti uses the camera to scan business cards and create contacts automatically.</string>
 		<key>NSPhotoLibraryUsageDescription</key>
-		<string>TwentyMobile accesses your photo library to import business card images for contact scanning.</string>
+		<string>Venti accesses your photo library to import business card images for contact scanning.</string>
 		<key>NSSpeechRecognitionUsageDescription</key>
-		<string>TwentyMobile uses speech recognition to transcribe voice notes for your contacts.</string>
+		<string>Venti uses speech recognition to transcribe voice notes for your contacts.</string>
 		<key>NSMicrophoneUsageDescription</key>
-		<string>TwentyMobile uses the microphone to record voice notes that are transcribed and saved to your contacts.</string>
+		<string>Venti uses the microphone to record voice notes that are transcribed and saved to your contacts.</string>
 		<key>UIBackgroundModes</key>
 		<array>
 			<string>fetch</string>

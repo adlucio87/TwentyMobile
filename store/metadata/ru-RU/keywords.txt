@@ -1,1 +1,1 @@
-CRM,twenty,self-hosted,контакты,продажи,open source,лиды,компании,сканер,задачи,клиенты
+venti,CRM,twenty,self-hosted,контакты,продажи,open source,лиды,компании,сканер,задачи,клиенты
