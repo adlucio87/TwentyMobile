@@ -1,0 +1,4 @@
+• Verbesserte Unterstützung für OAuth 2.0 PKCE und SSO.
+• Schnellere Synchronisation mit deiner Twenty CRM Instanz.
+• Optimierter Visitenkarten-Scanner.
+• UI-Feinschliff und Stabilitätsverbesserungen.

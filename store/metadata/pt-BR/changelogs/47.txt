@@ -1,0 +1,4 @@
+• Suporte aprimorado para login OAuth 2.0 PKCE e SSO.
+• Desempenho de sincronização com o Twenty CRM otimizado.
+• Melhorias no scanner de cartões de visita.
+• Ajustes de estabilidade e refinamentos visuais.
