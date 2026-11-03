@@ -1284,7 +1284,7 @@ abstract class AppLocalizations {
   /// No description provided for @welcomeSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Your portable CRM always with you. Manage contacts and companies on the go with a premium experience.'**
+  /// **'Mobile CRM for Twenty. Your portable CRM always with you: manage contacts, companies, and tasks on the go with a native experience.'**
   String get welcomeSubtitle;
 
   /// No description provided for @connectCrm.

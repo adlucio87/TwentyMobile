@@ -618,7 +618,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get welcomeSubtitle =>
-      'Votre CRM portable toujours avec vous. Gérez vos contacts et entreprises en déplacement avec une expérience premium.';
+      'Mobile CRM pour Twenty. Votre CRM portable toujours avec vous : gérez vos contacts, entreprises et tâches en déplacement.';
 
   @override
   String get connectCrm => 'Connecter votre CRM';

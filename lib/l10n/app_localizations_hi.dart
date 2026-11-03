@@ -614,7 +614,7 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get welcomeSubtitle =>
-      'आपका पोर्टेबल सीआरएम हमेशा आपके साथ। चलते-फिरते संपर्कों और कंपनियों को प्रीमियम अनुभव के साथ प्रबंधित करें।';
+      'Twenty के लिए मोबाइल CRM। आपका पोर्टेबल CRM हमेशा आपके साथ: चलते-फिरते संपर्कों, कंपनियों और कार्यों को प्रबंधित करें।';
 
   @override
   String get connectCrm => 'अपना सीआरएम कनेक्ट करें';

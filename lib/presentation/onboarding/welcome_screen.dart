@@ -59,7 +59,7 @@ class WelcomeScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 48),
                         Text(
-                          'Venti',
+                          'venti',
                           style: theme.textTheme.headlineLarge?.copyWith(
                             fontWeight: FontWeight.bold,
                             letterSpacing: -0.5,

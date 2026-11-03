@@ -47,8 +47,9 @@ void main() {
     ) async {
       await _pumpWelcome(tester, const Size(412, 915));
 
-      expect(find.text('Venti'), findsOneWidget);
+      expect(find.text('venti'), findsOneWidget);
       expect(find.text('Connect your CRM'), findsOneWidget);
+      expect(find.textContaining('Mobile CRM for Twenty'), findsOneWidget);
       expect(find.textContaining('Your portable CRM'), findsOneWidget);
     });
 
@@ -62,6 +63,7 @@ void main() {
       );
 
       expect(find.text('Collega il tuo CRM'), findsOneWidget);
+      expect(find.textContaining('Mobile CRM per Twenty'), findsOneWidget);
       expect(find.textContaining('Il tuo CRM portatile'), findsOneWidget);
     });
 
