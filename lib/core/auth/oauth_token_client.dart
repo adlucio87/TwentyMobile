@@ -218,7 +218,7 @@ class OAuthTokenClient {
   Future<OAuthClientCredentials?> registerClient({
     required String instanceUrl,
     required String redirectUri,
-    String clientName = 'Venti',
+    String clientName = 'TwentyMobile',
   }) async {
     try {
       final response = await _httpClient

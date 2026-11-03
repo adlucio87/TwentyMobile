@@ -40,7 +40,7 @@ class AppConfig {
   /// OAuth scopes requested from Twenty.
   static const List<String> oauthScopes = ['api', 'profile'];
 
-  /// Public registry used to look up and share pre-registered Venti
+  /// Public registry used to look up and share pre-registered TwentyMobile (and Venti)
   /// OAuth client IDs per Twenty CRM instance, so multi-user teams share a
   /// single application on Twenty CRM rather than creating duplicates.
   ///
