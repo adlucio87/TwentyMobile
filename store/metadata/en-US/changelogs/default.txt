@@ -1,3 +1,4 @@
+• New visual identity and rebranding to Venti (Mobile CRM for Twenty).
 • Enhanced OAuth 2.0 PKCE & SSO authentication support.
 • Improved Twenty CRM synchronization performance.
 • Business card scanner optimizations & quick lead capture.

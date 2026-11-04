@@ -1,4 +1,5 @@
-• Geliştirilmiş OAuth 2.0 PKCE ve SSO giriş desteği.
-• Twenty CRM senkronizasyon performansında artış.
-• Kartvizit tarayıcı optimizasyonları ve hızlı kayıt.
-• Kararlılık iyileştirmeleri ve arayüz güncellemeleri.
+• Yeni görsel kimlik ve Venti (Twenty için Mobile CRM) olarak yeniden markalama.
+• Gelişmiş OAuth 2.0 PKCE ve SSO kimlik doğrulama desteği.
+• Twenty CRM senkronizasyon performansında iyileştirmeler.
+• Kartvizit tarayıcısı için optimizasyonlar.
+• Kullanıcı arayüzü iyileştirmeleri ve artırılmış kararlılık.

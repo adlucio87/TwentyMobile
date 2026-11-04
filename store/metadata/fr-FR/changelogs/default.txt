@@ -1,4 +1,5 @@
+• Nouvelle identité visuelle et changement de marque vers Venti (Mobile CRM pour Twenty).
 • Prise en charge améliorée de l'authentification OAuth 2.0 PKCE et SSO.
-• Performances de synchronisation Twenty CRM optimisées.
-• Améliorations du scanner de cartes de visite.
-• Corrections de bugs et stabilité renforcée.
+• Performances de synchronisation avec Twenty CRM accélérées.
+• Optimisations pour le scanner de cartes de visite.
+• Améliorations de l'interface utilisateur et stabilité accrue.

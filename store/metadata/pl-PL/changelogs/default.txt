@@ -1,4 +1,5 @@
-• Ulepszone wsparcie logowania OAuth 2.0 PKCE i SSO.
-• Zoptymalizowana prędkość synchronizacji z Twenty CRM.
-• Usprawnienia skanera wizytówek biznesowych.
-• Poprawki stabilności i interfejsu użytkownika.
+• Nowa tożsamość wizualna i rebranding na Venti (Mobile CRM dla Twenty).
+• Ulepszona obsługa uwierzytelniania OAuth 2.0 PKCE i SSO.
+• Szybsza synchronizacja z Twenty CRM.
+• Optymalizacje skanera wizytówek.
+• Udoskonalenia interfejsu użytkownika i większa stabilność.

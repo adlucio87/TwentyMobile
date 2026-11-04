@@ -1,4 +1,5 @@
-• Compatibilidad mejorada con autenticación OAuth 2.0 PKCE y SSO.
+• Nueva identidad visual y cambio de marca a Venti (Mobile CRM para Twenty).
+• Soporte mejorado para autenticación OAuth 2.0 PKCE y SSO.
 • Mayor velocidad de sincronización con Twenty CRM.
-• Optimizaciones en el escáner de tarjetas de visita.
-• Mejoras de estabilidad y ajustes de interfaz.
+• Optimizaciones para el escáner de tarjetas de visita.
+• Mejoras en la interfaz de usuario y mayor estabilidad.
