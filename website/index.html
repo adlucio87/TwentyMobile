@@ -1354,6 +1354,7 @@
             <a href="#features" class="nav-link">Features</a>
             <a href="#how-it-works" class="nav-link">How it works</a>
             <a href="#faq" class="nav-link">FAQ &amp; Guides</a>
+            <a href="https://github.com/adlucio87/TwentyMobile/issues" target="_blank" class="nav-link">Feedback</a>
             <a href="https://blog.luciosoft.it/" target="_blank" class="nav-link">Blog</a>
             <a href="https://luciosoft.it/donate.html" target="_blank" class="nav-link" style="color: rgba(252,138,76,0.8);">☕ Support</a>
         </div>
@@ -1698,8 +1699,9 @@
                 <button type="button" class="faq-category-btn" data-category="contacts">📷 Contacts &amp; Scanner</button>
                 <button type="button" class="faq-category-btn" data-category="notifications">🔔 Notifications</button>
                 <button type="button" class="faq-category-btn" data-category="workflows">⚡ Workflows &amp; CRM</button>
+                <button type="button" class="faq-category-btn" data-category="community">💬 Community &amp; Feedback</button>
             </div>
-            <div class="faq-count" id="faq-count">Showing 13 of 13 guides</div>
+            <div class="faq-count" id="faq-count">Showing 15 of 15 guides</div>
         </div>
 
         <!-- Accordion FAQ Items (Native <details> with search indexing) -->
@@ -2065,6 +2067,27 @@
                 </div>
             </details>
 
+            <!-- 13. Feedback & Bug Reports -->
+            <details class="faq-item" data-category="community" data-keywords="feedback bug feature request github issues suggest error report support discussions community contribute roadmap vote contact email">
+                <summary>
+                    <div class="faq-question-wrap">
+                        <span class="faq-badge">Community</span>
+                        <span class="faq-badge">Open Feedback</span>
+                        <div class="faq-question">How can I request a feature or report a bug?</div>
+                    </div>
+                    <i class="fa-solid fa-chevron-down faq-chevron"></i>
+                </summary>
+                <div class="faq-answer">
+                    <p><strong>We build TwentyMobile openly and love community feedback!</strong></p>
+                    <p>You can propose new ideas, vote on feature requests, or report issues directly on our GitHub:</p>
+                    <ul>
+                        <li><a href="https://github.com/adlucio87/TwentyMobile/issues/new?template=feature_request.yml" target="_blank" style="color:var(--text); text-decoration:underline;"><strong>Submit a Feature Request</strong></a>: Have an idea that would make mobile CRM work better for your team? Share your use case!</li>
+                        <li><a href="https://github.com/adlucio87/TwentyMobile/issues/new?template=bug_report.yml" target="_blank" style="color:var(--text); text-decoration:underline;"><strong>Report a Bug</strong></a>: Found an unexpected behavior or crash? Open a bug report with your steps to reproduce and logs.</li>
+                        <li>Prefer email? You can always reach us directly at <a href="mailto:adlucio87@gmail.com?subject=%5BTwentyMobile%5D%20Feedback" style="color:var(--text); text-decoration:underline;">adlucio87@gmail.com</a>.</li>
+                    </ul>
+                </div>
+            </details>
+
         </div>
 
         <!-- Empty State for Search -->
@@ -2110,6 +2133,7 @@
                 <a href="https://luciosoft.it/">Luciosoft</a>
                 <a href="https://privacy.luciosoft.it/twentymobilecrm/">Privacy Policy</a>
                 <a href="https://github.com/adlucio87/TwentyMobile" target="_blank">GitHub</a>
+                <a href="https://github.com/adlucio87/TwentyMobile/issues" target="_blank">Feedback &amp; Issues</a>
                 <a href="https://blog.luciosoft.it/" target="_blank">Blog</a>
                 <a href="https://luciosoft.it/donate.html" target="_blank">☕ Support Us</a>
                 <a href="mailto:adlucio87@gmail.com">Contact</a>
@@ -2298,6 +2322,10 @@
             });
             filterFaq();
         };
+
+        // Keep the counter and the category state accurate on first paint: the
+        // static text in the markup goes stale whenever a guide is added.
+        filterFaq();
     </script>
 
 </body>
