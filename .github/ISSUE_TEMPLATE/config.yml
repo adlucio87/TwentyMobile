@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 💬 Questions & Issues
+    url: https://github.com/adlucio87/TwentyMobile/issues
+    about: Browse known issues, share feedback, or ask questions on the issue tracker.
+  - name: ✉️ Direct Email Support
+    url: mailto:adlucio87@gmail.com?subject=%5BTwentyMobile%5D%20Support
+    about: For account, privacy, or security concerns.

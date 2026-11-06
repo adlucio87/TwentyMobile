@@ -264,6 +264,16 @@ For upcoming features, privacy controls, UI enhancements, and future plans, chec
 ## 🛡️ Security & Privacy Audit
 TwentyMobile is designed with data sovereignty for self-hosted CRM instances. For a detailed breakdown of all runtime network endpoints, proxy verification, and hardening options, see [doc/SECURITY_AUDIT.md](doc/SECURITY_AUDIT.md).
 
+## 💬 Feedback & Contributing
+TwentyMobile is built in the open and community feedback drives the roadmap:
+
+- 🐛 **Report a bug** — open the [bug report form](https://github.com/adlucio87/TwentyMobile/issues/new?template=bug_report.yml) with platform, Twenty CRM version, steps to reproduce and any relevant log.
+- 💡 **Request a feature** — use the [feature request form](https://github.com/adlucio87/TwentyMobile/issues/new?template=feature_request.yml) and describe the use case you are trying to solve.
+- 📋 **Browse existing issues** — check <https://github.com/adlucio87/TwentyMobile/issues> before filing a new one, to avoid duplicates.
+- ✉️ **Email** — [adlucio87@gmail.com](mailto:adlucio87@gmail.com?subject=%5BTwentyMobile%5D%20Support) for account, privacy or security concerns.
+
+The same options are available inside the app under **Settings → Feedback & Support**.
+
 ## 📄 License
 TwentyMobile is an open-source project distributed under the **AGPL-3.0** license.
 

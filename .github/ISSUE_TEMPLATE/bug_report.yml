@@ -1,0 +1,80 @@
+name: 🐛 Bug Report
+description: File a bug report to help improve TwentyMobile
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug! Please fill out the information below to help us understand and resolve the issue quickly.
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Platform
+      description: What operating system is your device running?
+      options:
+        - iOS
+        - Android
+    validations:
+      required: true
+  - type: input
+    id: app-version
+    attributes:
+      label: TwentyMobile App Version
+      description: e.g. 1.0.0 (found in app store or build info)
+      placeholder: "1.0.0"
+    validations:
+      required: false
+  - type: dropdown
+    id: twenty-env
+    attributes:
+      label: Twenty CRM Environment
+      description: Where is your Twenty instance hosted?
+      options:
+        - Twenty Cloud (app.twenty.com)
+        - Self-Hosted (Docker / Kubernetes / Cloud Provider)
+        - Demo Mode
+    validations:
+      required: true
+  - type: input
+    id: twenty-version
+    attributes:
+      label: Twenty CRM Version (if self-hosted)
+      description: e.g. v0.32.0 or latest
+      placeholder: "v0.32.0"
+    validations:
+      required: false
+  - type: textarea
+    id: description
+    attributes:
+      label: Describe the bug
+      description: A clear and concise description of what went wrong.
+      placeholder: "When I tap on..."
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: How can we reproduce this behavior?
+      placeholder: |
+        1. Open the app
+        2. Go to '...'
+        3. Tap on '....'
+        4. See error
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      description: A clear and concise description of what you expected to happen.
+    validations:
+      required: true
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots or Logs
+      description: Drag and drop screenshots, screen recordings, or paste relevant error logs here.
+    validations:
+      required: false
