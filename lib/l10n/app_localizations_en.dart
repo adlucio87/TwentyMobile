@@ -855,6 +855,37 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get verifyingServer => 'Verifying server...';
+
+  @override
+  String get feedbackAndSupport => 'Feedback & Support';
+
+  @override
+  String get requestFeature => 'Request a Feature';
+
+  @override
+  String get requestFeatureSubtitle =>
+      'Suggest new features or improvements on GitHub';
+
+  @override
+  String get reportBug => 'Report a Bug';
+
+  @override
+  String get reportBugSubtitle => 'File a bug report or issue on GitHub';
+
+  @override
+  String get contactSupport => 'Email Support';
+
+  @override
+  String get contactSupportSubtitle => 'Send feedback or questions directly';
+
+  @override
+  String get sourceCodeAndCommunity => 'Source Code & Discussions';
+
+  @override
+  String get sourceCodeAndCommunitySubtitle => 'Visit TwentyMobile on GitHub';
+
+  @override
+  String get couldNotOpenLink => 'Could not open the link';
 }
 
 /// The translations for English, as used in the United Kingdom (`en_GB`).
@@ -1708,4 +1739,35 @@ class AppLocalizationsEnGb extends AppLocalizationsEn {
 
   @override
   String get verifyingServer => 'Verifying server...';
+
+  @override
+  String get feedbackAndSupport => 'Feedback & Support';
+
+  @override
+  String get requestFeature => 'Request a Feature';
+
+  @override
+  String get requestFeatureSubtitle =>
+      'Suggest new features or improvements on GitHub';
+
+  @override
+  String get reportBug => 'Report a Bug';
+
+  @override
+  String get reportBugSubtitle => 'File a bug report or issue on GitHub';
+
+  @override
+  String get contactSupport => 'Email Support';
+
+  @override
+  String get contactSupportSubtitle => 'Send feedback or questions directly';
+
+  @override
+  String get sourceCodeAndCommunity => 'Source Code & Discussions';
+
+  @override
+  String get sourceCodeAndCommunitySubtitle => 'Visit TwentyMobile on GitHub';
+
+  @override
+  String get couldNotOpenLink => 'Could not open the link';
 }

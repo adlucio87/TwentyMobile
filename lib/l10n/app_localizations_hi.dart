@@ -857,4 +857,35 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get verifyingServer => 'सर्वर सत्यापित किया जा रहा है...';
+
+  @override
+  String get feedbackAndSupport => 'प्रतिक्रिया और सहायता';
+
+  @override
+  String get requestFeature => 'सुविधा का सुझाव दें';
+
+  @override
+  String get requestFeatureSubtitle =>
+      'GitHub पर नए सुझाव या सुधार प्रस्तावित करें';
+
+  @override
+  String get reportBug => 'समस्या रिपोर्ट करें';
+
+  @override
+  String get reportBugSubtitle => 'GitHub पर बग रिपोर्ट या समस्या दर्ज करें';
+
+  @override
+  String get contactSupport => 'ईमेल सहायता';
+
+  @override
+  String get contactSupportSubtitle => 'सीधे प्रतिक्रिया या प्रश्न भेजें';
+
+  @override
+  String get sourceCodeAndCommunity => 'स्रोत कोड और चर्चाएँ';
+
+  @override
+  String get sourceCodeAndCommunitySubtitle => 'GitHub पर TwentyMobile देखें';
+
+  @override
+  String get couldNotOpenLink => 'लिंक खोला नहीं जा सका';
 }

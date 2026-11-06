@@ -1736,6 +1736,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Verifying server...'**
   String get verifyingServer;
+
+  /// No description provided for @feedbackAndSupport.
+  ///
+  /// In en, this message translates to:
+  /// **'Feedback & Support'**
+  String get feedbackAndSupport;
+
+  /// No description provided for @requestFeature.
+  ///
+  /// In en, this message translates to:
+  /// **'Request a Feature'**
+  String get requestFeature;
+
+  /// No description provided for @requestFeatureSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Suggest new features or improvements on GitHub'**
+  String get requestFeatureSubtitle;
+
+  /// No description provided for @reportBug.
+  ///
+  /// In en, this message translates to:
+  /// **'Report a Bug'**
+  String get reportBug;
+
+  /// No description provided for @reportBugSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'File a bug report or issue on GitHub'**
+  String get reportBugSubtitle;
+
+  /// No description provided for @contactSupport.
+  ///
+  /// In en, this message translates to:
+  /// **'Email Support'**
+  String get contactSupport;
+
+  /// No description provided for @contactSupportSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Send feedback or questions directly'**
+  String get contactSupportSubtitle;
+
+  /// No description provided for @sourceCodeAndCommunity.
+  ///
+  /// In en, this message translates to:
+  /// **'Source Code & Discussions'**
+  String get sourceCodeAndCommunity;
+
+  /// No description provided for @sourceCodeAndCommunitySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Visit TwentyMobile on GitHub'**
+  String get sourceCodeAndCommunitySubtitle;
+
+  /// No description provided for @couldNotOpenLink.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not open the link'**
+  String get couldNotOpenLink;
 }
 
 class _AppLocalizationsDelegate

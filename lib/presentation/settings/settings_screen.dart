@@ -53,6 +53,22 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     });
   }
 
+  /// Opens an external link (web page or `mailto:`) and tells the user when the
+  /// platform cannot hand the URI over to another app — e.g. a device without
+  /// a mail client. Without this the tap would silently do nothing.
+  Future<void> _openExternal(Uri uri) async {
+    var launched = false;
+    try {
+      launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } catch (e) {
+      debugPrint('Could not launch $uri: $e');
+    }
+    if (launched || !mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(context.l10n.couldNotOpenLink)),
+    );
+  }
+
   Future<void> _saveErrorReportingEnabled(bool value) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(AppConfig.errorReportingPrefKey, value);
@@ -403,6 +419,56 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     ),
             ),
           ],
+          const SizedBox(height: 32),
+          Text(
+            l10n.feedbackAndSupport,
+            style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 16),
+          ListTile(
+            leading: const Icon(Icons.lightbulb_outline),
+            title: Text(l10n.requestFeature),
+            subtitle: Text(l10n.requestFeatureSubtitle),
+            trailing: const Icon(Icons.open_in_new, size: 20),
+            onTap: () => _openExternal(
+              Uri.parse(
+                '${AppConfig.githubIssuesUrl}/new?template=feature_request.yml',
+              ),
+            ),
+          ),
+          ListTile(
+            leading: const Icon(Icons.bug_report_outlined),
+            title: Text(l10n.reportBug),
+            subtitle: Text(l10n.reportBugSubtitle),
+            trailing: const Icon(Icons.open_in_new, size: 20),
+            onTap: () => _openExternal(
+              Uri.parse(
+                '${AppConfig.githubIssuesUrl}/new?template=bug_report.yml',
+              ),
+            ),
+          ),
+          ListTile(
+            leading: const Icon(Icons.mail_outline),
+            title: Text(l10n.contactSupport),
+            subtitle: Text(l10n.contactSupportSubtitle),
+            trailing: const Icon(Icons.open_in_new, size: 20),
+            onTap: () => _openExternal(
+              Uri.parse(
+                'mailto:${AppConfig.supportEmail}'
+                '?subject=${Uri.encodeComponent(AppConfig.supportEmailSubject)}',
+              ),
+            ),
+          ),
+          ListTile(
+            leading: const Icon(Icons.code_outlined),
+            title: Text(l10n.sourceCodeAndCommunity),
+            subtitle: Text(l10n.sourceCodeAndCommunitySubtitle),
+            trailing: const Icon(Icons.open_in_new, size: 20),
+            onTap: () => _openExternal(Uri.parse(AppConfig.githubRepoUrl)),
+          ),
           const SizedBox(height: 48),
           const Divider(),
           const SizedBox(height: 16),
@@ -430,13 +496,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             leading: const Icon(Icons.privacy_tip_outlined),
             title: Text(l10n.privacyPolicy),
             trailing: const Icon(Icons.open_in_new, size: 20),
-            onTap: () => launchUrl(Uri.parse('https://privacy.luciosoft.it/twentymobilecrm/')),
+            onTap: () => _openExternal(Uri.parse(AppConfig.privacyPolicyUrl)),
           ),
           ListTile(
             leading: const Icon(Icons.description_outlined),
             title: Text(l10n.termsOfUse),
             trailing: const Icon(Icons.open_in_new, size: 20),
-            onTap: () => launchUrl(Uri.parse('https://www.apple.com/legal/internet-services/itunes/dev/stdeula/')),
+            onTap: () => _openExternal(Uri.parse(AppConfig.termsOfUseUrl)),
           ),
         ],
       ),

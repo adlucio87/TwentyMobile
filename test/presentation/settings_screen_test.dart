@@ -104,5 +104,37 @@ void main() {
       await tester.scrollUntilVisible(find.text('Privacy Policy'), 300);
       expect(find.text('Privacy Policy'), findsOneWidget);
     });
+
+    testWidgets('Renders Feedback & Support section and links', (WidgetTester tester) async {
+      await tester.pumpWidget(createWidgetUnderTest());
+      await tester.pumpAndSettle();
+
+      await tester.scrollUntilVisible(find.text('Feedback & Support'), 300);
+      expect(find.text('Feedback & Support'), findsOneWidget);
+      expect(find.text('Request a Feature'), findsOneWidget);
+
+      await tester.scrollUntilVisible(find.text('Email Support'), 300);
+      expect(find.text('Report a Bug'), findsOneWidget);
+      expect(find.text('Email Support'), findsOneWidget);
+
+      await tester.scrollUntilVisible(find.text('Source Code & Discussions'), 300);
+      expect(find.text('Source Code & Discussions'), findsOneWidget);
+    });
+
+    testWidgets('Lists Feedback & Support above the Logout action',
+        (WidgetTester tester) async {
+      await tester.pumpWidget(createWidgetUnderTest());
+      await tester.pumpAndSettle();
+
+      await tester.scrollUntilVisible(find.text('Logout'), 300);
+
+      final feedbackY = tester.getTopLeft(find.text('Feedback & Support')).dy;
+      final logoutY = tester.getTopLeft(find.text('Logout')).dy;
+      expect(
+        feedbackY,
+        lessThan(logoutY),
+        reason: 'Logout must stay the last action of the screen',
+      );
+    });
   });
 }

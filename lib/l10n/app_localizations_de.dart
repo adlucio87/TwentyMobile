@@ -863,4 +863,36 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get verifyingServer => 'Server wird überprüft...';
+
+  @override
+  String get feedbackAndSupport => 'Feedback & Support';
+
+  @override
+  String get requestFeature => 'Funktion vorschlagen';
+
+  @override
+  String get requestFeatureSubtitle =>
+      'Neue Ideen oder Verbesserungen auf GitHub vorschlagen';
+
+  @override
+  String get reportBug => 'Fehler melden';
+
+  @override
+  String get reportBugSubtitle => 'Einen Fehlerbericht auf GitHub erstellen';
+
+  @override
+  String get contactSupport => 'E-Mail-Support';
+
+  @override
+  String get contactSupportSubtitle => 'Feedback oder Fragen direkt senden';
+
+  @override
+  String get sourceCodeAndCommunity => 'Quellcode & Diskussionen';
+
+  @override
+  String get sourceCodeAndCommunitySubtitle =>
+      'TwentyMobile auf GitHub besuchen';
+
+  @override
+  String get couldNotOpenLink => 'Link konnte nicht geöffnet werden';
 }

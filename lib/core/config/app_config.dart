@@ -50,4 +50,29 @@ class AppConfig {
     'OAUTH_REGISTRY_URL',
     defaultValue: 'https://twentymobilecrm.luciosoft.it/api/oauth-client',
   );
+
+  // ---------------------------------------------------------------------------
+  // Feedback & support links — single source of truth for the Settings screen.
+  // Keep in sync with website/index.html and .github/ISSUE_TEMPLATE/config.yml.
+  // ---------------------------------------------------------------------------
+
+  /// Public repository (source code, issues, feature requests).
+  static const String githubRepoUrl =
+      'https://github.com/adlucio87/TwentyMobile';
+
+  /// Issue tracker root. Append `/new?template=feature_request.yml` or
+  /// `/new?template=bug_report.yml` to open one of the prefilled issue forms.
+  static const String githubIssuesUrl = '$githubRepoUrl/issues';
+
+  /// Direct support inbox used by the "Email Support" row in Settings.
+  static const String supportEmail = 'adlucio87@gmail.com';
+
+  /// Subject prefilled in support emails (brand tag kept for triage).
+  static const String supportEmailSubject = '[TwentyMobile] Feedback';
+
+  static const String privacyPolicyUrl =
+      'https://privacy.luciosoft.it/twentymobilecrm/';
+
+  static const String termsOfUseUrl =
+      'https://www.apple.com/legal/internet-services/itunes/dev/stdeula/';
 }

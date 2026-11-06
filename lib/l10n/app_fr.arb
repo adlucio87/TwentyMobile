@@ -271,5 +271,15 @@
   "redirectUriLabel": "URI de redirection pour Twenty :",
   "copiedToClipboard": "Copié dans le presse-papiers",
   "invalidTwentyInstance": "L'URL ne semble pas être une instance Twenty CRM valide. Veuillez vérifier l'adresse.",
-  "verifyingServer": "Vérification du serveur..."
+  "verifyingServer": "Vérification du serveur...",
+  "feedbackAndSupport": "Commentaires et support",
+  "requestFeature": "Suggérer une fonctionnalité",
+  "requestFeatureSubtitle": "Proposer de nouvelles idées ou améliorations sur GitHub",
+  "reportBug": "Signaler un bug",
+  "reportBugSubtitle": "Créer un rapport de bug sur GitHub",
+  "contactSupport": "Support par e-mail",
+  "contactSupportSubtitle": "Envoyer des commentaires ou questions directement",
+  "sourceCodeAndCommunity": "Code source et discussions",
+  "sourceCodeAndCommunitySubtitle": "Visiter TwentyMobile sur GitHub",
+  "couldNotOpenLink": "Impossible d'ouvrir le lien"
 }

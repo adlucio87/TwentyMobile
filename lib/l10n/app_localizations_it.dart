@@ -860,4 +860,35 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get verifyingServer => 'Verifica del server...';
+
+  @override
+  String get feedbackAndSupport => 'Feedback e supporto';
+
+  @override
+  String get requestFeature => 'Suggerisci una funzionalità';
+
+  @override
+  String get requestFeatureSubtitle =>
+      'Proponi nuove idee o miglioramenti su GitHub';
+
+  @override
+  String get reportBug => 'Segnala un bug';
+
+  @override
+  String get reportBugSubtitle => 'Apri una segnalazione o problema su GitHub';
+
+  @override
+  String get contactSupport => 'Supporto via email';
+
+  @override
+  String get contactSupportSubtitle => 'Invia feedback o domande direttamente';
+
+  @override
+  String get sourceCodeAndCommunity => 'Codice sorgente e community';
+
+  @override
+  String get sourceCodeAndCommunitySubtitle => 'Visita TwentyMobile su GitHub';
+
+  @override
+  String get couldNotOpenLink => 'Impossibile aprire il link';
 }

@@ -271,5 +271,15 @@
   "redirectUriLabel": "Twenty के लिए पुनर्निर्देशन URI:",
   "copiedToClipboard": "क्लिपबोर्ड पर कॉपी किया गया",
   "invalidTwentyInstance": "यह URL एक मान्य Twenty CRM इंस्टेंस प्रतीत नहीं होता है। कृपया पता जांचें।",
-  "verifyingServer": "सर्वर सत्यापित किया जा रहा है..."
+  "verifyingServer": "सर्वर सत्यापित किया जा रहा है...",
+  "feedbackAndSupport": "प्रतिक्रिया और सहायता",
+  "requestFeature": "सुविधा का सुझाव दें",
+  "requestFeatureSubtitle": "GitHub पर नए सुझाव या सुधार प्रस्तावित करें",
+  "reportBug": "समस्या रिपोर्ट करें",
+  "reportBugSubtitle": "GitHub पर बग रिपोर्ट या समस्या दर्ज करें",
+  "contactSupport": "ईमेल सहायता",
+  "contactSupportSubtitle": "सीधे प्रतिक्रिया या प्रश्न भेजें",
+  "sourceCodeAndCommunity": "स्रोत कोड और चर्चाएँ",
+  "sourceCodeAndCommunitySubtitle": "GitHub पर TwentyMobile देखें",
+  "couldNotOpenLink": "लिंक खोला नहीं जा सका"
 }
