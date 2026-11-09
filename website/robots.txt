@@ -1,4 +1,5 @@
 User-agent: *
 Allow: /
+Disallow: /oauth/
 
-Sitemap: https://twentymobilecrm.luciosoft.it/sitemap.xml
+Sitemap: https://twentymobilecrm.luciosoft.com/sitemap.xml

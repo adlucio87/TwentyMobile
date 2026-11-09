@@ -71,8 +71,8 @@ class AppConfig {
   static const String supportEmailSubject = '[TwentyMobile] Feedback';
 
   static const String privacyPolicyUrl =
-      'https://privacy.luciosoft.it/twentymobilecrm/';
+      'https://privacy.luciosoft.com/twentymobilecrm/';
 
   static const String termsOfUseUrl =
-      'https://www.apple.com/legal/internet-services/itunes/dev/stdeula/';
+      'https://privacy.luciosoft.com/twentymobilecrm/terms.html';
 }
